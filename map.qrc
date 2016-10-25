@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/background.jpg</file>
+        <file>images/info.png</file>
+        <file>images/TabBar_icon_0.png</file>
+        <file>images/repo_marker_64.png</file>
+        <file>images/repo_marker_48.png</file>
+        <file>images/map_marker_64.png</file>
+        <file>images/map_marker_48.png</file>
+        <file>images/map_marker_32.png</file>
+        <file>images/repo_marker_32.png</file>
+        <file>images/gps_map_red_64.png</file>
+        <file>images/gps_map_orrange_64.png</file>
+        <file>images/gps_map_green_64.png</file>
+        <file>images/gps_map_blue_64.png</file>
+        <file>images/gps_map_red_48.png</file>
+        <file>images/gps_map_orrange_48.png</file>
+        <file>images/gps_map_green_48.png</file>
+        <file>images/gps_map_blue_48.png</file>
+        <file>images/truck_icon_48.png</file>
+        <file>images/truck_icon_64.png</file>
+    </qresource>
+</RCC>
