@@ -1,5 +1,6 @@
 # QExpress
 A smart logistics distribution system developed for practice
+<<<<<<< HEAD
 
 车行千里
 车行千里是一款智能化物流配送系统
@@ -41,3 +42,5 @@ Qt 5.0 或更高，GCC 4.7 或更高（需支持C++11）
 ./truckwidget.h ./truckwidget.cpp  定义货车界面
 ./main.cpp  主函数入口
 ./map.qrc  资源文件
+=======
+>>>>>>> 96edafe325ddeebf31e49816402391df7a1cd0d2
