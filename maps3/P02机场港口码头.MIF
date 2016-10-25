@@ -1,0 +1,45 @@
+Version   300
+Charset "WindowsSimpChinese"
+Delimiter ","
+CoordSys Earth Projection 1, 104
+Columns 4
+  Name Char(100)
+  type Char(30)
+  address Char(100)
+  zip Char(10)
+Data
+
+Point 115.8488291 28.64317401
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.8777112 28.68967098
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.9106152 28.715436
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.896384 28.70573499
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.8682162 28.66910598
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.9076131 28.85961897
+    Symbol (87,45056,15,"MapInfo Transportation",256,0) 
+Point 115.898108 28.76492403
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.896839 28.76170401
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.908696 28.85972697
+    Symbol (87,45056,15,"MapInfo Transportation",256,0) 
+Point 115.908547 28.859328
+    Symbol (87,45056,15,"MapInfo Transportation",256,0) 
+Point 115.90781 28.86002802
+    Symbol (87,45056,15,"MapInfo Transportation",256,0) 
+Point 116.015706 28.83589299
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.91024 28.86026697
+    Symbol (87,45056,15,"MapInfo Transportation",256,0) 
+Point 116.0155559 28.83362004
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.8846818 28.75022604
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.8933899 28.75975101
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 
+Point 115.8890749 28.75562604
+    Symbol (95,3175935,15,"MapInfo Transportation",256,0) 

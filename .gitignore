@@ -1,2 +1,5 @@
 # ignore user configuration files
-*.pro.user 
+*.pro.user
+
+# not include project-document text
+pro_doc.txt
