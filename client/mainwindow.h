@@ -3,15 +3,16 @@
 
 #include <QMainWindow>
 
+class MapView;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = 0);
 
-signals:
-
-public slots:
+private:
+    MapView *mapWidget;
 };
 
 #endif // MAINWINDOW_H

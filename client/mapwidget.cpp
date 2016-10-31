@@ -1,6 +1,6 @@
 #include "mapwidget.h"
 
-MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
+MapView::MapView(QWidget *parent)
+    : QGraphicsView(parent)
 {
-
 }

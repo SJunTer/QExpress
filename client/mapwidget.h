@@ -1,16 +1,16 @@
 #ifndef MAPWIDGET_H
 #define MAPWIDGET_H
 
+#include <QWidget>
+#include <QGraphicsView>
 
-class MapWidget : public QWidget
+class MapView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    explicit MapWidget(QWidget *parent = 0);
+    explicit MapView(QWidget *parent = 0);
 
-signals:
 
-public slots:
 };
 
 #endif // MAPWIDGET_H
