@@ -1,0 +1,33 @@
+Version   300
+Charset "WindowsSimpChinese"
+Delimiter ","
+CoordSys Earth Projection 1, 104
+Columns 4
+  Name Char(100)
+  type Char(30)
+  address Char(100)
+  zip Char(10)
+Data
+
+Point 116.2413479 28.35798903
+    Symbol (35,0,10) 
+Point 115.9020191 28.69814898
+    Symbol (35,0,10) 
+Point 115.956023 28.44623799
+    Symbol (35,0,10) 
+Point 115.9130318 28.66625496
+    Symbol (35,0,10) 
+Point 115.9560259 28.44623304
+    Symbol (35,0,10) 
+Point 115.913029 28.66625802
+    Symbol (35,0,10) 
+Point 115.9245742 28.60160103
+    Symbol (35,0,10) 
+Point 115.9129051 28.66581603
+    Symbol (35,0,10) 
+Point 115.9560209 28.446237
+    Symbol (35,0,10) 
+Point 115.8609481 28.74392298
+    Symbol (35,0,10) 
+Point 115.8657052 28.81774098
+    Symbol (35,0,10) 

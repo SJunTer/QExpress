@@ -16,70 +16,104 @@
 
 MapView::MapView(QWidget *parent = 0)
     : QGraphicsView(parent)
-    , zoomLevel(7)
+    , zoomLevel(18)
+    , zoom(0.0)
     , selectMode(false)
     , repoSelected(false)
 {
-//    resize(1280, 720);
-//    setStyleSheet("background: transparent");
-/*    QPalette p;
-    p.setBrush(backgroundRole(), QColor(255,255,255,210));
-    setPalette(p);*/
 
+//    setStyleSheet("background: transparent");
+
+    graph = new Graph;
+    mifFile = new MifFile;
+    scene = new QGraphicsScene();
     zoomInBtn = new QPushButton(this);
     zoomOutBtn = new QPushButton(this);
+
     zoomInBtn->resize(BTN_SIZE,BTN_SIZE);
     zoomInBtn->setText("+");
     zoomOutBtn->resize(BTN_SIZE,BTN_SIZE);
     zoomOutBtn->setText("-");
 
-
+    // set widget attributes
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setDragMode(QGraphicsView::ScrollHandDrag);//手型拖动
-
-    graph = new Graph;
-    scene = new QGraphicsScene();
+    setDragMode(QGraphicsView::ScrollHandDrag); //手型拖动
     setScene(scene);
-    mapfile = new MapFile;
-    // get name list of *.mif file
-    fileInfo = getFileList();
-    for(int i = 0; i < fileInfo->count(); ++i)
-    {
-        MapLayer layer;
-        // convert QString to const char *
-        mapfile->openFile(fileInfo->at(i).filePath().toStdString().c_str());
-        mapfile->getLayerInfo(&layer);
-        layers.append(layer);
-        // add graphics items to the scene
-        layer.drawLayer(scene);
-        mapfile->closeFile();
-    }
-    centerOn(scene->itemsBoundingRect().center());
 
-     // store as algorithm style
+    // read gst file for definition of layers
+    QFileInfoList fileList = getFileList("gst");
+    if(!fileList.empty())
+        initLayers(fileList.at(0).filePath());
+    // get definition of each layer
+    getLayerDefn();
+    centerOn(center);
+
+    // store as algorithm style
     convertData();
-
     graph->GenerateGraph(vertexs.size(), distances.size(), distances);
-
 }
 
-QFileInfoList *MapView::getFileList()
+QFileInfoList MapView::getFileList(QString filter)
 {
     QDir *dir = new QDir("./maps/");
     // set suffix filter
-    QStringList filter;
-    filter << "*.mif";
-    dir->setNameFilters(filter);
-    QFileInfoList *fileInfo = new QFileInfoList(dir->entryInfoList(filter));
-    return fileInfo;
+    QStringList filters;
+    filters << QString("*.")+filter;
+    dir->setNameFilters(filters);
+    QFileInfoList fileList(dir->entryInfoList(filters));
+    return fileList;
+}
+
+void MapView::initLayers(QString filePath)
+{
+    gstFile->openFile(filePath.toStdString().c_str());
+    gstFile->getGeoDefn(center, zoom);
+    /*************/
+    levelToZoom();
+    gstFile->getTableDefn(layers);
+    gstFile->closeFile();
+}
+
+void MapView::getLayerDefn()
+{
+    // reversely add layers to sene
+    for(int i = layers.size()-1; i >= 0; --i)
+    {
+//        qDebug() << layers.at(i)->getName();
+        QString path = QString("./maps/%1.mif").arg(layers.at(i)->getName());
+        mifFile->openFile(path.toStdString().c_str());
+        mifFile->getLayerDefn(layers.at(i));
+        layers.at(i)->addToScene(scene);
+        layers.at(i)->setVisible(zoom);
+        mifFile->closeFile();
+    }
+}
+
+void MapView::layerVisible(double zoom)
+{
+    for(auto &layer : layers)
+        layer->setVisible(zoom);
+}
+
+void MapView::levelToZoom()
+{
+    zoom = pow(2, (18-zoomLevel));
+    qDebug() << zoom;
+}
+
+void MapView::zoomToLevel()
+{
+    zoomLevel = 18 - log2(zoom);
 }
 
 void MapView::convertData()
 {
+    if(layers.empty())
+        return;
     for(auto &layer : layers)// 遍历每个图层
     {
-        for(auto line : layer.lines)//遍历图层中的每条路线
+        for(auto line : layer->m_lines)//遍历图层中的每条路线
         {
             for(auto point : line->getPoints())// 遍历每条线上的点
             {
@@ -90,10 +124,9 @@ void MapView::convertData()
     }
     //重排点集
     generatePoint(vertexs);
-
     for(auto &layer : layers)// 遍历每个图层
     {
-        for(auto line : layer.lines)//遍历图层中的每条路线
+        for(auto line : layer->m_lines)//遍历图层中的每条路线
         {
             auto points = line->getPoints();
             for(auto iter = points.begin(); iter != points.end()-1; ++iter)// 遍历每条线上的点
@@ -111,7 +144,6 @@ void MapView::convertData()
             }
         }
     }
-
 }
 
 /*****二分搜索点集返回下表******/
@@ -306,24 +338,29 @@ void MapView::wheelEvent(QWheelEvent *event)
 {
     QPoint focus;
     focus = (event->pos()+rect().center())/2;
+    // zoomLevel: 8~18
     if(event->delta() < 0)  //如果鼠标滚轮远离使用者，则delta()返回正值
     {
-        if(zoomLevel > 1)
+        if(zoomLevel > 8)
         {
             --zoomLevel;
+            levelToZoom();
             scale(0.5,0.5);  //视图缩放
+            layerVisible(zoom);
             centerOn(mapToScene(focus));
         }
     }
     else
     {
-            if(zoomLevel < 7)
-            {
-                ++zoomLevel;
-                scale(2,2);
-                centerOn(mapToScene(focus));
-            }
-     }
+        if(zoomLevel < 18)
+        {
+            ++zoomLevel;
+            levelToZoom();
+            scale(2,2);
+            layerVisible(zoom);
+            centerOn(mapToScene(focus));
+        }
+    }
 }
 
 //重载菜单事件
@@ -394,13 +431,13 @@ void MapView::addRepo()
 {
     selectedPoints.push_front(tempPoint);
     repoSelected = true;
-    addMarker(tempPoint->point, MARK_REPO);
+    addMarker(tempPoint->points[0], MARK_REPO);
 }
 
 void MapView::addPlace()
 {
     selectedPoints.push_back(tempPoint);
-    addMarker(tempPoint->point, MARK_POINT);
+    addMarker(tempPoint->points[0], MARK_POINT);
 }
 
 void MapView::removePoint()
@@ -444,7 +481,7 @@ void MapView::calculatePath()
         long index = -1;
         for(auto iter = vertexs.begin(); iter != vertexs.end(); ++iter)
         {
-            double len = getLen(*iter, n->point);
+            double len = getLen(*iter, n->points[0]);
             if(len < min)
             {
                 min = len;

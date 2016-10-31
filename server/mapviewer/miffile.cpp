@@ -1,15 +1,16 @@
-#include "mapfile.h"
+#include "miffile.h"
 #include <QDebug>
 #include <QTextCodec>
 
 // 指定字符集
 QTextCodec *codec = QTextCodec::codecForName("GBK");
 
-MapFile::MapFile()
+MifFile::MifFile()
+    : srcFile(NULL)
 {
 }
 
-int MapFile::openFile(const char *fileName)
+int MifFile::openFile(const char *fileName)
 {
     // 打开地图文件
      if ((srcFile = IMapInfoFile::SmartOpen(fileName)) == NULL)
@@ -20,17 +21,17 @@ int MapFile::openFile(const char *fileName)
     return 0;
 }
 
-int MapFile::closeFile()
+int MifFile::closeFile()
 {
-    srcFile->Close();
+    if(srcFile->Close() != 0)
+        return -1;
     delete srcFile;
+    return 0;
 }
 
 // 获取图形信息
-int MapFile::getLayerInfo(MapLayer *layer)
+int MifFile::getLayerDefn(MapLayer *layer)
 {
-    layer->getFeatureCount(srcFile->GetFeatureCount(TRUE));
-
     srcFile->ResetReading();
     MapShape *shape;
     TABFeature *feature;
@@ -43,32 +44,23 @@ int MapFile::getLayerInfo(MapLayer *layer)
         {
             TABFeatureClass featureClass = feature->GetFeatureClass();
             if (featureClass == TABFCRegion)
-            {
                 shape = new Region;
-            }
             else if(featureClass == TABFCPolyline)
-            {
                 shape = new Polyline;
-            }
             else if(featureClass == TABFCPoint)
-            {
                 shape = new Point;
-            }
             else
-            {
-                shape = new Region;
-            }
+                return -1;
 
-            shape->setIndex(featureId);
+            shape->setAutoLabel(layer->autoLabel);
+            getStyle(layer, shape, featureClass);
+//            getStyle(feature, shape, featureClass);
             // get coordinates of each vertexs of the feature
-            getStyle(feature, shape, featureClass);
-
-            getCoord(feature, shape, layer, featureClass);
+            getCoord(feature, shape, featureClass);
             // set boudingrect for every feature
             shape->setBounds();
             getField(feature, shape);
-            layer->addShape(shape, featureClass);
-
+            layer->addItem(shape, featureClass);
         }
         else
         {
@@ -79,7 +71,23 @@ int MapFile::getLayerInfo(MapLayer *layer)
     return 0;
 }
 
-void MapFile::getStyle(TABFeature *feature, MapShape *shape, TABFeatureClass featureClass)
+void MifFile::getStyle(MapLayer *layer, MapShape *shape, TABFeatureClass featureClass)
+{
+    switch(featureClass)
+    {
+    case TABFCPoint:
+        break;
+    case TABFCRegion:
+        static_cast<Region*>(shape)->setPen(layer->m_pen);
+        static_cast<Region*>(shape)->setBrush(layer->m_brush);
+        break;
+    case TABFCPolyline:
+        static_cast<Polyline*>(shape)->setPen(layer->m_pen);
+        break;
+    }
+}
+
+void MifFile::getStyle(TABFeature *feature, MapShape *shape, TABFeatureClass featureClass)
 {
     switch(featureClass)
     {
@@ -96,14 +104,12 @@ void MapFile::getStyle(TABFeature *feature, MapShape *shape, TABFeatureClass fea
             pen.setStyle(Qt::SolidLine);
         else
             pen.setStyle(Qt::DashLine);
-        shape->setPen(pen);
+        static_cast<Region*>(shape)->setPen(pen);
 
         QBrush brush(Qt::white);
         TABRegion *region = (TABRegion *)feature;
         brush.setColor(region->GetBrushFGColor());
-        //b->GetBrushBGColor();
-       // b->GetBrushPattern();
-        shape->setBrush(brush);
+        static_cast<Region*>(shape)->setBrush(brush);
         break;
     }
     case TABFCPolyline:
@@ -116,13 +122,13 @@ void MapFile::getStyle(TABFeature *feature, MapShape *shape, TABFeatureClass fea
             pen.setStyle(Qt::SolidLine);
         else
             pen.setStyle(Qt::DashLine);
-        shape->setPen(pen);
+        static_cast<Polyline*>(shape)->setPen(pen);
         break;
     }
     }
 }
 
-void MapFile::getCoord(TABFeature *feature, MapShape *shape, MapLayer *layer, TABFeatureClass featureClass)
+void MifFile::getCoord(TABFeature *feature, MapShape *shape, TABFeatureClass featureClass)
 {
     switch(featureClass)
     {
@@ -136,7 +142,7 @@ void MapFile::getCoord(TABFeature *feature, MapShape *shape, MapLayer *layer, TA
             {
                 double x = ring->getX(pointId);
                 double y = ring->getY(pointId);
-                layer->coordTransform(x, y);
+                coordTransform(x, y);
                 shape->addPoint(x, y);
             }
         }
@@ -152,7 +158,7 @@ void MapFile::getCoord(TABFeature *feature, MapShape *shape, MapLayer *layer, TA
             {
                 double x = line->getX(pointId);
                 double y = line->getY(pointId);
-                layer->coordTransform(x, y);
+                coordTransform(x, y);
                 shape->addPoint(x, y);
             }
         }
@@ -164,14 +170,15 @@ void MapFile::getCoord(TABFeature *feature, MapShape *shape, MapLayer *layer, TA
         OGRPoint *point = (OGRPoint *)geom;
         double x = point->getX();
         double y = point->getY();
-        layer->coordTransform(x, y);
+        coordTransform(x, y);
         shape->addPoint(x, y);
         break;
     }
+    default: break;
     }
 }
 
-void MapFile::getField(TABFeature *feature, MapShape *shape)
+void MifFile::getField(TABFeature *feature, MapShape *shape)
 {
     // 获取图层信息
     QString fieldName, fieldType, fieldContent;

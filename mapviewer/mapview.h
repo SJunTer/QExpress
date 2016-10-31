@@ -8,7 +8,8 @@
 #include <QtMath>
 #include <QPushButton>
 #include "maplayer.h"
-#include "mapfile.h"
+#include "mifreader.h"
+#include "gstreader.h"
 #include "optimumPath.h"
 
 #define BTN_SIZE 25
@@ -33,7 +34,20 @@ public:
     void updatePath(int index, DeliveryPath *path);
 
 private:
-    QFileInfoList *getFileList(); // 获取地图文件列表
+    QFileInfoList getFileList(QString filter); // 获取地图文件列表
+    void initLayers(QString filePath);
+    void getLayerDefn();
+
+    GstFile *gstFile;
+    MifFile *mifFile;
+    QGraphicsScene *scene;
+    QList<MapLayer *> layers;
+    double zoom;
+    int zoomLevel;
+    QPointF center;
+    void layerVisible(double zoom);
+    void levelToZoom();
+    void zoomToLevel();
 
     // 生成图论算法数据结构
     void convertData();
@@ -49,12 +63,6 @@ private:
 //    void makeTile(QGraphicsScene *scene);
 
     Graph *graph;
-
-    QFileInfoList *fileInfo;
-    QGraphicsScene *scene;
-    QList<MapLayer> layers;
-    MapFile *mapfile;
-    int zoomLevel;
 
     //储存小车标记
     QList<QGraphicsPixmapItem *> cars;

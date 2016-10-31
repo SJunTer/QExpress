@@ -1,0 +1,906 @@
+Version   300
+Charset "WindowsSimpChinese"
+Delimiter ","
+CoordSys Earth Projection 1, 104
+Columns 3
+  NAME Char(100)
+  Type Char(30)
+  code Char(30)
+Data
+
+Point 115.555453 28.474757
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.605913 28.480305
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.577675 28.516193
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.574016 28.485537
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.576141 28.429362
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.564498 28.436018
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.579664 28.464036
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.574927 28.468308
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.572204 28.483808
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.589998 28.486449
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.589419 28.46251
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.619019 28.625242
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.584958 28.636473
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.575735 28.609557
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.567419 28.603161
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.591931 28.636457
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.58841 28.626608
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.597733 28.634405
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.603501 28.63292
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.586194 28.637986
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.631315 28.639873
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.631555 28.647418
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.595227 28.652782
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.567921 28.53593
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.566461 28.569627
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.589272 28.52349
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.641387 28.570816
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.642599 28.556174
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.600701 28.550109
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.612686 28.55503
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.614959 28.527233
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.640429 28.456484
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.650865 28.521509
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.645422 28.522374
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.656562 28.42521
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.64176 28.461616
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.633009 28.461865
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.662245 28.48763
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.639163 28.429139
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.65391 28.472926
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.648795 28.460116
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.619875 28.473957
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.469941 28.746818
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.483984 28.778371
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.548764 28.703041
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.559752 28.795449
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.49862 29.01733
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.483129 29.012381
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.530224 28.954486
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.507654 28.969819
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.557457 28.964051
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.532935 28.972835
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.474096 28.968907
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.474919 28.994442
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.56715 28.873856
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.540281 28.942302
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.489473 28.941873
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.521207 28.931622
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.515081 28.915677
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.518035 28.885492
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.571452 28.404709
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.549894 28.390826
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.564517 28.413613
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.55944 28.402166
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.646697 28.418531
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.692084 28.454441
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.703828 28.429885
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.712958 28.451466
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.688371 28.436515
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.761647 28.557277
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.788258 28.567184
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.768753 28.524597
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.778267 28.529
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.765324 28.542728
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.751774 28.545515
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.785107 28.548666
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.758255 28.550254
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.755219 28.560318
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.770184 28.56103
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.785603 28.561962
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.782362 28.567945
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.776223 28.525757
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.761017 28.537121
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.784879 28.505651
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.775831 28.49146
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.787212 28.48622
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.859001 28.540515
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.786795 28.406116
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.840412 28.40809
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.811937 28.426499
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.775198 28.435656
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.803793 28.436636
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.01773 28.34858
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.028797 28.310303
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.968511 28.356705
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.040275 28.304349
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.020054 28.325043
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.001404 28.326574
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.034962 28.331767
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.018768 28.331952
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.026615 28.33285
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.040043 28.316721
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.0456 28.334906
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.022173 28.348377
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.036599 28.398256
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.04044 28.401285
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.044545 28.400733
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.95343 28.525716
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.96581 28.474444
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.124497 28.425942
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.119996 28.38161
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.13041 28.381412
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.107709 28.38158
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.070974 28.393406
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.103379 28.380964
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.106381 28.433085
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.120278 28.417702
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.085672 28.407538
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.066717 28.409583
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.107224 28.415273
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.080808 28.407335
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.081308 28.4193
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.072126 28.43229
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.070692 28.436692
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.099793 28.44206
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.076566 28.432234
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.086763 28.446962
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.088235 28.437504
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.153271 28.255263
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.162053 28.259775
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.059328 28.323187
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.05411 28.334649
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.059165 28.335452
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.115857 28.345322
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.091254 28.368462
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.095397 28.374515
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.101418 28.37485
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.159578 28.342225
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.200078 28.356749
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.16953 28.262603
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.17373 28.267048
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.186508 28.279257
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.188949 28.284312
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.19363 28.295383
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.21442 28.285979
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.215481 28.297408
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.210127 28.237044
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.216524 28.237726
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.2096 28.205707
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.226469 28.229425
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.162864 28.503328
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.152723 28.518371
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.180864 28.525771
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.155973 28.529736
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.186048 28.536961
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.196207 28.550412
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.181549 28.569978
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.212362 28.508387
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.217554 28.531601
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.190885 28.574538
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.248744 28.496614
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.19271 28.495704
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.280206 28.61391
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.267701 28.634998
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.205699 28.596323
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.196823 28.436206
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.138852 28.421339
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.194595 28.46111
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.194297 28.451469
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.204677 28.487062
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.220851 28.458177
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.223865 28.45672
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.235317 28.46145
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.240924 28.468088
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.24092 28.475847
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.213573 28.468576
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.210513 28.453498
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.227744 28.469983
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.305586 28.479523
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.23304 28.310701
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.212856 28.319762
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.216007 28.327511
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.216552 28.333833
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.256634 28.352556
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.253067 28.32941
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.230945 28.385396
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.217903 28.388369
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.248937 28.211951
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.230749 28.239102
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.24435 28.291986
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.239681 28.280445
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.237552 28.296835
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.265616 28.298874
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.232294 28.256845
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.234232 28.234336
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.28546 28.256295
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.319265 28.30622
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.329435 28.303511
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.352282 28.250623
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.337093 28.39706
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.284346 28.400382
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.246219 28.431377
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.325644 28.391119
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.348857 28.399725
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.323814 28.406091
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.34333 28.409148
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.323917 28.415111
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.310424 28.433814
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.354394 28.452281
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.378168 28.598008
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.290849 28.571648
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.395003 28.600918
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.414681 28.59025
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.389067 28.590933
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.419975 28.605417
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.358021 28.623674
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.407711 28.286103
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.418331 28.31749
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.392648 28.244902
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.429522 28.249265
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.388815 28.243218
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.439756 28.431687
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.413738 28.469502
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.382065 28.457678
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.459299 28.414816
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.482388 28.385712
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.476984 28.396036
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.471163 28.397641
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.379732 28.396814
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.476748 28.415448
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.479737 28.381895
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.484976 28.463298
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.475119 28.485329
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.483667 28.304098
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.472963 28.296578
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.496889 28.33974
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.525705 28.524572
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.528829 28.52194
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.625784 28.685247
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.645873 28.685302
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.632045 28.693204
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.647006 28.700261
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.631732 28.702891
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.654029 28.705602
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.59779 28.676514
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.594378 28.684565
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.631994 28.759259
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.647149 28.757001
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.646792 28.735842
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.614105 28.740909
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.687916 28.78369
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.625237 28.854176
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.655767 28.836905
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.653897 28.81739
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.683209 28.772356
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.681627 28.819444
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.647065 28.819879
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.656335 28.820382
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.685022 28.821527
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.639013 28.770728
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.646715 28.783124
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.617404 28.825226
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.684528 28.682915
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.667464 28.688764
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.675277 28.698028
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.676618 28.75773
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.673616 28.760813
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.719565 28.693693
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.689505 28.697633
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.6981 28.717685
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.699859 28.728519
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.679803 28.747375
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.682373 28.741172
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.665564 28.667812
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.697901 28.611383
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.673135 28.638261
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.761386 28.773286
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.692459 28.77926
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.703495 28.792289
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.691418 28.79412
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.704256 28.796787
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.703694 28.759526
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.720982 28.749663
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.780219 28.789636
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.754929 28.796863
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.726185 28.794069
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.724537 28.769011
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.781096 28.754661
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.781211 28.760482
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.750468 28.740139
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.786647 28.786203
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.76537 28.863164
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.747021 28.827775
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.776116 28.812033
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.775562 28.822986
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.753395 28.830657
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.730799 28.825163
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.737106 28.828551
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.711668 28.828337
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.705087 28.836437
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.775524 28.854431
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.75935 28.893918
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.734253 28.922283
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.713362 28.906223
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.738182 28.912172
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.785974 28.875651
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.763733 28.720148
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.772728 28.690225
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.753296 28.690391
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.772487 28.702538
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.76815 28.706204
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.780845 28.708457
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.773906 28.71279
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.773643 28.714949
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.778045 28.732368
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.742923 28.711104
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.772268 28.624761
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.766188 28.656199
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.764273 28.627477
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.788814 28.62879
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.766199 28.631549
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.776503 28.637348
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.771788 28.637663
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.76407 28.641599
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.775526 28.654601
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.79084 28.658751
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.79916 28.661629
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.783615 28.706145
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.785694 28.708879
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.786825 28.724151
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.789805 28.699758
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.794397 28.692884
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.792505 28.696968
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.790964 28.708455
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.81048 28.709292
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.798613 28.710126
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.804613 28.714892
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.812147 28.72376
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.789812 28.731844
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.803965 28.734248
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.789961 28.706866
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.823664 28.968265
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.834189 28.969817
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.833303 28.964969
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.856767 28.958124
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.800803 28.777872
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.816169 28.746093
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.795359 28.750836
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.796138 28.78733
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.815581 28.791384
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.794875 28.795669
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.797396 28.796157
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.818399 28.803714
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.810576 28.770467
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.826151 28.798651
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.802831 28.81389
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.841426 28.722932
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.817373 28.709307
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.823828 28.713101
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.816694 28.70387
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.813597 28.707171
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.821985 28.718058
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.813288 28.730308
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.837915 28.704696
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.842594 28.719003
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.839156 28.728262
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.817255 28.81786
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.821283 28.824238
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.82485 28.822925
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.826459 28.863406
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.824476 28.876719
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.81141 28.883957
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.815733 28.866648
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.837217 28.883598
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.839381 28.825319
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.845382 28.830362
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.864651 28.919688
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.870213 28.918073
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.850731 28.900628
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.856589 28.849931
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.850069 28.919802
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.878596 28.742139
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.874598 28.76693
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.870406 28.731505
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.864018 28.721655
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.854037 28.732664
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.8836 28.634113
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.799579 28.623719
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.757269 28.613985
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.780233 28.608993
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.763151 28.589912
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.766794 28.596814
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.802563 28.605287
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.776484 28.608317
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.801465 28.608927
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.765257 28.612086
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.775434 28.613525
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.775022 28.617525
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.76277 28.618423
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.797163 28.625845
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.808134 28.630484
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.800368 28.631137
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.809627 28.634237
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.809875 28.639079
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.795939 28.641401
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.823412 28.645241
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.983755 28.597349
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.918614 28.598118
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.923167 28.796488
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.866946 28.776649
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.878676 28.7996
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.884543 28.785156
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.873275 28.77214
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.851996 28.787066
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.854426 28.793363
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.847838 28.814716
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.864653 28.806479
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.927277 28.79582
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.889041 28.775009
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.898737 28.776199
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.920904 28.783671
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.932286 28.788579
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.890604 28.790504
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.93327 28.796092
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.93066 28.824556
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.937748 28.782583
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.922487 28.787651
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.891903 28.779902
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.966574 29.068534
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.953688 29.068437
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.885921 28.983309
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.930673 28.937195
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.985222 28.854717
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.905925 28.873799
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.891322 28.909922
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.881848 28.878709
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.887379 28.88925
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.87692 28.926223
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.944877 28.929283
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.904641 28.939277
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 115.916776 28.958478
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.066899 29.064216
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.058405 29.116023
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.321549 28.890707
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.322911 28.896243
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.372192 28.750852
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.351586 28.959812
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
+Point 116.352517 28.963362
+    Symbol (95,41040,8,"MapInfo Cartographic",0,0) 
