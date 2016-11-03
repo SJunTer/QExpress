@@ -19,7 +19,6 @@ class MapLayer
 public:
     MapLayer();
     void addItem(MapShape *shape, TABFeatureClass type);
-    void initLayer();
     void addToScene(QGraphicsScene *scene);
     void setVisible(double zoom);
     void setBrush(QBrush &brush) { m_brush = brush; }
@@ -28,7 +27,6 @@ public:
 //    void setFeatureCnt(int cnt) { m_featureCnt = cnt;  }
 
 private:
-    int index;
     QString name;
     double minZoom, maxZoom;
     // Override style

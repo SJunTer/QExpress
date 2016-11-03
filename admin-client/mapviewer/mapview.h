@@ -25,49 +25,45 @@ class MapView : public QGraphicsView
 public:
     MapView(QWidget *parent);
 
-    void setSelectMode(bool m){
-        selectMode = m;
-    }
+    void setSelectMode(bool m) {  selectMode = m;  }
 
-    void drawPath(DeliveryPath *path); //绘制路径
+    // 路径相关
+    void drawPath(DeliveryPath *path);
     void removePath(int index);
     void updatePath(int index, DeliveryPath *path);
 
 private:
-    QFileInfoList getFileList(QString filter); // 获取地图文件列表
     void initLayers(QString filePath);
     void getLayerDefn();
 
+    QPointF center;
     GstFile *gstFile;
     MifFile *mifFile;
     QGraphicsScene *scene;
     QList<MapLayer *> layers;
+
     double zoom;
     int zoomLevel;
-    QPointF center;
     void layerVisible(double zoom);
     void levelToZoom(int level);
     void zoomToLevel();
 
-    // 生成图论算法数据结构
-    void convertData();
-    void generatePoint(QVector<QPointF> &theVector);
-    long findPoint(QVector<QPointF> &points, QPointF point, int xx, int yy);
     double getLen(QPointF &p1, QPointF &p2);
 
-    void saveFile(QList<dist> &distances);
-    void readFile(QList<dist> &distances);
-
-    QList<Polyline *> paths;
+    // 生成图论算法数据结构
+    Graph *graph;
+    QList<dist> distances;
+    QVector<QPointF> vertexs;
+    void convertData();
+    void sortPoint(QVector<QPointF> &theVector);
+    long binarySearch(QVector<QPointF> &points, QPointF point, int xx, int yy);
 
     void makeTile(QGraphicsScene *scene);
 
-    Graph *graph;
-
-    //储存小车标记
+    QList<Polyline *> paths;
     QList<QGraphicsPixmapItem *> cars;
 
-    //储存标记图层
+    // 储存标记图层
     QList<QGraphicsPixmapItem *> markers;
     void addMarker(QPointF p, int type);
     void removeMarker(int index);
@@ -77,14 +73,6 @@ private:
     QList<Point *> selectedPoints;
     Point *tempPoint;
     bool repoSelected;
-
-    //储存路径图层
-    QList<QGraphicsItem *> pathLayer;
-
-    double minX, minY, maxX, maxY;
-
-    QList<dist> distances;
-    QVector<QPointF> vertexs;
 
     bool selectMode;  // 标记当前是否为选择模式
 
@@ -104,8 +92,12 @@ private slots:
     void addPlace(); // 添加配送点
     void removePoint(); // 移除标记点
     void calculatePath(); // 计算路径并返回配送界面
+
+    void zoomIn(); // 放大
+    void zoomOut(); // 缩小
 };
 
+QFileInfoList getFileList(QString filter); // 获取地图文件列表
 void makeDir(const QString &folderName);
 
 #endif // MAPVIEW_H

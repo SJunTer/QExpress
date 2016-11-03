@@ -40,7 +40,11 @@ Polyline::Polyline()
 
 QRectF Polyline::boundingRect() const
 {
-    return QRectF(minX, minY, maxX-minX, maxY-minY);
+    QRectF rect;
+    int w = pen.width();
+    rect.setTopLeft(QPointF(minX-w/2.0, minY-w/2.0));
+    rect.setBottomRight(QPointF(maxX+w/2.0, maxY+w/2.0));
+    return rect;
 }
 
 void Polyline::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -53,7 +57,8 @@ void Polyline::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     for(auto iter = points.begin(); iter != points.end()-1; ++iter)
     {
         painter->drawLine(*iter, *(iter+1));
-    }/*
+    }
+    /*
     if(autoLabel)
     {
         painter->setPen(Qt::black);
@@ -99,7 +104,11 @@ Region::Region()
 
 QRectF Region::boundingRect() const
 {
-    return QRectF(minX, minY, maxX-minX, maxY-minY);
+    QRectF rect;
+    int w = pen.width();
+    rect.setTopLeft(QPointF(minX-w/2.0, minY-w/2.0));
+    rect.setBottomRight(QPointF(maxX+w/2.0, maxY+w/2.0));
+    return rect;
 }
 
 void Region::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -173,7 +182,7 @@ void Point::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
         if(getName() != "")
         {
             painter->drawEllipse(points[0], RADIUS, RADIUS);
-            painter->drawText(QPointF(points[0].x(), points[0].y()),getName());
+//            painter->drawText(QPointF(points[0].x(), points[0].y()),getName());
         }
     }
 }

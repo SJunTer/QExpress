@@ -63,16 +63,16 @@ void GstFile::getGeoDefn(QPointF &center, double &zoomLevel)
 
 int GstFile::getTableDefn(QList<MapLayer *> &layers)
 {
-//    resetReading();
+    resetReading();
 
     QString line;
     QString key, value;
     QStringList ss;
+
     int currTableId = 0;
     while((currTableId = getNextTableId(currTableId)) != -1)
     {
         MapLayer *layer = new MapLayer;
-        layer->index = currTableId-1;
         QPen pen;
         QBrush brush(Qt::white);
         while(in.readLineInto(&line) &&
@@ -119,7 +119,7 @@ int GstFile::getTableDefn(QList<MapLayer *> &layers)
         layer->setPen(pen);
         layer->setBrush(brush);
         in.seek(pre_pos);
-        //TODO*/
+        //TODO
         layers.append(layer);
     }
 }

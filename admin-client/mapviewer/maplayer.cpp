@@ -5,8 +5,7 @@
 #include <cmath>
 
 MapLayer::MapLayer()
-    : index(-1)
-    , name("")
+    : name("")
     , minZoom(0.0)
     , maxZoom(1E10)
     , autoLabel(false)
@@ -33,11 +32,6 @@ void MapLayer::addItem(MapShape *shape, TABFeatureClass type)
     }
 }
 
-void MapLayer::initLayer()
-{
-    // TODO
-
-}
 
 void MapLayer::addToScene(QGraphicsScene *scene)
 {

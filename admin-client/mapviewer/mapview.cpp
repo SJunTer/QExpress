@@ -10,6 +10,7 @@
 #include <QGraphicsPixmapItem>
 #include <QMessageBox>
 #include <QWheelEvent>
+#include <QTransform>
 #include <QContextMenuEvent>
 #include <algorithm>
 //#include <cstdio>
@@ -26,7 +27,7 @@ MapView::MapView(QWidget *parent = 0)
 
     graph = new Graph;
     mifFile = new MifFile;
-    scene = new QGraphicsScene();
+    scene = new QGraphicsScene;
     zoomInBtn = new QPushButton(this);
     zoomOutBtn = new QPushButton(this);
 
@@ -56,16 +57,6 @@ MapView::MapView(QWidget *parent = 0)
 //    makeTile(scene);
 }
 
-QFileInfoList MapView::getFileList(QString filter)
-{
-    QDir *dir = new QDir("./maps/");
-    // set suffix filter
-    QStringList filters;
-    filters << QString("*.")+filter;
-    dir->setNameFilters(filters);
-    QFileInfoList fileList(dir->entryInfoList(filters));
-    return fileList;
-}
 
 void MapView::initLayers(QString filePath)
 {
@@ -82,7 +73,6 @@ void MapView::getLayerDefn()
     // reversely add layers to sene
     for(int i = layers.size()-1; i >= 0; --i)
     {
-//        qDebug() << layers.at(i)->getName();
         QString path = QString("./maps/%1.mif").arg(layers.at(i)->getName());
         mifFile->openFile(path.toStdString().c_str());
         mifFile->getLayerDefn(layers.at(i));
@@ -100,13 +90,18 @@ void MapView::layerVisible(double zoom)
 
 void MapView::levelToZoom(int level)
 {
-    zoom = pow(2, (18-level));
+    zoom = pow(2, (18-level))*0.75;
 }
 
 void MapView::zoomToLevel()
 {
     zoomLevel = 18 - log2(zoom);
 }
+
+
+/*************************************
+ **                     数据转化                            **
+ *************************************/
 
 void MapView::convertData()
 {
@@ -124,7 +119,7 @@ void MapView::convertData()
         }
     }
     //重排点集
-    generatePoint(vertexs);
+    sortPoint(vertexs);
     for(auto &layer : layers)// 遍历每个图层
     {
         for(auto line : layer->m_lines)//遍历图层中的每条路线
@@ -133,8 +128,8 @@ void MapView::convertData()
             for(auto iter = points.begin(); iter != points.end()-1; ++iter)// 遍历每条线上的点
             {
                 dist d;
-                d.vertexA = findPoint(vertexs, *iter, 0, vertexs.size()-1);
-                d.vertexB = findPoint(vertexs, *(iter+1), 0, vertexs.size()-1);
+                d.vertexA = binarySearch(vertexs, *iter, 0, vertexs.size()-1);
+                d.vertexB = binarySearch(vertexs, *(iter+1), 0, vertexs.size()-1);
                 d.length = getLen(*iter, *(iter+1));
                 distances.append(d);
 
@@ -147,70 +142,102 @@ void MapView::convertData()
     }
 }
 
-/*****二分搜索点集返回下表******/
-long MapView::findPoint(QVector<QPointF> &points, QPointF point, int xx, int yy)
+// 二分搜索点集
+long MapView::binarySearch(QVector<QPointF> &points, QPointF point, int xx, int yy)
 {
     int m = xx + (yy - xx) / 2;
     if(xx > yy)
-    {
         return -1;
-    }
     else
     {
         if(points[m].x() == point.x())
         {
             if(points[m].y() == point.y())
-            {
                 return m;
-            }
             else if(points[m].y() > point.y())
-            {
-                return findPoint(points, point, xx, m - 1);
-            }
+                return binarySearch(points, point, xx, m - 1);
             else
-            {
-                return findPoint(points, point, m + 1, yy);
-            }
+                return binarySearch(points, point, m + 1, yy);
         }
         else if(points[m].x() > point.x())
-        {
-            return findPoint(points, point, xx, m - 1);
-        }
+            return binarySearch(points, point, xx, m - 1);
         else
-        {
-            return findPoint(points, point, m + 1, yy);
-        }
+            return binarySearch(points, point, m + 1, yy);
     }
-
 }
 
+// 将点集排序并消除重复项
+void MapView::sortPoint(QVector<QPointF> &theVector)
+{
+    struct cmp
+    {
+        bool operator() (const QPointF a, const QPointF b)
+        {
+            if(a.x() == b.x())
+                return a.y() > b.y();
+            else
+                return a.x() > b.x();
+        }
+    };
+    priority_queue<QPointF, QVector<QPointF>, cmp> myQueue;
+    QVector <QPointF>::iterator Iter1;
+    for (Iter1 = theVector.begin(); Iter1 != theVector.end(); ++Iter1)
+    {
+        myQueue.push(*Iter1);
+    }
+
+    QVector<QPointF>().swap(theVector);
+
+    theVector.push_back(myQueue.top());
+    myQueue.pop();
+
+    while(!myQueue.empty())
+    {
+        if (myQueue.top() == theVector.back());
+        else
+        {
+            theVector.push_back(myQueue.top());
+        }
+        myQueue.pop();
+    }
+}
 
 double MapView::getLen(QPointF &p1, QPointF &p2)
 {
     return sqrt(pow((p1.x() - p2.x()), 2) + pow((p1.y() - p2.y()), 2));
 }
 
+
+/******************************************
+ **                             标记部分                            **
+ ******************************************/
+
 void MapView::addMarker(QPointF p, int type)
 {
     QGraphicsPixmapItem *mark = new QGraphicsPixmapItem;
+    mark->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
     if(type == MARK_REPO)
     {
         mark->setPixmap(QPixmap(":/images/gps_map_red_48.png"));
         mark->setOffset(p.x()-ICON_SIZE/2+1, p.y()-ICON_SIZE);
+        qDebug() << mapFromScene(p);
         markers.push_front(mark);
     }
     else if(type ==MARK_POINT)
     {
         mark->setPixmap(QPixmap(":/images/gps_map_blue_48.png"));
         mark->setOffset(p.x()-ICON_SIZE/2+1, p.y()-ICON_SIZE);
+        qDebug() << mapFromScene(p);
         markers.push_back(mark);
     }
     scene->addItem(mark);
+    scene->update();
 }
 
 void MapView::removeMarker(int index)
 {
     scene->removeItem(markers.at(index));
+    scene->update();
     QGraphicsPixmapItem *p = markers.takeAt(index);
     delete p;
 }
@@ -223,7 +250,13 @@ void MapView::clearMarker()
         QGraphicsPixmapItem *p = markers.takeFirst();
         delete p;
     }
+    scene->update();
 }
+
+
+/*******************************************
+ **                             路径相关                             **
+ ******************************************/
 
 void MapView::drawPath(DeliveryPath *path)
 {
@@ -241,6 +274,7 @@ void MapView::drawPath(DeliveryPath *path)
     paths.append(line);
 
     QGraphicsPixmapItem *car = new QGraphicsPixmapItem;
+    car->setZValue(1);
     car->setPixmap(QPixmap(":/images/truck_icon_48.png"));
     car->setOffset(vertexs[0].x()-ICON_SIZE/2, vertexs[0].y()-ICON_SIZE/2);
     cars.push_back(car);
@@ -280,31 +314,9 @@ void MapView::updatePath(int index, DeliveryPath *path)
     }
 }
 
-void MapView::saveFile(QList<dist> &distances)
-{
-    FILE *fp;
-    fp = fopen("data.dat", "wb");
-
-    for(int i=0;i<distances.size();i++)
-    {
-        fwrite(&distances[i], sizeof(dist), 1, fp);
-    }
-    fclose(fp);
-}
-
-void MapView::readFile(QList<dist> &distances)
-{
-    FILE *fp;
-    fp = fopen("data.dat", "rb");
-
-    dist d;
-    while(fread(&d, sizeof(dist), 1, fp) == 1)
-        distances.append(d);
-    fclose(fp);
-}
 
 
-/* make map tiles of 8~18 levels */
+/*-----------------------  制作切片---------------------------*/
 void MapView::makeTile(QGraphicsScene *scene)
 {
     QPixmap pix(256, 256);
@@ -339,34 +351,27 @@ void MapView::makeTile(QGraphicsScene *scene)
 }
 
 
+
+/***********************************************
+ **                            重载部分                                      **
+ ***********************************************/
+
 void MapView::wheelEvent(QWheelEvent *event)
 {
-    QPoint focus;
-    focus = (event->pos()+rect().center())/2;
+    center = mapToScene((event->pos()+rect().center())/2);
     // zoomLevel: 8~18
     if(event->delta() < 0)  //如果鼠标滚轮远离使用者，则delta()返回正值
     {
-        if(zoomLevel > 8)
-        {
-            --zoomLevel;
-            levelToZoom(zoomLevel);
-            scale(0.5,0.5);  //视图缩放
-            layerVisible(zoom);
-            centerOn(mapToScene(focus));
-        }
+        if(zoomLevel > 8) // 缩小视图
+            zoomOut();
     }
     else
     {
         if(zoomLevel < 18)
-        {
-            ++zoomLevel;
-            levelToZoom(zoomLevel);
-            scale(2,2);
-            layerVisible(zoom);
-            centerOn(mapToScene(focus));
-        }
+            zoomIn();
     }
 }
+
 
 //重载菜单事件
 void MapView::contextMenuEvent(QContextMenuEvent *event)
@@ -431,6 +436,11 @@ void MapView::contextMenuEvent(QContextMenuEvent *event)
 
     menu.exec(event->globalPos());
 }
+
+
+/*******************************************
+ **                           响应菜单函数                          **
+ *******************************************/
 
 void MapView::addRepo()
 {
@@ -510,46 +520,38 @@ void MapView::calculatePath()
 
 }
 
-struct cmp
+
+/**********************************
+ **                  其他私有槽函数                **
+ **********************************/
+void MapView::zoomOut()
 {
-    bool operator() (const QPointF a, const QPointF b)
-    {
-        if(a.x() == b.x())
-        {
-            return a.y() > b.y();
-        }
-        else
-        {
-            return a.x() > b.x();
-        }
-    }
-};
-
-/***将点集排序并消除重复项**/
-void MapView::generatePoint(QVector<QPointF> &theVector)
-{
-    priority_queue<QPointF, QVector<QPointF>, cmp> myQueue;
-    QVector <QPointF>::iterator Iter1;
-    for (Iter1 = theVector.begin(); Iter1 != theVector.end(); ++Iter1)
-    {
-        myQueue.push(*Iter1);
-    }
-
-    QVector<QPointF>().swap(theVector);
-
-    theVector.push_back(myQueue.top());
-    myQueue.pop();
-
-    while(!myQueue.empty())
-    {
-        if (myQueue.top() == theVector.back());
-        else
-        {
-            theVector.push_back(myQueue.top());
-        }
-        myQueue.pop();
-    }
+    --zoomLevel;
+    levelToZoom(zoomLevel);
+    qDebug() << zoom;
+    scale(0.5,0.5);
+    layerVisible(zoom);
+    centerOn(center);
+    for(auto &n: markers)
+        qDebug() << mapToScene(QPoint(n->boundingRect().center().x(), n->boundingRect().center().y()));
 }
+
+void MapView::zoomIn()
+{
+    ++zoomLevel;
+    levelToZoom(zoomLevel);
+    qDebug() << zoom;
+    scale(2,2);
+    layerVisible(zoom);
+    centerOn(center);
+    for(auto &n: markers)
+        qDebug() << mapToScene(QPoint(n->boundingRect().center().x(), n->boundingRect().center().y()));
+}
+
+
+/******************************************
+ **                           非成员函数                           **
+ ******************************************/
 
 void makeDir(const QString &folderName)
 {
@@ -558,4 +560,15 @@ void makeDir(const QString &folderName)
     {
         dir.mkdir(dir.absolutePath());
     }
+}
+
+QFileInfoList getFileList(QString filter)
+{
+    QDir *dir = new QDir("./maps/");
+    // set suffix filter
+    QStringList filters;
+    filters << QString("*.")+filter;
+    dir->setNameFilters(filters);
+    QFileInfoList fileList(dir->entryInfoList(filters));
+    return fileList;
 }

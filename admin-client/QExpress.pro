@@ -1,4 +1,4 @@
-TARGET = qt-map
+TARGET = QExpress
 
 TEMPLATE = app
 CONFIG += c++11
