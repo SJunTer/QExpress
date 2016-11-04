@@ -56,8 +56,14 @@ void Polyline::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setPen(pen);
     for(auto iter = points.begin(); iter != points.end()-1; ++iter)
     {
+        painter->save();
+        painter->setPen(Qt::red);
+        painter->drawEllipse(*iter, 5, 5);
+        painter->restore();
         painter->drawLine(*iter, *(iter+1));
     }
+    painter->setPen(Qt::red);
+    painter->drawRect(minX, minY, maxX-minX, maxY-minY);
     /*
     if(autoLabel)
     {
@@ -71,15 +77,15 @@ void Polyline::setBounds(void)
     double xmin, xmax, ymin, ymax;
     xmin = xmax = points.front().x();
     ymin = ymax = points.front().y();
-    for(auto p : points)
+    for(auto &p : points)
     {
         if(p.x() < xmin)
             xmin = p.x();
-        else if(p.x() > xmax)
+        if(p.x() > xmax)
             xmax = p.x();
-        else if(p.y() < ymin)
+        if(p.y() < ymin)
             ymin = p.y();
-        else if(p.y() > ymax)
+        if(p.y() > ymax)
             ymax = p.y();
     }
     minX = xmin;
@@ -141,11 +147,11 @@ void Region::setBounds(void)
     {
         if(p.x() < xmin)
             xmin = p.x();
-        else if(p.x() > xmax)
+        if(p.x() > xmax)
             xmax = p.x();
-        else if(p.y() < ymin)
+        if(p.y() < ymin)
             ymin = p.y();
-        else if(p.y() > ymax)
+         if(p.y() > ymax)
             ymax = p.y();
     }
     minX = xmin;
