@@ -17,10 +17,10 @@
 
 MapView::MapView(QWidget *parent = 0)
     : QGraphicsView(parent)
-    , zoomLevel(18)
     , zoom(0.0)
-    , selectMode(false)
+    , zoomLevel(18)
     , repoSelected(false)
+    , selectMode(false)
 {
 
 //    setStyleSheet("background: transparent");
@@ -218,14 +218,14 @@ void MapView::addMarker(QPointF p, int type)
     mark->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
     if(type == MARK_REPO)
     {
-        mark->setPixmap(QPixmap(":/images/gps_map_red_48.png"));
+        mark->setPixmap(QPixmap(":/images/repo_marker_48.png"));
         mark->setOffset(p.x()-ICON_SIZE/2+1, p.y()-ICON_SIZE);
         qDebug() << mapFromScene(p);
         markers.push_front(mark);
     }
     else if(type ==MARK_POINT)
     {
-        mark->setPixmap(QPixmap(":/images/gps_map_blue_48.png"));
+        mark->setPixmap(QPixmap(":/images/map_marker_48.png"));
         mark->setOffset(p.x()-ICON_SIZE/2+1, p.y()-ICON_SIZE);
         qDebug() << mapFromScene(p);
         markers.push_back(mark);

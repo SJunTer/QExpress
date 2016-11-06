@@ -56,14 +56,8 @@ void Polyline::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setPen(pen);
     for(auto iter = points.begin(); iter != points.end()-1; ++iter)
     {
-        painter->save();
-        painter->setPen(Qt::red);
-        painter->drawEllipse(*iter, 5, 5);
-        painter->restore();
         painter->drawLine(*iter, *(iter+1));
     }
-    painter->setPen(Qt::red);
-    painter->drawRect(minX, minY, maxX-minX, maxY-minY);
     /*
     if(autoLabel)
     {
@@ -130,7 +124,8 @@ void Region::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     QPointF *vertexs = new QPointF[size];
     for(int i = 0; i < size; ++i)
         vertexs[i] = points.at(i);
-    painter->drawPolygon(vertexs, size);/*
+    painter->drawPolygon(vertexs, size);
+    /*
     if(autoLabel)
     {
         painter->setPen(Qt::black);
