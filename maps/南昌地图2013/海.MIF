@@ -1,0 +1,10 @@
+Version   300
+Charset "WindowsSimpChinese"
+Delimiter ","
+CoordSys Earth Projection 1, 104
+Columns 3
+  Name Char(100)
+  Kind Char(50)
+  DispClass Char(50)
+Data
+

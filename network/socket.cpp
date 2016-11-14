@@ -1,4 +1,5 @@
 #include "socket.h"
+
 #include <cstdlib>
 #include <cstring>
 
@@ -15,13 +16,6 @@ ServerSocket::ServerSocket()
     memset(&cli_addr, 0, sizeof(cli_addr));
 }
 
-ServerSocket::~ServerSocket()
-{
-    serv_sockfd = -1;
-    cli_sockfd = -1;
-    memset(&serv_addr, 0, sizeof(serv_addr));
-    memset(&cli_addr, 0, sizeof(cli_addr));
-}
 
 // 初始化套结字和地址并绑定
 int ServerSocket::init(int port)
@@ -65,9 +59,9 @@ void ServerSocket::closeServer()
 }
 
 // 关闭客户端连接
-void ServerSocket::closeClient()
+void ServerSocket::closeClient(int sockfd)
 {
-    close(cli_sockfd);
+    close(sockfd);
 }
 
 // 返回指定客户端套接字
@@ -83,12 +77,8 @@ int ServerSocket::client() const
 ClientSocket::ClientSocket()
 : sockfd(-1)
 {
-    memset(&addr, 0, sizeof(addr));
-}
-
-ClientSocket::~ClientSocket()
-{
-    sockfd = -1;
+    timeout.tv_sec = 75;
+    timeout.tv_usec = 0;
     memset(&addr, 0, sizeof(addr));
 }
 
@@ -99,18 +89,19 @@ int ClientSocket::init(int port, const char *hostname)
     if (sockfd < 0)
         return SOCK_ERROR;
 
-    struct hostent *host = gethostbyname(hostname);
+
+     struct hostent *host = gethostbyname(hostname);
     if (host == NULL)
         return HOST_ERROR;
-
     addr.sin_family = AF_INET;
     bcopy((char *)host->h_addr,
             (char *)&addr.sin_addr.s_addr,
             host->h_length);
     addr.sin_port = htons(port);
 
-	return 0;
+    return 0;
 }
+
 
 // 连接到服务器
 int ClientSocket::connectTo()

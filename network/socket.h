@@ -3,6 +3,7 @@
 
 #include <sys/types.h> 
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
@@ -18,14 +19,13 @@
 class ServerSocket
 {
 public:
-	ServerSocket();
-    ~ServerSocket();
+    ServerSocket();
 
-	int init(int port);
-	void startListen(int connCnt);
-	int acceptClient();
-	void closeServer();
-    void closeClient();
+    int init(int port);
+    void startListen(int connCnt);
+    int acceptClient();
+    void closeServer();
+    void closeClient(int sockfd);
     int client() const;
 
 private:
@@ -39,16 +39,17 @@ private:
 class ClientSocket
 {
 public:
-	ClientSocket();
-    ~ClientSocket();
+    ClientSocket();
 
-	int init(int port, const char *hostname);
-	int connectTo();
-	void closeSock();
+    int init(int port, const char *hostname);
+    void setTimeout(int sec) { timeout.tv_sec = sec; }
+    int connectTo();
+    void closeSock();
     int sock() const;
 
 private:
     int sockfd;
+    struct timeval timeout;
     struct sockaddr_in addr;
 };
 

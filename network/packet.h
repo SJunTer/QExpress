@@ -11,10 +11,11 @@
 #include "commands.h"
 
 // 错误代码
-#define PACKET_LOSS 0
-#define SEND_ERROR 1
-#define READ_ERROR 2
-#define CLIENT_CLOSE 3
+#define SUCCESS 0
+#define PACKET_LOSS 1
+#define WRITE_ERROR 2
+#define READ_ERROR 3
+#define CLIENT_CLOSE 4
 
 
 
@@ -59,5 +60,8 @@ T fromByteString(std::string &s)
     memcpy(&n, temp, sizeof(T));
     return n;
 }
+//处理字符串
+std::string fromByteString(std::string &s, int len);
+
 
 #endif
