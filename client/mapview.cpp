@@ -1,6 +1,7 @@
 #include "../network/commands.h"
 #include "../network/packet.h"
 #include "mapview.h"
+#include "pixmapitem.h"
 #include <string>
 #include <cstdio>
 #include <QFont>
@@ -61,12 +62,6 @@ MapView::MapView(QWidget *parent, ClientSocket *cli)
     scene->setSceneRect(bound);
     setScene(scene);
     centerOn(center);
-    item = new QGraphicsPixmapItem;
-    item->setPixmap(QPixmap("/home/shen/1.png"));
-    item->setOffset(center);
-    item->setFlag(QGraphicsItem::ItemIgnoresTransformations);
-
-    scene->addItem(item);
 
     getTiles();
 }
@@ -141,10 +136,8 @@ int MapView::getTiles()
         {
             int col = (left - cornerX) / step;
             QString fileName = QString("tmp/%1_%2_%3.png").arg(zoomLevel).arg(row).arg(col);
-            QGraphicsPixmapItem *pix = new QGraphicsPixmapItem;
-     //       QTransform t = transform();
-   //         t.scale(16, 16);
-    //        pix->setTransform(t);
+            PixmapItem *pix = new PixmapItem;
+
             if(!isExisted(fileName))
             {
 //                qDebug() << fileName<<"not existed";
@@ -172,10 +165,10 @@ int MapView::getTiles()
             QPixmap p(fileName);
             pix->setPixmap(p);
             pix->setOffset(left, top);
+            scene->addItem(pix);
 //            pix->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 //            pix->setTransformationMode(Qt::SmoothTransformation);
 //            qDebug() << pix->boundingRect();
-//            scene->addItem(pix);
         }
     }
     //************增加缓冲保护（缩放动画显示，再加载图片）
@@ -196,9 +189,6 @@ void MapView::wheelEvent(QWheelEvent *event)
         zoomOut();
     else
         zoomIn();
-
-
-    qDebug() << item->boundingRect();
 }
 
 void MapView::mouseReleaseEvent(QMouseEvent *event)

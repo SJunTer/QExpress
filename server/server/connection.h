@@ -1,32 +1,34 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include <QThread>
+#include <QObject>
 #include <string>
 
 class MapView;
 
-class Connection : public QThread
+class Connection : public QObject
 {
     Q_OBJECT
 public:
-    Connection(int sockfd, MapView *m);
-    void stop();
-
-protected:
-    void run();
+    Connection(int s, MapView *v) : sockfd(s), view(v), closed(false) {}
 
 private:
-    volatile bool stopped;
     int sockfd;
-    MapView *map;
+    MapView *view;
+    bool closed;
 
+    //*----------------服务接口-----------------*//
     int testUsrPwd(std::string &data);
     int preLoad(std::string &data);
     int getTile(std::string &data);
 
 signals:
     void close(int);
+    void taskFinished();
+
+public slots:
+    void start();
+    void stop();
 };
 
 #endif // CONNECTION_H

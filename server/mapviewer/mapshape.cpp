@@ -61,13 +61,14 @@ void Polyline::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     pen.setCosmetic(true);
     painter->setPen(pen);
     painter->drawPolyline(QPolygonF(points));
-    /*
+/*
     QPen outline = pen;
     outline.setWidthF(pen.widthF()+2.0);
     outline.setColor(Qt::black);
     painter->setPen(outline);
-    painter->drawPolyline(QPolygonF(points));
     painter->drawPolyline(QPolygonF(points));*/
+    painter->setPen(pen);
+    painter->drawPolyline(QPolygonF(points));
 
     /*
     QPainterPath path;

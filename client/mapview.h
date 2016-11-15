@@ -26,7 +26,6 @@ private:
     QRectF bound;
     ClientSocket *client;
 
-    QGraphicsPixmapItem *item;
     QGraphicsScene *scene;
     QPushButton *zoomInBtn;
     QPushButton *zoomOutBtn;

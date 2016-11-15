@@ -9,7 +9,6 @@
 QT_BEGIN_NAMESPACE
 class QPushButton;
 class QTableWidget;
-class DES;
 QT_END_NAMESPACE
 
 
@@ -70,7 +69,6 @@ private:
     bool selectMode;
     bool editMode;
 
-    DES *des;
 
 signals:
     void sendTitles(QStringList &titles);

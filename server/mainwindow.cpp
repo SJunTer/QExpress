@@ -5,9 +5,11 @@
 #include "truckwidget.h"
 #include "inventorywidget.h"
 #include "accwidget.h"
-#include "server/serverthread.h"
+#include "server/tcpserver.h"
+#include <QThread>
 #include <QCloseEvent>
-#include <QPalette>
+#include <QMessageBox>
+//#include <QPalette>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -15,18 +17,17 @@ MainWindow::MainWindow(QWidget *parent)
 {
 //    setWindowFlags(Qt::FramelessWindowHint);
     setMinimumSize(1100, 800);
-    setAutoFillBackground(true);
+//    setAutoFillBackground(true);
+
 
     tabWidget = new TabWidget(this);
     mapWidget = new MapWidget(this);
     deliveryWidget = new DeliveryWidget(this);
+    accWidget = new AccWidget(this);
     truckWidget = new TruckWidget(this);
     inventoryWidget = new InventoryWidget(this);
-    accWidget = new AccWidget(this);
 
-    serverThd = new ServerThread(this);
-    serverThd->setMap(mapWidget->view);
-    serverThd->start(); // 运行监听服务器
+    runServer();
 
     setCentralWidget(tabWidget);
 
@@ -34,11 +35,11 @@ MainWindow::MainWindow(QWidget *parent)
     tabWidget->setTabEnabled(0, true);
     tabWidget->insertTab(1, deliveryWidget, "配送", "Delivery");
     tabWidget->setTabEnabled(1, true);
-    tabWidget->insertTab(2, inventoryWidget, "货物", "Inventory");
+    tabWidget->insertTab(2, accWidget, "账户", "Account");
     tabWidget->setTabEnabled(2, true);
     tabWidget->insertTab(3, truckWidget, "车辆", "Transfer truck");
     tabWidget->setTabEnabled(3, true);
-    tabWidget->insertTab(4, accWidget, "用户", "Account");
+    tabWidget->insertTab(4, inventoryWidget, "货物", "Inventory");
     tabWidget->setTabEnabled(4, true);
     /*************客户端管理界面*****************/
 
@@ -62,6 +63,24 @@ MainWindow::MainWindow(QWidget *parent)
     connect(truckWidget, SIGNAL(delTruck(int)), deliveryWidget, SLOT(delTruck(int)));
 }
 
+MainWindow::~MainWindow()
+{
+
+}
+
+void MainWindow::runServer()
+{
+    QThread *thread = new QThread;
+    server = new TcpServer(mapWidget->view);
+    server->moveToThread(thread);
+    connect(thread, SIGNAL(started()), server, SLOT(start()));
+    connect(server, SIGNAL(taskFinished()), thread, SLOT(quit()));
+    connect(thread, SIGNAL(finished()), server, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(this, SIGNAL(stopServer()), server, SLOT(stop()), Qt::DirectConnection);
+    thread->start(); // 开启服务器线程
+}
+
 // 进入选点模式
 void MainWindow::enterSelectMode()
 {
@@ -82,6 +101,7 @@ void MainWindow::transferData(QVector<long> &points, QVector<long> &path, QStrin
     deliveryWidget->setPath(points, path, nameList);
 }
 
+// 切断客户端连接
 void MainWindow::sendTitles(QStringList &titles)
 {
     tabWidget->setCurrentIndex(1);
@@ -101,14 +121,14 @@ void MainWindow::resizeEvent(QResizeEvent *)
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
-    Q_UNUSED(e)
-    qDebug() << "close";
-    serverThd->stop();
-    qDebug() << serverThd->isRunning();
-    serverThd->quit();
-    if(!serverThd->wait(3000)) //Wait until it actually has terminated (max. 3 sec)
+    if(QMessageBox::warning(this, tr("关闭"), tr("后台程序正在运行，确定退出吗？"),
+                            QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
     {
-        serverThd->terminate(); //Thread didn't exit in time, probably deadlocked, terminate it!
-        serverThd->wait(); //We have to wait again here!
+        e->ignore();
+    }
+    else
+    {
+        emit stopServer();
+        e->accept();
     }
 }

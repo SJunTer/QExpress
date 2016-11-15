@@ -1,21 +1,22 @@
 #ifndef PACKET_H
 #define PACKET_H
 
-
-#define PACKET_LEN (sizeof(Packet))
-#define DATA_LEN 1024
-
 #include <string>
 #include <cstdlib>
 #include <cstring>
 #include "commands.h"
 
+
+#define PACKET_LEN (sizeof(Packet))
+#define DATA_LEN 1024
+
 // 错误代码
 #define SUCCESS 0
-#define PACKET_LOSS 1
-#define WRITE_ERROR 2
-#define READ_ERROR 3
-#define CLIENT_CLOSE 4
+#define PACKET_LOSS 1   //数据传输时丢包
+#define WRITE_ERROR 2   //写入错误
+#define READ_ERROR 3    //读取错误
+#define CLIENT_CLOSE 4  //客户端已关闭
+#define CONN_INTR 5     //连接被中断
 
 
 

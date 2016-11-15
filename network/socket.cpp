@@ -1,5 +1,5 @@
 #include "socket.h"
-
+#include "signal.h"
 #include <cstdlib>
 #include <cstring>
 
@@ -55,13 +55,14 @@ int ServerSocket::acceptClient()
 // 关闭服务器连接
 void ServerSocket::closeServer()
 {
-    close(serv_sockfd);
+    // 关闭套结字并破坏连接
+    shutdown(serv_sockfd, SHUT_RDWR);
 }
 
 // 关闭客户端连接
 void ServerSocket::closeClient(int sockfd)
 {
-    close(sockfd);
+    shutdown(sockfd, SHUT_RDWR);
 }
 
 // 返回指定客户端套接字
@@ -80,6 +81,7 @@ ClientSocket::ClientSocket()
     timeout.tv_sec = 75;
     timeout.tv_usec = 0;
     memset(&addr, 0, sizeof(addr));
+    signal(SIGPIPE, SIG_IGN); //忽略SIGPIPE信号
 }
 
 // 初始化客户端套结字和目标服务器的地址

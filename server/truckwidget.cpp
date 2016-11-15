@@ -18,7 +18,6 @@ TruckWidget::TruckWidget(QWidget *parent)
     : QWidget(parent)
     , editMode(false)
 {
-    des = new DES;
 
     truckTable = new QTableWidget(this);
     addBtn = new QPushButton(this);
@@ -79,7 +78,6 @@ TruckWidget::TruckWidget(QWidget *parent)
 
 TruckWidget::~TruckWidget()
 {
-    delete des;
     for(auto n : trucks)
     {
 	TruckInfo *t = trucks.takeFirst();

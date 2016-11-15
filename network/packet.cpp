@@ -1,7 +1,7 @@
 #include "packet.h"
 #include "unistd.h"
-
-//#include <iostream>
+#include "../security/des.h"
+#include <iostream>
 
 using namespace std;
 
@@ -9,8 +9,12 @@ using namespace std;
 int sendPacket(int sockfd, commandType cmd, const string &s_data)
 {
 //    cout << "send packet:" << endl;
+    string wrapper = s_data;
+//    DES_Encrypt(wrapper);
+//    cout << "wrapper_len" << wrapper.size();
+
     int totalLen, tempLen;
-    totalLen = tempLen = s_data.size();
+    totalLen = tempLen = wrapper.size();
 
     Packet packet;
     packet.dataLen = tempLen;
@@ -22,7 +26,7 @@ int sendPacket(int sockfd, commandType cmd, const string &s_data)
         {
             packet.flag = true;
             packet.packetLen = DATA_LEN;
-            memcpy(packet.data, s_data.c_str()+(totalLen-tempLen), DATA_LEN);
+            memcpy(packet.data, wrapper.c_str()+(totalLen-tempLen), DATA_LEN);
             /*			cout <<  packet.dataLen << " " << packet.flag << " " << packet.cmd
                 << " " << packet.packetLen << endl;*/
             int sendLen = write(sockfd, (char*)&packet, PACKET_LEN);
@@ -38,7 +42,7 @@ int sendPacket(int sockfd, commandType cmd, const string &s_data)
         {
             packet.flag = false;
             packet.packetLen = tempLen;
-            memcpy(packet.data, s_data.c_str()+(totalLen-tempLen), tempLen);
+            memcpy(packet.data, wrapper.c_str()+(totalLen-tempLen), tempLen);
             /*		cout << packet.dataLen << " " << packet.flag << " " << packet.cmd
                 << " " << packet.packetLen << endl;*/
             int sendLen = write(sockfd, (char*)&packet, PACKET_LEN);
@@ -69,7 +73,7 @@ int recvPacket(int sockfd, commandType *cmd, std::string &s_data)
             << " " << packet.packetLen << endl;*/
         if(readLen == -1)//读取错误
             return READ_ERROR;
-        else if(readLen == 0)//返回0说明客户端已关闭套接字
+        else if(readLen == 0)//返回0说明客户端已关闭连接
             return CLIENT_CLOSE;
         else if(readLen != PACKET_LEN)//包不完整
             return PACKET_LOSS;
@@ -82,6 +86,9 @@ int recvPacket(int sockfd, commandType *cmd, std::string &s_data)
 //    cout << s_data.size() << endl;
 
     *cmd = packet.cmd;
+
+//    DES_Decrypt(s_data);
+//    cout << "data_len_after" << s_data.size();
 
     return 0;
 }

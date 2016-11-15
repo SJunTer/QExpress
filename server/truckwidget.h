@@ -8,7 +8,6 @@
 QT_BEGIN_NAMESPACE
 class QTableWidget;
 class QPushButton;
-class DES;
 QT_END_NAMESPACE
 
 
@@ -41,7 +40,6 @@ private:
 
     TruckInfo *temp;
     QList<TruckInfo *> trucks;
-    DES *des;
 
     bool editMode;
 

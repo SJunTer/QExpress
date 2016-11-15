@@ -20,7 +20,6 @@ InventoryWidget::InventoryWidget(QWidget *parent)
     , selectMode(false)
     , editMode(false)
 {
-    des = new DES;
     cargoTable = new QTableWidget(this);
     addBtn = new QPushButton(this);
     delBtn = new QPushButton(this);
@@ -88,7 +87,6 @@ InventoryWidget::InventoryWidget(QWidget *parent)
 
 InventoryWidget::~InventoryWidget()
 {
-    delete des;
     for(auto n : cargos)
     {
 	CargoInfo *c = cargos.takeFirst();

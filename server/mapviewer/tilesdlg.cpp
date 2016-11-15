@@ -72,12 +72,6 @@ void TileMaker::stop()
 }
 
 
-void TileMaker::exit()
-{
-    emit setLayerVisible(0);  //restore zoom
-    emit updateProgress(cnt);
-    emit taskFinished();
-}
 
 void TileMaker::makeDir(const QString &folderName)
 {

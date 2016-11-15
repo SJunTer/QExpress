@@ -29,7 +29,6 @@ private:
     bool stopped;
     QGraphicsScene *scene;
 
-    void exit();
     void makeDir(const QString &folderName);
 
 signals:

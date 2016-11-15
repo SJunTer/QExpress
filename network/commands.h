@@ -9,7 +9,7 @@ enum commandType {
     cmd_signUp,     // 注册请求
     cmd_preLoad,    // 预加载地图信息
     cmd_getTile,    //获取切片
-    cmd_pic,        // 传输图片
+    cmd_closeClient,    // 服务器切断连接
 };
 
 #define SEND_ERROR 0x101

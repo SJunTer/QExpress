@@ -12,7 +12,8 @@ HEADERS += \
     ../network/socket.h \
     ../security/des.h \
     logindlg.h \
-    mapview.h
+    mapview.h \
+    pixmapitem.h
 
 SOURCES += \
     mainwindow.cpp \
@@ -21,6 +22,7 @@ SOURCES += \
     ../network/socket.cpp \
     ../security/des.cpp \
     logindlg.cpp \
-    mapview.cpp
+    mapview.cpp \
+    pixmapitem.cpp
 
 FORMS +=

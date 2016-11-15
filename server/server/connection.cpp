@@ -6,38 +6,26 @@
 
 using namespace std;
 
-const int grid[] = { 10,10,10,10,10,10,10,12,16,23,32,45 };
 
 
-Connection::Connection(int sockfd, MapView *m)
-    : stopped(false)
-    , sockfd(sockfd)
-    , map(m)
+void Connection::start()
 {
-}
-
-void Connection::stop()
-{
-    stopped = true;
-}
-
-void Connection::run()
-{
-    if(stopped)
-        return;
-
     string data;
     commandType cmd;
+
     while(1)
     {
         int ret = recvPacket(sockfd, &cmd, data);
         if(ret == CLIENT_CLOSE)
         {
-            qDebug() << "client closed";
+            qDebug() << "CLIENT CLOSED";
             break;
         }
         else if(ret != 0)
+        {
+            qDebug() << "ERROR on receive";
             break;
+        }
         switch(cmd)
         {
         case cmd_default: break;
@@ -48,7 +36,15 @@ void Connection::run()
         default: break;
         }
     }
+    if(!closed)
+        emit close(sockfd);
+    emit taskFinished();
+}
+
+void Connection::stop()
+{
     emit close(sockfd);
+    closed = true;
 }
 
 // 验证用户名密码
@@ -77,13 +73,13 @@ int Connection::testUsrPwd(string &data)
 int Connection::preLoad(string &data)
 {
     data.clear();
-    data += toByteString(map->originLevel);
-    data += toByteString(map->sceneRect().x());
-    data += toByteString(map->sceneRect().y());
-    data += toByteString(map->sceneRect().width());
-    data += toByteString(map->sceneRect().height());
-    data += toByteString(map->originCenter.x());
-    data += toByteString(map->originCenter.y());
+    data += toByteString(view->originLevel);
+    data += toByteString(view->sceneRect().x());
+    data += toByteString(view->sceneRect().y());
+    data += toByteString(view->sceneRect().width());
+    data += toByteString(view->sceneRect().height());
+    data += toByteString(view->originCenter.x());
+    data += toByteString(view->originCenter.y());
     if(sendPacket(sockfd, cmd_signIn, data) != 0)
         return SEND_ERROR;
 
@@ -93,6 +89,7 @@ int Connection::preLoad(string &data)
 // 发送切片
 int Connection::getTile(string &data)
 {
+    const int grid[] = { 10,10,10,10,10,10,10,12,16,23,32,45 };
     int level = fromByteString<int>(data);
     int row = fromByteString<int>(data);
     int col = fromByteString<int>(data);

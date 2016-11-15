@@ -27,12 +27,12 @@ SOURCES += \
     inventorywidget.cpp \
     mapviewer/gstfile.cpp \
     mapviewer/miffile.cpp \
-    server/serverthread.cpp \
     ../network/packet.cpp \
     ../network/socket.cpp \
     server/connection.cpp \
     ../security/des.cpp \
     mapviewer/tilesdlg.cpp \
+    server/tcpserver.cpp \
     accwidget.cpp
 
 HEADERS += \
@@ -51,13 +51,13 @@ HEADERS += \
     inventorywidget.h \
     mapviewer/gstfile.h \
     mapviewer/miffile.h \
-    server/serverthread.h \
     ../network/commands.h \
     ../network/packet.h \
     ../network/socket.h \
     server/connection.h \
     ../security/des.h \
     mapviewer/tilesdlg.h \
+    server/tcpserver.h \
     accwidget.h
 
 RESOURCES += \
