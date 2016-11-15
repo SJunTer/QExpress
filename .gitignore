@@ -3,3 +3,6 @@
 
 # not include project-document text
 pro_doc.txt
+
+# ignore autosave files
+*.autosave
