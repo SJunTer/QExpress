@@ -63,7 +63,7 @@ private:
 signals:
     void posChange(int m_pos, int index);
 
-/*暂时先做成内部槽响应计时器*/
+/*计时器*/
 private slots:
     void updateStatus();
 

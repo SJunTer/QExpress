@@ -1,5 +1,5 @@
-#include "../network/commands.h"
-#include "../network/packet.h"
+#include "commands.h"
+#include "packet.h"
 #include "mapview.h"
 #include "pixmapitem.h"
 #include <string>
@@ -7,14 +7,12 @@
 #include <QFont>
 #include <QDir>
 #include <QPixmap>
-#include <QGraphicsPixmapItem>
-#include <QBoxLayout>
 #include <QWheelEvent>
 #include <QMessageBox>
-#include <QTransform>
 #include <QDebug>
 
 #define MAX(a, b) ((a)>(b)?(a):(b))
+#define MIN(a, b) ((a)<(b)?(a):(b))
 
 MapView::MapView(QWidget *parent, ClientSocket *cli)
     : QGraphicsView(parent)
@@ -22,35 +20,16 @@ MapView::MapView(QWidget *parent, ClientSocket *cli)
     , preLoaded(false)
 {
     scene = new QGraphicsScene(this);
-    zoomInBtn = new QPushButton(this);
-    zoomOutBtn = new QPushButton(this);
 
-    QFont font;
-//    font.setBold(true);
-    font.setPixelSize(15);
-    zoomInBtn->setFont(font);
-    zoomOutBtn->setFont(font);
-    zoomInBtn->setText("+");
-    zoomOutBtn->setText("-");
-    zoomInBtn->setFixedSize(BTN_SIZE,BTN_SIZE);
-    zoomOutBtn->setFixedSize(BTN_SIZE,BTN_SIZE);
+    for(int i = MIN_LEVEL; i <= MAX_LEVEL; ++i)
+    {
+        QGraphicsItemGroup *group = new QGraphicsItemGroup;
+        basemap.push_back(group);
+        scene->addItem(group);
+    }
 
-    QVBoxLayout *btnLayout = new QVBoxLayout;
-    btnLayout->setSpacing(0);
-    btnLayout->setMargin(0);
-    btnLayout->addWidget(zoomInBtn);
-    btnLayout->addWidget(zoomOutBtn);
-    QGridLayout *gridLayout = new QGridLayout;
-    gridLayout->setSpacing(0);
-    gridLayout->setMargin(10);
-    gridLayout->addLayout(btnLayout, 1, 1, Qt::AlignRight|Qt::AlignBottom);
-    setLayout(gridLayout);
-
-    connect(zoomInBtn, SIGNAL(clicked(bool)), this, SLOT(zoomIn()));
-    connect(zoomOutBtn, SIGNAL(clicked(bool)), this, SLOT(zoomOut()));
-
-//    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    setHorizontalScrollBarPolicy(Qt::S crollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setDragMode(QGraphicsView::ScrollHandDrag); //手型拖动
 
     // preload geographical informatioin
@@ -116,26 +95,36 @@ int MapView::getTiles()
 
     int paddingH = (256-(int)(bound.width())%256)/2;
     int paddingV = (256-(int)(bound.height())%256)/2;
-    int cornerX = bound.x() - paddingH;
-    int cornerY = bound.y() - paddingV;
-    int step = bound.height() / pow(2, zoomLevel-MIN_LEVEL);
+    int sceneLeft = bound.x() - paddingH;
+    int sceneTop = bound.y() - paddingV;
+    int sceneRight = bound.x() + bound.width() + paddingH;
+    int sceneBottom = bound.y() +bound.height() + paddingV;
+    int step = (bound.height()+2*paddingV) / pow(2, zoomLevel-MIN_LEVEL);
 
-    int right = mapToScene(sizeHint().width(), sizeHint().height()).x();
-    int bottom = mapToScene(sizeHint().width(), sizeHint().height()).y();
+    QPoint corner = this->viewport()->rect().bottomRight();
+    int viewRight = mapToScene(corner).x();
+    int viewBottom = mapToScene(corner).y();
+    int viewLeft = mapToScene(0, 0).x();
+    int viewTop = mapToScene(0, 0).y();
 
-//    qDebug() << (int)mapToScene(0, 0).y() << cornerY << bottom << step;
-//    qDebug() << (int)mapToScene(0, 0).x() << cornerX << right << step;
+    qDebug() << step;
+    qDebug() << bound.width() << bound.height();
+    qDebug() << sceneLeft << sceneRight << sceneTop << sceneBottom;
+    qDebug() << viewLeft << viewRight << viewTop << viewBottom;
 
     QString s("tmp");
     makeDir(s);
     //*********增加判断切片是否已显示
-    for(int top = MAX(mapToScene(0, 0).y(), cornerY); top <= bottom; top += step - (top - cornerY) % step)
+    viewTop = MAX(viewTop, sceneTop);
+    viewLeft = MAX(viewLeft, sceneLeft);
+    for(int y = viewTop - (viewTop-sceneTop)%256; y < MIN(viewBottom, sceneBottom); y += step)
     {
-        int row = (top - cornerY) / step;
-        for(int left = MAX(mapToScene(0, 0).x(), cornerX); left <= right; left += step - (left - cornerX) % step)
+        int row = (y-sceneTop) / step;
+        for(int x = viewLeft - (viewLeft-sceneLeft)%256; x < MIN(viewRight, sceneRight); x += step)
         {
-            int col = (left - cornerX) / step;
+            int col = (x-sceneLeft) / step;
             QString fileName = QString("tmp/%1_%2_%3.png").arg(zoomLevel).arg(row).arg(col);
+            qDebug() << fileName;
             PixmapItem *pix = new PixmapItem;
 
             if(!isExisted(fileName))
@@ -164,11 +153,8 @@ int MapView::getTiles()
             }
             QPixmap p(fileName);
             pix->setPixmap(p);
-            pix->setOffset(left, top);
-            scene->addItem(pix);
-//            pix->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-//            pix->setTransformationMode(Qt::SmoothTransformation);
-//            qDebug() << pix->boundingRect();
+            pix->setOffset(x, y);
+            basemap[zoomLevel-MIN_LEVEL]->addToGroup(pix);
         }
     }
     //************增加缓冲保护（缩放动画显示，再加载图片）
@@ -179,6 +165,17 @@ int MapView::getTiles()
 int MapView::getSymbols()
 {
 
+}
+
+void MapView::setLayerVisible()
+{
+    for(int i = MIN_LEVEL; i <= MAX_LEVEL; ++i)
+    {
+        if(i == zoomLevel)
+            basemap[i-MIN_LEVEL]->setVisible(true);
+        else
+            basemap[i-MIN_LEVEL]->setVisible(false);
+    }
 }
 
 void MapView::wheelEvent(QWheelEvent *event)
@@ -194,12 +191,13 @@ void MapView::wheelEvent(QWheelEvent *event)
 void MapView::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
+/*   QGraphicsView::mouseReleaseEvent(event);
     qDebug() << center;
     qDebug() << mapToScene(viewport()->rect().center());
     if(center == mapToScene(viewport()->rect().center()))
         return;
     qDebug() <<"view changed";
-    getTiles();
+    getTiles();*/
 }
 
 // 放大视图
@@ -211,6 +209,7 @@ void MapView::zoomIn()
         scale(2,2);
         centerOn(center);
         getTiles();
+        setLayerVisible();
     }
 }
 
@@ -223,5 +222,6 @@ void MapView::zoomOut()
         scale(0.5,0.5);
         centerOn(center);
         getTiles();
+        setLayerVisible();
     }
 }

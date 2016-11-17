@@ -5,11 +5,14 @@ CONFIG += c++11
 
 QT += widgets
 
-LIBS += -L$$PWD/./mitab/ -lmitab
-LIBS += -L$$PWD/./mitab/ -logr
-LIBS += -L$$PWD/./mitab/ -lcpl
+LIBS += -L"$$PWD/mitab" -lmitab
+LIBS += -L"$$PWD/mitab" -logr
+LIBS += -L"$$PWD/mitab" -lcpl
 
-INCLUDEPATH += ./mitab
+INCLUDEPATH += mitab
+INCLUDEPATH += mapviewer
+INCLUDEPATH += ../network
+INCLUDEPATH += ../security
 
 SOURCES += \
     main.cpp \
@@ -33,7 +36,8 @@ SOURCES += \
     ../security/des.cpp \
     mapviewer/tilesdlg.cpp \
     server/tcpserver.cpp \
-    accwidget.cpp
+    accwidget.cpp \
+    mapviewer/pixmapitem.cpp
 
 HEADERS += \
     optimumPath.h \
@@ -58,7 +62,8 @@ HEADERS += \
     ../security/des.h \
     mapviewer/tilesdlg.h \
     server/tcpserver.h \
-    accwidget.h
+    accwidget.h \
+    mapviewer/pixmapitem.h
 
 RESOURCES += \
     map.qrc

@@ -31,7 +31,8 @@ void TileMaker::doWork()
     {
         makeDir(QString("tiles/%1").arg(currLevel));
         emit setLayerVisible(currLevel);
-        int step = scene->itemsBoundingRect().height() / pow(2, currLevel-MIN_LEVEL);
+        int step = (scene->itemsBoundingRect().height()+2*paddingV) / pow(2, currLevel-MIN_LEVEL);
+        qDebug() << step;
         //make dirs
         for(int row = 0; !stopped && row*grid[currLevel-MIN_LEVEL] < pow(2, currLevel-MIN_LEVEL); ++row)
         {
@@ -55,7 +56,7 @@ void TileMaker::doWork()
                         arg(row/grid[currLevel-MIN_LEVEL]).arg(col/grid[currLevel-MIN_LEVEL]).arg(row).arg(col);
                 pix.save(filename);
                 ++cnt;
-                //if(cnt % 20 == 0)
+                if(cnt % 10 == 0)
                     emit updateProgress(cnt);
             }
         }
@@ -165,15 +166,15 @@ void TilesDlg::start()
 // 取消
 void TilesDlg::cancel()
 {
-    emit stopTask();
-
     if(!running)
+    {
         this->close();
-
+        return;
+    }
     if(QMessageBox::warning(this, "警告", "切片任务正在进行，是否确定退出？",
                             QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
         return;
-    // 退出操作
+    emit stopTask();
     this->close();
 }
 

@@ -2,14 +2,14 @@
 #define MAPSHAPE_H
 
 #include <QVector>
-#include <QGraphicsItem>
-#include <QMouseEvent>
 #include <QPointF>
 #include <QPen>
 #include <QBrush>
+#include <QPixmap>
+#include <QGraphicsItem>
 #include "mapfield.h"
 
-#define RADIUS 10
+#define POS_ICON_SIZE 10
 
 class MapShape : public QGraphicsItem
 {
@@ -22,6 +22,7 @@ public:
     QString getName(void);
     virtual void setBounds() = 0;
 
+protected:
     double minX, minY, maxX, maxY;
     QVector<QPointF> points;
     MapField fieldInfo;
@@ -76,8 +77,11 @@ public:
     void setBounds(void);
     int featureClass;
 
-private:
+    void setPixmap(const QPixmap &pix);
 
+private:
+    qreal width, height;
+    QPixmap pixmap;
 };
 
 

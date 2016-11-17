@@ -158,7 +158,6 @@ int DES_Encrypt(string &Data)
     char flag;
 
     //DES算法密钥制造部分   设置密钥 将密钥转换为二进制流 生成子密钥
-    flag=Get_Flag(Data);
     memcpy(keyBlock,KEYSTR,8);
     Char8ToBit64(keyBlock,bKey);
     DES_MakeSubKeys(bKey,subKeys);
@@ -227,11 +226,8 @@ int DES_Decrypt(std::string &Data)
 
 static char Get_Flag(const string &Data)
 {
-    char flag=0x0,left;
-    left=Data.size()%8;
-    flag |= left;
-    flag &= 0x0007;
-    return flag;
+    int remain = Data.size() % 8;
+    return (char)(remain == 0?8: remain);
 }
 
 /*****************************************

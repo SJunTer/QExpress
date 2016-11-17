@@ -5,6 +5,11 @@ CONFIG += c++11
 
 QT += widgets
 
+
+INCLUDEPATH += ../network
+INCLUDEPATH += ../security
+
+
 HEADERS += \
     mainwindow.h \
     ../network/commands.h \
@@ -13,7 +18,10 @@ HEADERS += \
     ../security/des.h \
     logindlg.h \
     mapview.h \
-    pixmapitem.h
+    pixmapitem.h \
+    pathwidget.h \
+    regdlg.h \
+    userdlg.h
 
 SOURCES += \
     mainwindow.cpp \
@@ -23,6 +31,9 @@ SOURCES += \
     ../security/des.cpp \
     logindlg.cpp \
     mapview.cpp \
-    pixmapitem.cpp
+    pixmapitem.cpp \
+    pathwidget.cpp \
+    regdlg.cpp \
+    userdlg.cpp
 
 FORMS +=

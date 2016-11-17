@@ -1,39 +1,43 @@
 #ifndef MAPWIDGET_H
 #define MAPWIDGET_H
 
-#include <QWidget>
-#include <QList>
-#include <QCheckBox>
-#include <QStringList>
+#include <QMainWindow>
 #include <QVector>
-#include <QListWidget>
-#include "mapviewer/mapview.h"
+#include <QList>
+#include <QStringList>
 
+
+QT_BEGIN_NAMESPACE
 class DeliveryPath;
-class TilesDlg;
+class QListWidget;
+class QCheckBox;
+class QPushButton;
+class MapView;
+QT_END_NAMESPACE
 
-///////////////////////////
-/// The MapWidget class ////
-//////////////////////////
-class MapWidget : public QWidget
+
+class MapWidget : public QMainWindow
 {
     Q_OBJECT
     friend class MainWindow;
 public:
     explicit MapWidget(QWidget *parent = 0);
-    void setSelectMode(bool b)
-    { view->setSelectMode(true); }
+
+    void enterSelectMode();
 
 private:
-    void initList();
-
-    TilesDlg *dlg;
     MapView *view;
-    QListWidget *pathList;
     QList<DeliveryPath *> paths;
+
+    QPushButton *tileBtn;   //切片窗口
+    QPushButton *zoomInBtn; //放大按钮
+    QPushButton *zoomOutBtn; //缩小按钮
 
 signals:
     void transferData(QVector<long> &points, QVector<long> &path, QStringList &nameList);
+
+private slots:
+    void makeTile();
 
 public slots:
     void addPath(DeliveryPath *path);

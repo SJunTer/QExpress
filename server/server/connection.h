@@ -10,9 +10,11 @@ class Connection : public QObject
 {
     Q_OBJECT
 public:
-    Connection(int s, MapView *v) : sockfd(s), view(v), closed(false) {}
+    Connection(int s, MapView *v) : id(0), sockfd(s),
+        view(v), closed(false) {}
 
 private:
+    int id; // 账户ID
     int sockfd;
     MapView *view;
     bool closed;
@@ -25,6 +27,8 @@ private:
 signals:
     void close(int);
     void taskFinished();
+    void signIn(int i);
+    void signOut(int i);
 
 public slots:
     void start();

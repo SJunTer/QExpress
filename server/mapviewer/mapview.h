@@ -2,14 +2,10 @@
 #define MAPVIEW_H
 
 #include <QGraphicsView>
+#include <QList>
+#include <QPointF>
 #include <QVector>
 #include <QFileInfo>
-#include <QList>
-#include <QtMath>
-#include <QPushButton>
-#include "maplayer.h"
-#include "miffile.h"
-#include "gstfile.h"
 #include "optimumPath.h"
 
 #define BTN_SIZE 30
@@ -19,7 +15,16 @@
 #define MAX_LEVEL 18
 #define MIN_LEVEL 8
 
+
+QT_BEGIN_NAMESPACE
 class DeliveryPath;
+class MapLayer;
+class MifFile;
+class GstFile;
+class PixmapItem;
+class Polyline;
+class Point;
+QT_END_NAMESPACE
 
 class MapView : public QGraphicsView
 {
@@ -66,11 +71,12 @@ private:
     void sortPoint(QVector<QPointF> &theVector);
     long binarySearch(QVector<QPointF> &points, QPointF point, int xx, int yy);
 
+    // 路径标示
     QList<Polyline *> paths;
-    QList<QGraphicsPixmapItem *> cars;
+    QList<PixmapItem *> cars;
 
     // 储存标记图层
-    QList<QGraphicsPixmapItem *> markers;
+    QList<PixmapItem *> markers;
     void addMarker(QPointF p, int type);
     void removeMarker(int index);
     void clearMarker();
@@ -82,8 +88,6 @@ private:
 
     bool selectMode;  // 标记当前是否为选择模式
 
-    QPushButton *zoomInBtn; //放大按钮
-    QPushButton *zoomOutBtn; //缩小按钮
 
 protected:
     void wheelEvent(QWheelEvent *event); // 滚轮事件
@@ -99,13 +103,13 @@ private slots:
     void removePoint(); // 移除标记点
     void calculatePath(); // 计算路径并返回配送界面
 
-    void zoomIn(); // 放大
-    void zoomOut(); // 缩小
 
 public slots:
-    void setLayerVisible(int level);
+    void zoomIn(); // 放大
+    void zoomOut(); // 缩小
+    void setLayerVisible(int level);// 重新显示图层
 };
 
-QFileInfoList getFileList(QString filter); // 获取地图文件列表
+QFileInfoList getFileList(QString filter); // 获取指定后缀文件
 
 #endif // MAPVIEW_H

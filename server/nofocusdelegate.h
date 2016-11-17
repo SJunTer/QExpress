@@ -10,6 +10,8 @@
  * **********************/
 class NoFocusDelegate : public QStyledItemDelegate
 {
+public:
+    NoFocusDelegate(QObject *parent = 0):QStyledItemDelegate(parent) {}
 protected:
     void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
     {

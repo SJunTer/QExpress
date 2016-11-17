@@ -1,20 +1,22 @@
 #include "mapview.h"
+#include "maplayer.h"
+#include "miffile.h"
+#include "gstfile.h"
+#include "pixmapitem.h"
 #include "deliverypath.h"
-#include <QDebug>
 #include <QDir>
 #include <QPalette>
 #include <QMenu>
 #include <QAction>
 #include <QString>
 #include <QPixmap>
+#include <QBoxLayout>
 #include <QGraphicsPixmapItem>
 #include <QMessageBox>
 #include <QWheelEvent>
-#include <QTransform>
 #include <QContextMenuEvent>
-#include <QBoxLayout>
 #include <algorithm>
-//#include <cstdio>
+#include <QDebug>
 
 MapView::MapView(QWidget *parent = 0)
     : QGraphicsView(parent)
@@ -32,32 +34,6 @@ MapView::MapView(QWidget *parent = 0)
     gstFile = new GstFile;
     scene = new QGraphicsScene;
 
-    zoomInBtn = new QPushButton(this);
-    zoomOutBtn = new QPushButton(this);
-
-    QFont font;
-    font.setPixelSize(15);
-    zoomInBtn->setFont(font);
-    zoomOutBtn->setFont(font);
-    zoomInBtn->setText("+");
-    zoomOutBtn->setText("-");
-    zoomInBtn->setFixedSize(BTN_SIZE,BTN_SIZE);
-    zoomOutBtn->setFixedSize(BTN_SIZE,BTN_SIZE);
-
-    QVBoxLayout *btnLayout = new QVBoxLayout;
-    btnLayout->setSpacing(0);
-    btnLayout->setMargin(0);
-    btnLayout->addWidget(zoomInBtn);
-    btnLayout->addWidget(zoomOutBtn);
-    QGridLayout *gridLayout = new QGridLayout;
-    gridLayout->setSpacing(0);
-    gridLayout->setMargin(10);
-    gridLayout->addLayout(btnLayout, 1, 1, Qt::AlignRight|Qt::AlignBottom);
-    setLayout(gridLayout);
-
-    connect(zoomInBtn, SIGNAL(clicked(bool)), this, SLOT(zoomIn()));
-    connect(zoomOutBtn, SIGNAL(clicked(bool)), this, SLOT(zoomOut()));
-
     // set widget attributes
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -73,8 +49,8 @@ MapView::MapView(QWidget *parent = 0)
     centerOn(center);
 
     // store as algorithm style
-//    convertData();
-//    graph->GenerateGraph(vertexs.size(), distances.size(), distances);
+    convertData();
+    graph->GenerateGraph(vertexs.size(), distances.size(), distances);
 
 
 }
@@ -249,20 +225,19 @@ double MapView::getLen(QPointF &p1, QPointF &p2)
 
 void MapView::addMarker(QPointF p, int type)
 {
-    QGraphicsPixmapItem *mark = new QGraphicsPixmapItem;
-    mark->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+    PixmapItem *mark = new PixmapItem;
     if(type == MARK_REPO)
     {
         mark->setPixmap(QPixmap(":/images/repo_marker_48.png"));
         mark->setOffset(p.x()-ICON_SIZE/2+1, p.y()-ICON_SIZE);
-        qDebug() << mapFromScene(p);
+        mark->setAlignPos(PixmapItem::BottomCenter);
         markers.push_front(mark);
     }
     else if(type ==MARK_POINT)
     {
         mark->setPixmap(QPixmap(":/images/map_marker_48.png"));
         mark->setOffset(p.x()-ICON_SIZE/2+1, p.y()-ICON_SIZE);
-        qDebug() << mapFromScene(p);
+        mark->setAlignPos(PixmapItem::BottomCenter);
         markers.push_back(mark);
     }
     scene->addItem(mark);
@@ -273,7 +248,7 @@ void MapView::removeMarker(int index)
 {
     scene->removeItem(markers.at(index));
     scene->update();
-    QGraphicsPixmapItem *p = markers.takeAt(index);
+    PixmapItem *p = markers.takeAt(index);
     delete p;
 }
 
@@ -282,7 +257,7 @@ void MapView::clearMarker()
     for(auto n : markers)
     {
         scene->removeItem(markers[0]);
-        QGraphicsPixmapItem *p = markers.takeFirst();
+        PixmapItem *p = markers.takeFirst();
         delete p;
     }
     scene->update();
@@ -308,10 +283,12 @@ void MapView::drawPath(DeliveryPath *path)
     scene->addItem(line);
     paths.append(line);
 
-    QGraphicsPixmapItem *car = new QGraphicsPixmapItem;
+    PixmapItem *car = new PixmapItem;
     car->setZValue(1);
     car->setPixmap(QPixmap(":/images/truck_icon_48.png"));
-    car->setOffset(vertexs[0].x()-ICON_SIZE/2, vertexs[0].y()-ICON_SIZE/2);
+    int index = path->m_path[0].index;
+    car->setOffset(vertexs[index].x()-ICON_SIZE/2, vertexs[index].y()-ICON_SIZE/2);
+    car->setAlignPos(PixmapItem::Center);
     cars.push_back(car);
     scene->addItem(car);
     scene->update();
@@ -324,7 +301,7 @@ void MapView::removePath(int index)
     delete l;
 
     scene->removeItem(cars.at(index));
-    QGraphicsPixmapItem *p = cars.takeAt(index);
+    PixmapItem *p = cars.takeAt(index);
     delete p;
 }
 
@@ -343,8 +320,8 @@ void MapView::updatePath(int index, DeliveryPath *path)
         line->setPen(pen);
 
         scene->addItem(line);
-        cars[index]->setOffset(vertexs[path->m_path[path->m_pos-1].index].x()-ICON_SIZE/2,
-                 vertexs[path->m_path[path->m_pos-1].index].y()-ICON_SIZE/2);
+        int v_index = path->m_path[path->m_pos-1].index;
+        cars[index]->setOffset(vertexs[v_index].x()-ICON_SIZE/2, vertexs[v_index].y()-ICON_SIZE/2);
         scene->update();
     }
 }

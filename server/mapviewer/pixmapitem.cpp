@@ -2,9 +2,11 @@
 #include <QPainter>
 #include <QDebug>
 
+
 PixmapItem::PixmapItem()
 {
     top = left = width = height = 0.0;
+    pos = TopLeft;
 }
 
 void PixmapItem::setPixmap(const QPixmap &pix)
@@ -20,6 +22,11 @@ void PixmapItem::setOffset(qreal x, qreal y)
     top = y;
 }
 
+void PixmapItem::setAlignPos(PixmapItem::AlignPos p)
+{
+    pos = p;
+}
+
 
 QRectF PixmapItem::boundingRect() const
 {
@@ -32,11 +39,18 @@ void PixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    QPointF p(left, top);
+    QPointF p;
+    switch(pos)
+    {
+    case TopLeft: p = QPointF(left, top); break;
+    case Center: p = QPointF(left+width/2-2, top+height/2-2); break;
+    case BottomCenter: p = QPointF(left+width/2-2, top+height); break;
+    default: break;
+    }
     painter->setMatrix(stableMatrix(painter->worldMatrix(), p));
     painter->drawPixmap(left, top, width, height, pixmap);
-    qDebug("%.10f, %.10f", boundingRect().x(), boundingRect().y());
-    painter->drawRect(boundingRect());
+//    qDebug("%.10f, %.10f", boundingRect().x(), boundingRect().y());
+//    painter->drawRect(boundingRect());
 }
 
 

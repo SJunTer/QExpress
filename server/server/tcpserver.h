@@ -6,7 +6,7 @@
 
 #include <QObject>
 
-#include "../network/socket.h"
+#include "socket.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -30,6 +30,8 @@ private:
 signals:
     void taskFinished();
     void closeClient();
+    void signIn(int i);
+    void signOut(int i);
 
 public slots:
     void start();   // 开启服务器

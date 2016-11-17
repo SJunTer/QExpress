@@ -130,8 +130,7 @@ void DeliveryWidget::initTable()
     deliveryTable->horizontalHeader()->setFixedHeight(30); //设置表头的高度
 //    deliveryTable->setStyleSheet("selection-background-color:lightblue;"); //设置选中背景色
 //    deliveryTable->horizontalHeader()->setStyleSheet("QHeaderView::section{background:skyblue;}"); //设置表头背景色
-    NoFocusDelegate nfd;
-    deliveryTable->setItemDelegate(&nfd);  // 消除选中虚框
+    deliveryTable->setItemDelegate(new NoFocusDelegate(this));  // 消除选中虚框
 }
 
 

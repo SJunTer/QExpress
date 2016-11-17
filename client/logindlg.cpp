@@ -1,7 +1,12 @@
-#include "../network/commands.h"
-#include "../network/packet.h"
+#include "commands.h"
+#include "packet.h"
+#include "socket.h"
 #include "logindlg.h"
+#include "regdlg.h"
 #include <string>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
 #include <QMessageBox>
 #include <QBoxLayout>
 #include <QDebug>
@@ -85,7 +90,7 @@ void LoginDlg::signIn()
         return;
     }
     // 连接服务器
-    if(cli->init(PORTNO, "localhost") != 0)
+    if(cli->init(PORTNO, "192.168.1.107") != 0)
     {
         QMessageBox::warning(this, tr("错误"), tr("网络模块初始化失败！"), QMessageBox::Ok);
         signInBtn->setFocus();

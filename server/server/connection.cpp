@@ -1,12 +1,10 @@
-#include"../network/packet.h"
-#include "mapviewer/mapview.h"
+#include"packet.h"
+#include "mapview.h"
 #include "connection.h"
 #include <cstdio>
 #include <QDebug>
 
 using namespace std;
-
-
 
 void Connection::start()
 {
@@ -29,15 +27,24 @@ void Connection::start()
         switch(cmd)
         {
         case cmd_default: break;
-        case cmd_signIn: testUsrPwd(data); break;   //用户登录
+        case cmd_signIn:  //用户登录
+            if(testUsrPwd(data) == LOGIN_YES)
+            {
+                emit signIn(id);
+                qDebug() << "emit signal";
+            }
+            break;
         case cmd_signUp: break;     //用户注册
         case cmd_preLoad: preLoad(data); break;     //预加载地图信息
         case cmd_getTile: getTile(data); break;     //获取切片
         default: break;
         }
     }
-    if(!closed)
+    if(!closed)//客户端断开连接
+    {
+        emit signOut(id);
         emit close(sockfd);
+    }
     emit taskFinished();
 }
 
@@ -66,7 +73,7 @@ int Connection::testUsrPwd(string &data)
     if(sendPacket(sockfd, cmd_signIn, data) != 0)
         return SEND_ERROR;
 
-    return 0;
+    return ret;
 }
 
 // 传递地图信息

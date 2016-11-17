@@ -112,8 +112,7 @@ void TruckWidget::initTable()
     truckTable->horizontalHeader()->setFixedHeight(30); //设置表头的高度
 //    truckTable->setStyleSheet("selection-background-color:lightblue;"); //设置选中背景色
 //    truckTable->horizontalHeader()->setStyleSheet("QHeaderView::section{background:skyblue;}"); //设置表头背景色
-    NoFocusDelegate nfd;
-    truckTable->setItemDelegate(&nfd);  // 消除选中虚框
+    truckTable->setItemDelegate(new NoFocusDelegate(this));  // 消除选中虚框
 }
 
 void TruckWidget::addRecord()

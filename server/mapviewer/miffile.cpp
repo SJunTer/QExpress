@@ -1,4 +1,5 @@
 #include "miffile.h"
+#include <QPixmap>
 #include <QDebug>
 #include <QTextCodec>
 
@@ -76,6 +77,7 @@ void MifFile::getStyle(MapLayer *layer, MapShape *shape, TABFeatureClass feature
     switch(featureClass)
     {
     case TABFCPoint:
+        static_cast<Point *>(shape)->setPixmap(QPixmap(":/images/symbol_24.png"));
         break;
     case TABFCRegion:
         static_cast<Region*>(shape)->setPen(layer->m_pen);
@@ -91,9 +93,6 @@ void MifFile::getStyle(TABFeature *feature, MapShape *shape, TABFeatureClass fea
 {
     switch(featureClass)
     {
-    case TABFCPoint:
-        break;
-
     case TABFCRegion:
     {
         QPen pen;
@@ -125,6 +124,12 @@ void MifFile::getStyle(TABFeature *feature, MapShape *shape, TABFeatureClass fea
         static_cast<Polyline*>(shape)->setPen(pen);
         break;
     }
+    case TABFCPoint:
+    {
+        static_cast<Point *>(shape)->setPixmap(QPixmap(":/images/symbol_24.png"));
+        break;
+    }
+    default: break;
     }
 }
 

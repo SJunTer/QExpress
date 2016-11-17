@@ -1,5 +1,5 @@
 #include "tcpserver.h"
-#include "../network/commands.h"
+#include "commands.h"
 #include "connection.h"
 #include <QThread>
 #include <QDebug>
@@ -16,8 +16,10 @@ void TcpServer::newConn(int sockfd)
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     // 切断客户端连接
     connect(this, SIGNAL(closeClient()), conn, SLOT(stop()), Qt::DirectConnection);
-    // 客户端切断自身连接
+    // 客户端断开连接
     connect(conn, SIGNAL(close(int)), this, SLOT(close(int))); //close socket first
+    connect(conn, SIGNAL(signIn(int)), this, SIGNAL(signIn(int)), Qt::DirectConnection);
+    connect(conn, SIGNAL(signOut(int)), this, SIGNAL(signOut(int)), Qt::DirectConnection);
     thread->start(); // 开启服务器线程
 }
 

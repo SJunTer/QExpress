@@ -121,8 +121,7 @@ void InventoryWidget::initTable()
     cargoTable->horizontalHeader()->setFixedHeight(30); //设置表头的高度
 //    cargoTable->setStyleSheet("selection-background-color:lightblue;"); //设置选中背景色
 //    cargoTable->horizontalHeader()->setStyleSheet("QHeaderView::section{background:skyblue;}"); //设置表头背景色
-    NoFocusDelegate nfd;
-    cargoTable->setItemDelegate(&nfd);  // 消除选中虚框
+    cargoTable->setItemDelegate(new NoFocusDelegate(this));  // 消除选中虚框
 
 }
 

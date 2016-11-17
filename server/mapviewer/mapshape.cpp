@@ -3,8 +3,10 @@
 
 #include <QPainter>
 #include <QCursor>
+#include <QMatrix>
 #include <QPolygonF>
 #include <QPainterPath>
+#include <QMouseEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QDebug>
 
@@ -183,10 +185,29 @@ void Region::setBounds(void)
 
 /*------------------------Point-------------------------*/
 
+static QMatrix stableMatrix(const QMatrix &matrix, const QPointF &p)
+{
+    QMatrix newMatrix = matrix;
+
+    qreal scaleX, scaleY;
+    scaleX = newMatrix.m11();
+    scaleY = newMatrix.m22();
+    newMatrix.scale(1.0/scaleX, 1.0/scaleY);
+
+    qreal offsetX, offsetY;
+    offsetX = p.x()*(scaleX-1.0);
+    offsetY = p.y()*(scaleY-1.0);
+    newMatrix.translate(offsetX, offsetY);
+
+    return newMatrix;
+}
+
+
 Point::Point()
     : featureClass(TABFCPoint)
 {
     setCursor(Qt::PointingHandCursor);
+    width = height = 0.0;
 }
 
 QRectF Point::boundingRect() const
@@ -200,23 +221,32 @@ void Point::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     Q_UNUSED(widget);
 
     painter->setRenderHint(QPainter::Antialiasing, true);
+    QPointF p = points[0];
+//    painter->setMatrix(stableMatrix(painter->worldMatrix(), p));
+    /*
     QPen pen;
     pen.setCosmetic(true);
-    painter->setPen(pen);
-    if(autoLabel)
+    painter->setPen(pen);*/
+    if(getName() != "")
     {
-        if(getName() != "")
-        {
-//            painter->drawEllipse(points[0], RADIUS, RADIUS);
-//            painter->drawText(QPointF(points[0].x(), points[0].y()),getName());
-        }
+        painter->drawPixmap(p.x()-width/2, p.y()-height/2, width, height, pixmap);
+        //            painter->drawText(QPointF(points[0].x(), points[0].y()),getName());
     }
 }
 
 void Point::setBounds()
 {
-    minX = points[0].x() - RADIUS;
-    maxX = points[0].x() + RADIUS;
-    minY = points[0].y() - RADIUS;
-    maxY = points[0].y() + RADIUS;
+    minX = points[0].x() - POS_ICON_SIZE;
+    maxX = points[0].x() + POS_ICON_SIZE;
+    minY = points[0].y() - POS_ICON_SIZE;
+    maxY = points[0].y() + POS_ICON_SIZE;
 }
+
+void Point::setPixmap(const QPixmap &pix)
+{
+    pixmap = pix;
+    width = pix.width();
+    height = pix.height();
+}
+
+

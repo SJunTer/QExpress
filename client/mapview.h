@@ -5,12 +5,11 @@
 #include <QPointF>
 #include <QRectF>
 #include <QString>
-#include <QPushButton>
+#include <QVector>
 #include <QGraphicsView>
-#include <QGraphicsPixmapItem>
+#include <QGraphicsItemGroup>
 #include "../network/socket.h"
 
-#define BTN_SIZE 25
 #define MIN_LEVEL 8
 #define MAX_LEVEL 18
 
@@ -27,8 +26,8 @@ private:
     ClientSocket *client;
 
     QGraphicsScene *scene;
-    QPushButton *zoomInBtn;
-    QPushButton *zoomOutBtn;
+
+    QVector<QGraphicsItemGroup *> basemap;
 
     int getPreGeoInfo();
     bool preLoaded;
@@ -39,11 +38,15 @@ protected:
     void wheelEvent(QWheelEvent *event); // 滚轮事件
     void mouseReleaseEvent(QMouseEvent *event);
 
+
 private slots:
-    void zoomIn();      // 放大
-    void zoomOut();     // 缩小
     int getTiles();     //重新加载切片
     int getSymbols();   // 获得标记信息
+
+public slots:
+    void zoomIn();      // 放大
+    void zoomOut();     // 缩小
+    void setLayerVisible();
 
 };
 

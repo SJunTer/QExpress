@@ -2,13 +2,18 @@
 #define LOGINDLG_H
 
 #include <QDialog>
-#include <QLabel>
 #include <QString>
-#include <QLineEdit>
-#include <QPushButton>
-#include "../network/socket.h"
+
 
 #define PORTNO 6666
+
+QT_BEGIN_NAMESPACE
+class QPushButton;
+class QLabel;
+class QLineEdit;
+class ClientSocket;
+QT_END_NAMESPACE
+
 
 class LoginDlg : public QDialog
 {

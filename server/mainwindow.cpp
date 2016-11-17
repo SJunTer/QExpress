@@ -12,6 +12,14 @@
 //#include <QPalette>
 #include <QDebug>
 
+
+#define MAPWIDGET_INDEX 0   // 地图
+#define DELYWIDGET_INDEX 1   // 配送
+#define ACCWIDGET_INDEX 2   // 帐号
+#define TRKWIDGET_INDEX 3   // 货车
+#define INVYWIDGET_INDEX 4   // 库存
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -31,16 +39,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     setCentralWidget(tabWidget);
 
-    tabWidget->insertTab(0, mapWidget, "地图", "Maps");
-    tabWidget->setTabEnabled(0, true);
-    tabWidget->insertTab(1, deliveryWidget, "配送", "Delivery");
-    tabWidget->setTabEnabled(1, true);
-    tabWidget->insertTab(2, accWidget, "账户", "Account");
-    tabWidget->setTabEnabled(2, true);
-    tabWidget->insertTab(3, truckWidget, "车辆", "Transfer truck");
-    tabWidget->setTabEnabled(3, true);
-    tabWidget->insertTab(4, inventoryWidget, "货物", "Inventory");
-    tabWidget->setTabEnabled(4, true);
+    tabWidget->insertTab(MAPWIDGET_INDEX, mapWidget, "地图", "Maps");
+    tabWidget->setTabEnabled(MAPWIDGET_INDEX, true);
+    tabWidget->insertTab(DELYWIDGET_INDEX, deliveryWidget, "配送", "Delivery");
+    tabWidget->setTabEnabled(DELYWIDGET_INDEX, true);
+    tabWidget->insertTab(ACCWIDGET_INDEX, accWidget, "账户", "Account");
+    tabWidget->setTabEnabled(ACCWIDGET_INDEX, true);
+    tabWidget->insertTab(TRKWIDGET_INDEX, truckWidget, "车辆", "Transfer truck");
+    tabWidget->setTabEnabled(TRKWIDGET_INDEX, true);
+    tabWidget->insertTab(INVYWIDGET_INDEX, inventoryWidget, "货物", "Inventory");
+    tabWidget->setTabEnabled(INVYWIDGET_INDEX, true);
     /*************客户端管理界面*****************/
 
 
@@ -78,33 +86,36 @@ void MainWindow::runServer()
     connect(thread, SIGNAL(finished()), server, SLOT(deleteLater()));
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     connect(this, SIGNAL(stopServer()), server, SLOT(stop()), Qt::DirectConnection);
+    // 服务器进程和主进程通信
+    connect(server, SIGNAL(signIn(int)), accWidget, SLOT(signIn(int)));
+    connect(server, SIGNAL(signOut(int)), accWidget, SLOT(signOut(int)));
     thread->start(); // 开启服务器线程
 }
 
 // 进入选点模式
 void MainWindow::enterSelectMode()
 {
-    tabWidget->setCurrentIndex(0);
-    mapWidget->setSelectMode(true);
+    tabWidget->setCurrentIndex(MAPWIDGET_INDEX);
+    mapWidget->enterSelectMode();
 }
 
 void MainWindow::enterCargoMode()
 {
-    tabWidget->setCurrentIndex(2);
+    tabWidget->setCurrentIndex(INVYWIDGET_INDEX);
     inventoryWidget->setSelectMode(true);
 }
 
 //传递数据并切换界面
 void MainWindow::transferData(QVector<long> &points, QVector<long> &path, QStringList &nameList)
 {
-    tabWidget->setCurrentIndex(1);
+    tabWidget->setCurrentIndex(DELYWIDGET_INDEX);
     deliveryWidget->setPath(points, path, nameList);
 }
 
-// 切断客户端连接
+
 void MainWindow::sendTitles(QStringList &titles)
 {
-    tabWidget->setCurrentIndex(1);
+    tabWidget->setCurrentIndex(DELYWIDGET_INDEX);
     deliveryWidget->setCargo(titles);
 }
 
@@ -119,6 +130,7 @@ void MainWindow::resizeEvent(QResizeEvent *)
 */
 }
 
+// 退出提示
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     if(QMessageBox::warning(this, tr("关闭"), tr("后台程序正在运行，确定退出吗？"),

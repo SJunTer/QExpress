@@ -1,6 +1,6 @@
 #include "packet.h"
 #include "unistd.h"
-#include "../security/des.h"
+#include "des.h"
 #include <iostream>
 
 using namespace std;
@@ -8,10 +8,12 @@ using namespace std;
 /** 发送数据包 **/
 int sendPacket(int sockfd, commandType cmd, const string &s_data)
 {
-//    cout << "send packet:" << endl;
+    cout << "send packet------------------" << endl;
     string wrapper = s_data;
+    cout << "ENCRYPT" << endl;
+    cout << "wrapper_before: " << wrapper.size()<< endl;
 //    DES_Encrypt(wrapper);
-//    cout << "wrapper_len" << wrapper.size();
+    cout << "wrapper_after: " << wrapper.size()<< endl << endl;
 
     int totalLen, tempLen;
     totalLen = tempLen = wrapper.size();
@@ -27,10 +29,10 @@ int sendPacket(int sockfd, commandType cmd, const string &s_data)
             packet.flag = true;
             packet.packetLen = DATA_LEN;
             memcpy(packet.data, wrapper.c_str()+(totalLen-tempLen), DATA_LEN);
-            /*			cout <<  packet.dataLen << " " << packet.flag << " " << packet.cmd
-                << " " << packet.packetLen << endl;*/
+            /**/			cout <<  packet.dataLen << " " << packet.flag << " " << packet.cmd
+                << " " << packet.packetLen << endl;
             int sendLen = write(sockfd, (char*)&packet, PACKET_LEN);
-//            cout << sendLen << endl;
+            cout << "send length: " << sendLen << endl;
             if(sendLen == -1)
                 return WRITE_ERROR;
             else if(sendLen != PACKET_LEN) // 丢包
@@ -43,10 +45,10 @@ int sendPacket(int sockfd, commandType cmd, const string &s_data)
             packet.flag = false;
             packet.packetLen = tempLen;
             memcpy(packet.data, wrapper.c_str()+(totalLen-tempLen), tempLen);
-            /*		cout << packet.dataLen << " " << packet.flag << " " << packet.cmd
-                << " " << packet.packetLen << endl;*/
+            /**/		cout << packet.dataLen << " " << packet.flag << " " << packet.cmd
+                << " " << packet.packetLen << endl;
             int sendLen = write(sockfd, (char*)&packet, PACKET_LEN);
-//            cout << sendLen << endl;
+            cout << "send length: " << sendLen << endl;
             if(sendLen == -1)
                 return WRITE_ERROR;
             else if(sendLen != PACKET_LEN)
@@ -54,23 +56,45 @@ int sendPacket(int sockfd, commandType cmd, const string &s_data)
             else
                 tempLen = 0;
         }
+        cout << endl;
     }//while
 
     return 0;
+}
+// 确保接包正常
+int myRead(int sock, void *buf, int len)
+{
+    int tempLen = 0;
+    while(tempLen < len)
+    {
+        int readLen = read(sock, (char*)buf+tempLen, len-tempLen);
+        if(readLen == -1)
+            return READ_ERROR;
+        else if(readLen == 0)
+        {
+            if(tempLen == 0)
+                return CLIENT_CLOSE;
+            else
+                return tempLen;
+        }
+        else
+            tempLen += readLen;
+    }
+    return tempLen;
 }
 
 /** 接收数据包 **/
 int recvPacket(int sockfd, commandType *cmd, std::string &s_data)
 {
-//    cout << "receive packet:" << endl;
+    cout << "receive packet-----------------------" << endl;
     Packet packet;
     s_data.clear();
     do
     {
-        int readLen = read(sockfd, (char*)&packet, PACKET_LEN);
-//        cout << readLen << endl;
-        /*			cout << packet.dataLen << " " << packet.flag << " " << packet.cmd
-            << " " << packet.packetLen << endl;*/
+        int readLen = myRead(sockfd, (char*)&packet, PACKET_LEN);
+        cout << "read length: " << readLen << endl;
+                    cout << packet.dataLen << " " << packet.flag << " " << packet.cmd
+            << " " << packet.packetLen << endl;
         if(readLen == -1)//读取错误
             return READ_ERROR;
         else if(readLen == 0)//返回0说明客户端已关闭连接
@@ -83,12 +107,16 @@ int recvPacket(int sockfd, commandType *cmd, std::string &s_data)
                 s_data.push_back(packet.data[n]);
         }
     }while(packet.flag);
-//    cout << s_data.size() << endl;
+    cout << "byte received: " << s_data.size() << endl;
 
     *cmd = packet.cmd;
 
+    cout << endl;
+    cout << "DECRYPT" << endl;
+    cout << "data_len_before: " << s_data.size()<< endl;
 //    DES_Decrypt(s_data);
-//    cout << "data_len_after" << s_data.size();
+    cout << "data_len_after: " << s_data.size() << endl;
+    cout << endl;
 
     return 0;
 }
