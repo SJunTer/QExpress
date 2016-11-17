@@ -5,7 +5,7 @@
 #define MAX_CONN 10
 
 #include <QObject>
-
+#include "accwidget.h"
 #include "socket.h"
 
 
@@ -31,6 +31,7 @@ signals:
     void taskFinished();
     void closeClient();
     void signIn(int i);
+    void signUp(Account &a);
     void signOut(int i);
 
 public slots:

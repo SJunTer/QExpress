@@ -12,10 +12,12 @@ enum commandType {
     cmd_closeClient,    // 服务器切断连接
 };
 
-#define SEND_ERROR 0x101
-#define RECV_ERROR 0x102
-#define LOGIN_YES 0x103
-#define LOGIN_NO 0x104
-#define NO_FILE 0x105
+#define SEND_ERROR 0x101    //接受数据错误
+#define RECV_ERROR 0x102    //发送数据错误
+#define LOGIN_YES 0x103     // 登陆成功
+#define LOGIN_NO 0x104      // 登录失败
+#define REG_YES 0x105       // 注册成功
+#define REG_NO 0x106        //注册失败
+#define NO_FILE 0x107       // 文件错误
 
 #endif // COMMANDS_H

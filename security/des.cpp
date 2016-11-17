@@ -170,7 +170,7 @@ int DES_Encrypt(string &Data)
     str.push_back(flag);
     for(int i = 0; i < n; i++)
     {
-        strncpy(plainBlock,Data.c_str()+i*8,8);
+        memcpy((char*)plainBlock,Data.c_str()+i*8,8);
         DES_EncryptBlock(plainBlock,subKeys,cipherBlock);
         for(int i = 0; i < 8; ++i)
             str.push_back(cipherBlock[i]);

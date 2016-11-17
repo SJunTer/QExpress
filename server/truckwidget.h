@@ -35,8 +35,6 @@ private:
     QPushButton *delBtn;
     QPushButton *applyBtn;
     QPushButton *cancelBtn;
-    QPushButton *readBtn;
-    QPushButton *saveBtn;
 
     TruckInfo *temp;
     QList<TruckInfo *> trucks;
@@ -52,8 +50,6 @@ private slots:
     void delRecord();
     void applyRecord();
     void cancelRecord();
-    void readRecord();
-    void saveRecord();
 
 public slots:
     void truckBack(QString &truckId);

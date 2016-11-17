@@ -27,16 +27,20 @@ void Connection::start()
         switch(cmd)
         {
         case cmd_default: break;
-        case cmd_signIn:  //用户登录
+        case cmd_signIn:    //用户登录
             if(testUsrPwd(data) == LOGIN_YES)
-            {
                 emit signIn(id);
-                qDebug() << "emit signal";
-            }
             break;
-        case cmd_signUp: break;     //用户注册
-        case cmd_preLoad: preLoad(data); break;     //预加载地图信息
-        case cmd_getTile: getTile(data); break;     //获取切片
+        case cmd_signUp:    //用户注册
+            if(recvReg(data) == REG_YES)
+                emit signUp(acc);
+            break;
+        case cmd_preLoad:      //预加载地图信息
+            preLoad(data);
+            break;
+        case cmd_getTile:      //获取切片
+            getTile(data);
+            break;
         default: break;
         }
     }
@@ -71,6 +75,30 @@ int Connection::testUsrPwd(string &data)
     data += toByteString(ret);
 
     if(sendPacket(sockfd, cmd_signIn, data) != 0)
+        return SEND_ERROR;
+
+    return ret;
+}
+
+//用户注册请求
+int Connection::recvReg(string &data)
+{
+    int str_len;
+    str_len = fromByteString<int>(data);
+    acc.username = QString::fromStdString(fromByteString(data, str_len));
+    str_len = fromByteString<int>(data);
+    acc.password = QString::fromStdString(fromByteString(data, str_len));
+    str_len = fromByteString<int>(data);
+    acc.name = QString::fromStdString(fromByteString(data, str_len));
+    str_len = fromByteString<int>(data);
+    acc.phone = QString::fromStdString(fromByteString(data, str_len));
+    str_len = fromByteString<int>(data);
+    acc.email = QString::fromStdString(fromByteString(data, str_len));
+
+    data.clear();
+    int ret = REG_YES;
+    data += toByteString(ret);
+    if(sendPacket(sockfd, cmd_signUp, data) != 0)
         return SEND_ERROR;
 
     return ret;

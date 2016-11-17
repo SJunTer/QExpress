@@ -19,6 +19,7 @@ void TcpServer::newConn(int sockfd)
     // 客户端断开连接
     connect(conn, SIGNAL(close(int)), this, SLOT(close(int))); //close socket first
     connect(conn, SIGNAL(signIn(int)), this, SIGNAL(signIn(int)), Qt::DirectConnection);
+    connect(conn, SIGNAL(signUp(Account&)), this, SIGNAL(signUp(Account&)), Qt::DirectConnection);
     connect(conn, SIGNAL(signOut(int)), this, SIGNAL(signOut(int)), Qt::DirectConnection);
     thread->start(); // 开启服务器线程
 }

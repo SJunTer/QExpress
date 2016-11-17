@@ -56,6 +56,7 @@ private slots:
 
 public slots:
     void signIn(int id);
+    void signUp(Account &a);
     void signOut(int id);
 };
 

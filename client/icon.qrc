@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/setting_24.png</file>
+        <file>images/about_48.png</file>
+        <file>images/order_32.png</file>
+        <file>images/order_48.png</file>
+        <file>images/traffic_32.png</file>
+        <file>images/traffic_48.png</file>
+        <file>images/traffic_64.png</file>
+        <file>images/user_72.png</file>
+        <file>images/user_96.png</file>
+        <file>images/user_48.png</file>
+        <file>images/user_64.png</file>
+    </qresource>
+</RCC>

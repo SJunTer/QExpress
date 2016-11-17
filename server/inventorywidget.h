@@ -58,8 +58,6 @@ private:
     QPushButton *applyBtn;
     QPushButton *cancelBtn;
     QPushButton *selectBtn;
-    QPushButton *readBtn;
-    QPushButton *saveBtn;
 
     CargoInfo *temp;
     QList<CargoInfo *> cargos;
@@ -79,8 +77,6 @@ private slots:
     void applyRecord();
     void cancelRecord();
     void selectCargo();
-    void readRecord();
-    void saveRecord();
 
 public slots:
     void complete(int index);

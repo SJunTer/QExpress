@@ -24,8 +24,6 @@ TruckWidget::TruckWidget(QWidget *parent)
     delBtn = new QPushButton(this);
     applyBtn = new QPushButton(this);
     cancelBtn = new QPushButton(this);
-    readBtn = new QPushButton(this);
-    saveBtn = new QPushButton(this);
     initTable();
 
     QFont font;
@@ -42,12 +40,6 @@ TruckWidget::TruckWidget(QWidget *parent)
     cancelBtn->setText("取消");
     cancelBtn->setFont(font);
     cancelBtn->setFixedSize(60, 35);
-    readBtn->setText("读取存档");
-    readBtn->setFont(font);
-    readBtn->setFixedSize(100, 35);
-    saveBtn->setText("写入存档");
-    saveBtn->setFont(font);
-    saveBtn->setFixedSize(100, 35);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
@@ -61,9 +53,6 @@ TruckWidget::TruckWidget(QWidget *parent)
     btnLayout->addWidget(delBtn);
     btnLayout->addWidget(applyBtn);
     btnLayout->addWidget(cancelBtn);
-    btnLayout->addStretch();
-    btnLayout->addWidget(readBtn);
-    btnLayout->addWidget(saveBtn);
 
     layout->addLayout(btnLayout);
     setLayout(layout);
@@ -72,8 +61,6 @@ TruckWidget::TruckWidget(QWidget *parent)
     connect(delBtn, SIGNAL(clicked(bool)), this, SLOT(delRecord()));
     connect(applyBtn, SIGNAL(clicked(bool)), this, SLOT(applyRecord()));
     connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelRecord()));
-    connect(readBtn, SIGNAL(clicked(bool)), this, SLOT(readRecord()));
-    connect(saveBtn, SIGNAL(clicked(bool)), this, SLOT(saveRecord()));
 }
 
 TruckWidget::~TruckWidget()
@@ -201,91 +188,6 @@ void TruckWidget::cancelRecord()
     editMode = false;
 }
 
-void TruckWidget::readRecord()
-{/*
-    if(editMode)
-        return;
-
-    if(!trucks.empty())
-    {
-        if(QMessageBox::warning(this, tr("警告"), tr("读取存档将覆盖当前数据，是否继续？"),
-                                QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
-            return;
-
-        for(int i = trucks.size()-1; i >= 0; --i)
-        {
-            truckTable->setCurrentCell(i,0);
-            delRecord();
-        }
-    }
-
-    std::string record;
-    if(des->DES_Unlock(record, "truck.dat") == -1)
-    {
-        QMessageBox::warning(this, tr("警告"), tr("无法打开数据文件！"));
-        return;
-    }
-    std::istringstream is(record);
-    int id;
-    bool b;
-    std::string s1, s2;
-    while(is >> id >> s1 >> s2 >> b)
-    {
-        TruckInfo *temp = new TruckInfo;
-        trucks.append(temp);
-
-        int rowCnt = truckTable->rowCount();
-        temp->m_id = rowCnt;
-        temp->m_brand = QString::fromStdString(s1);
-        temp->m_driver = QString::fromStdString(s2);
-        temp->m_isFree = b;
-        truckTable->insertRow(rowCnt);
-
-        QTableWidgetItem *item1 = new QTableWidgetItem;
-        QTableWidgetItem *item2 = new QTableWidgetItem;
-        QTableWidgetItem *item3 = new QTableWidgetItem;
-        QTableWidgetItem *item4 = new QTableWidgetItem;
-
-        item1->setText(QString::number(rowCnt+1));
-        item1->setFlags(item1->flags() & (~Qt::ItemIsEditable));
-        item2->setText(temp->m_brand);
-        item3->setText(temp->m_driver);
-        item4->setText(temp->m_isFree?"是":"否");
-        item4->setFlags(item4->flags() & (~Qt::ItemIsEditable));
-
-        truckTable->setItem(rowCnt, 0, item1);
-        truckTable->setItem(rowCnt, 1, item2);
-        truckTable->setItem(rowCnt, 2, item3);
-        truckTable->setItem(rowCnt, 3, item4);
-        truckTable->setCurrentCell(rowCnt, 0);
-
-        emit addTruck(temp);
-
-    }
-*/
-}
-
-void TruckWidget::saveRecord()
-{/*
-    if(editMode)
-        return;
-
-    for(auto &n : trucks)
-    {
-        if(!n->m_isFree)
-        {
-            QMessageBox::warning(this, tr("警告"), tr("当前有车辆在运行！"));
-            return;
-        }
-    }
-
-    QString s;
-    for(auto &t : trucks)
-        s += QString("%1 %2 %3 %4 ").arg(t->m_id).arg(t->m_brand).arg(t->m_driver).arg(t->m_isFree);
-    des->DES_Lock(s.toStdString().c_str(), "truck.dat");
-
-    QMessageBox::information(this, tr("提示"), tr("写入成功！"));*/
-}
 
 void TruckWidget::truckBack(QString &truckId)
 {

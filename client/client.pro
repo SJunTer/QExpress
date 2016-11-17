@@ -8,32 +8,50 @@ QT += widgets
 
 INCLUDEPATH += ../network
 INCLUDEPATH += ../security
+INCLUDEPATH += login
 
+FORMS += \
+    login/settingdlg.ui \
+    login/regdlg.ui \
+    login/logindlg.ui \
+    aboutdlg.ui \
+    taskwidget.ui \
+    userwidget.ui
 
 HEADERS += \
     mainwindow.h \
+    mapview.h \
+    pathwidget.h \
+    pixmapitem.h \
+    account.h \
+    login/logindlg.h \
+    login/regdlg.h \
+    login/settingdlg.h \
     ../network/commands.h \
     ../network/packet.h \
     ../network/socket.h \
     ../security/des.h \
-    logindlg.h \
-    mapview.h \
-    pixmapitem.h \
-    pathwidget.h \
-    regdlg.h \
-    userdlg.h
+    aboutdlg.h \
+    taskwidget.h \
+    userwidget.h
 
 SOURCES += \
-    mainwindow.cpp \
     main.cpp \
+    mainwindow.cpp \
+    mapview.cpp \
+    pathwidget.cpp \
+    pixmapitem.cpp \
+    login/logindlg.cpp \
+    login/regdlg.cpp \
+    login/settingdlg.cpp \
     ../network/packet.cpp \
     ../network/socket.cpp \
     ../security/des.cpp \
-    logindlg.cpp \
-    mapview.cpp \
-    pixmapitem.cpp \
-    pathwidget.cpp \
-    regdlg.cpp \
-    userdlg.cpp
+    aboutdlg.cpp \
+    taskwidget.cpp \
+    userwidget.cpp
 
-FORMS +=
+RESOURCES += \
+    icon.qrc
+
+

@@ -121,6 +121,11 @@ void AccWidget::signIn(int id)
     }
 }
 
+void AccWidget::signUp(Account &a)
+{
+
+}
+
 void AccWidget::signOut(int id)
 {
     qDebug() << "sign out" << id;

@@ -88,6 +88,7 @@ void MainWindow::runServer()
     connect(this, SIGNAL(stopServer()), server, SLOT(stop()), Qt::DirectConnection);
     // 服务器进程和主进程通信
     connect(server, SIGNAL(signIn(int)), accWidget, SLOT(signIn(int)));
+    connect(server, SIGNAL(signUp(Account&)), accWidget, SLOT(signUp(Account&)));
     connect(server, SIGNAL(signOut(int)), accWidget, SLOT(signOut(int)));
     thread->start(); // 开启服务器线程
 }

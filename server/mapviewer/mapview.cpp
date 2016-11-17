@@ -49,8 +49,8 @@ MapView::MapView(QWidget *parent = 0)
     centerOn(center);
 
     // store as algorithm style
-    convertData();
-    graph->GenerateGraph(vertexs.size(), distances.size(), distances);
+//    convertData();
+//    graph->GenerateGraph(vertexs.size(), distances.size(), distances);
 
 
 }

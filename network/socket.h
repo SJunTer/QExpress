@@ -9,11 +9,11 @@
 #include <unistd.h>
 
 // 错误代码
-#define SOCK_ERROR 0
 #define BIND_ERROR 1
 #define ACPT_ERROR 2
 #define HOST_ERROR 3
 #define CONN_ERROR 4
+#define SOCK_ERROR 5
 
 
 class ServerSocket

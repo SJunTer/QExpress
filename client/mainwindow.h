@@ -3,10 +3,9 @@
 
 #include <QMainWindow>
 
-#define BTN_SIZE 25
-
 
 QT_BEGIN_NAMESPACE
+class QToolButton;
 class QPushButton;
 class MapView;
 class ClientSocket;
@@ -27,13 +26,16 @@ private:
 
     QPushButton *zoomInBtn;
     QPushButton *zoomOutBtn;
-    QPushButton *orderBtn;
-    QPushButton *trafficBtn;
-    QPushButton *userBtn;
-    QPushButton *aboutBtn;
+    QToolButton *orderBtn;
+    QToolButton *trafficBtn;
+    QToolButton *userBtn;
+    QToolButton *aboutBtn;
 
 private slots:
-
+    void getOrder();
+    void UploadTraffic();
+    void userSetting();
+    void about();
 
 };
 
