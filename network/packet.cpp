@@ -1,6 +1,6 @@
 #include "packet.h"
 #include "unistd.h"
-#include "des.h"
+#include "../security/des.h"
 #include <iostream>
 
 using namespace std;
@@ -9,11 +9,9 @@ using namespace std;
 int sendPacket(int sockfd, commandType cmd, const string &s_data)
 {
 //    cout << "send packet------------------" << endl;
+//    cout << "send_size: " << s_data.size()<< endl;
     string wrapper = s_data;
-//    cout << "ENCRYPT" << endl;
-//    cout << "wrapper_before: " << wrapper.size()<< endl;
     DES_Encrypt(wrapper);
-//    cout << "wrapper_after: " << wrapper.size()<< endl << endl;
 
     int totalLen, tempLen;
     totalLen = tempLen = wrapper.size();
@@ -56,7 +54,6 @@ int sendPacket(int sockfd, commandType cmd, const string &s_data)
             else
                 tempLen = 0;
         }
-        cout << endl;
     }//while
 
     return 0;
@@ -69,11 +66,11 @@ int myRead(int sock, void *buf, int len)
     {
         int readLen = read(sock, (char*)buf+tempLen, len-tempLen);
         if(readLen == -1)
-            return READ_ERROR;
+            return -1;
         else if(readLen == 0)
         {
             if(tempLen == 0)
-                return CLIENT_CLOSE;
+                return 0;
             else
                 return tempLen;
         }
@@ -107,17 +104,11 @@ int recvPacket(int sockfd, commandType *cmd, std::string &s_data)
                 s_data.push_back(packet.data[n]);
         }
     }while(packet.flag);
-//    cout << "byte received: " << s_data.size() << endl;
 
     *cmd = packet.cmd;
-
-//    cout << endl;
-//    cout << "DECRYPT" << endl;
-//    cout << "data_len_before: " << s_data.size()<< endl;
     DES_Decrypt(s_data);
- //   cout << "data_len_after: " << s_data.size() << endl;
-//    cout << endl;
 
+//    cout << "byte received: " << s_data.size() << endl;
     return 0;
 }
 

@@ -11,5 +11,6 @@
         <file>images/user_96.png</file>
         <file>images/user_48.png</file>
         <file>images/user_64.png</file>
+        <file>images/symbol_24.png</file>
     </qresource>
 </RCC>

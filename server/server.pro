@@ -10,9 +10,6 @@ LIBS += -L"$$PWD/mitab" -logr
 LIBS += -L"$$PWD/mitab" -lcpl
 
 INCLUDEPATH += mitab
-INCLUDEPATH += mapviewer
-INCLUDEPATH += ../network
-INCLUDEPATH += ../security
 
 SOURCES += \
     main.cpp \

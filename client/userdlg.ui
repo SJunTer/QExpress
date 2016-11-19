@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TaskWidget</class>
- <widget class="QWidget" name="TaskWidget">
+ <class>UserDlg</class>
+ <widget class="QDialog" name="UserDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>429</width>
-    <height>412</height>
+    <width>563</width>
+    <height>468</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Dialog</string>
   </property>
  </widget>
  <resources/>

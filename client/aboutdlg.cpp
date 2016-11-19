@@ -6,9 +6,16 @@ AboutDlg::AboutDlg(QWidget *parent) :
     ui(new Ui::AboutDlg)
 {
     ui->setupUi(this);
+    setWindowTitle("关于QExpress");
 }
 
 AboutDlg::~AboutDlg()
 {
     delete ui;
+}
+
+void AboutDlg::on_okBtn_clicked()
+{
+    emit closed();
+    this->close();
 }

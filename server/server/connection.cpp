@@ -1,6 +1,9 @@
-#include"packet.h"
-#include "mapview.h"
+#include"../network/packet.h"
+#include "mapviewer/mapview.h"
+#include "mapviewer/maplayer.h"
 #include "connection.h"
+#include <QGraphicsItem>
+#include <QList>
 #include <cstdio>
 #include <QDebug>
 
@@ -40,6 +43,18 @@ void Connection::start()
             break;
         case cmd_getTile:      //获取切片
             getTile(data);
+            break;
+        case cmd_getSymbol: //获取地图标记
+            getSymbol(data);
+            break;
+        case cmd_getTask:   //获得任务
+            getTask(data);
+            break;
+        case cmd_acceptTask:  //接受任务
+            acptTask(data);
+            break;
+        case cmd_submitRoad:    //提交路况
+            submitRoad(data);
             break;
         default: break;
         }
@@ -153,5 +168,62 @@ int Connection::getTile(string &data)
     if(sendPacket(sockfd, cmd_getTile, data) != 0)
         return SEND_ERROR;
 
+    return 0;
+}
+
+//传送地图标记
+int Connection::getSymbol(string &data)
+{
+    int level = fromByteString<int>(data);
+    int x = fromByteString<int>(data);
+    int y = fromByteString<int>(data);
+    int side = fromByteString<int>(data);
+    //TODO
+//    qDebug() << level << x << y << side;
+    data = toByteString(0);
+    if(sendPacket(sockfd, cmd_getSymbol, data) != 0)
+        return SEND_ERROR;
+
+    return 0;
+}
+
+//获取任务
+int Connection::getTask(string &data)
+{
+    qDebug() << "get task";
+    data.clear();
+    //发送数据
+    data += toByteString(2);
+    string s("牛肉干");
+    int len = s.size();
+    data += toByteString(len) + s;
+    s = "Lenovo";
+    len = s.size();
+    data += toByteString(len) + s;
+    data += toByteString(173);
+    if(sendPacket(sockfd, cmd_getTask, data) != 0)
+        return SEND_ERROR;
+
+    return 0;
+}
+
+//接受任务
+int Connection::acptTask(string &data)
+{
+    qDebug() << "accept task";
+    data.clear();
+    //TODO
+}
+
+//提交路况
+int Connection::submitRoad(string &data)
+{
+    int type, len;
+    string s;
+    type =fromByteString<int>(data);
+    len = fromByteString<int>(data);
+    s =  fromByteString(data, len);
+    len = fromByteString<int>(data);
+    s = fromByteString(data, len);
     return 0;
 }

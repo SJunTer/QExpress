@@ -26,6 +26,10 @@ private:
     int recvReg(std::string &data);
     int preLoad(std::string &data);
     int getTile(std::string &data);
+    int getSymbol(std::string &data);
+    int getTask(std::string &data);
+    int acptTask(std::string &data);
+    int submitRoad(std::string &data);
 
 signals:
     void close(int);

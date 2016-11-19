@@ -6,17 +6,14 @@ CONFIG += c++11
 QT += widgets
 
 
-INCLUDEPATH += ../network
-INCLUDEPATH += ../security
-INCLUDEPATH += login
-
 FORMS += \
     login/settingdlg.ui \
     login/regdlg.ui \
     login/logindlg.ui \
     aboutdlg.ui \
-    taskwidget.ui \
-    userwidget.ui
+    taskdlg.ui \
+    uploaddlg.ui \
+    userdlg.ui
 
 HEADERS += \
     mainwindow.h \
@@ -32,8 +29,10 @@ HEADERS += \
     ../network/socket.h \
     ../security/des.h \
     aboutdlg.h \
-    taskwidget.h \
-    userwidget.h
+    tileloader.h \
+    taskdlg.h \
+    uploaddlg.h \
+    userdlg.h
 
 SOURCES += \
     main.cpp \
@@ -48,8 +47,10 @@ SOURCES += \
     ../network/socket.cpp \
     ../security/des.cpp \
     aboutdlg.cpp \
-    taskwidget.cpp \
-    userwidget.cpp
+    tileloader.cpp \
+    taskdlg.cpp \
+    uploaddlg.cpp \
+    userdlg.cpp
 
 RESOURCES += \
     icon.qrc

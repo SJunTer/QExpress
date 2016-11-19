@@ -9,7 +9,7 @@ class PathWidget : public QWidget
     Q_OBJECT
 public:
     explicit PathWidget(QWidget *parent = 0);
-    QPushButton btn;
+
 signals:
 
 public slots:

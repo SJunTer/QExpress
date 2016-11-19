@@ -6,7 +6,7 @@
 
 #include <QObject>
 #include "accwidget.h"
-#include "socket.h"
+#include "../network/socket.h"
 
 
 QT_BEGIN_NAMESPACE

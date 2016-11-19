@@ -1,57 +1,59 @@
 #include "mainwindow.h"
 #include "mapview.h"
-#include "socket.h"
+#include "../network/socket.h"
 #include "pathwidget.h"
+#include "taskdlg.h"
+#include "uploaddlg.h"
+#include "userdlg.h"
 #include "aboutdlg.h"
-#include "userwidget.h"
-#include "taskwidget.h"
 #include <QFont>
 #include <QToolButton>
 #include <QPushButton>
 #include <QBoxLayout>
 
-MainWindow::MainWindow(QWidget *parent, ClientSocket *cli)
-    : QMainWindow(parent)
-    , client(cli)
+MainWindow::MainWindow(QWidget *parent, ClientSocket *cli) :
+    QMainWindow(parent),
+    client(cli),
+    uploadDlgShowed(false),
+    userDlgShowed(false),
+    aboutDlgShowed(false)
 {
     setWindowTitle(tr("QExpress"));
     setMinimumSize(800, 600);
 
-    view = new MapView(this, cli);
+    taskDlg = new TaskDlg(client, this);
+
+    view = new MapView(this, client);
     pathWidget = new PathWidget(this);
     zoomInBtn = new QPushButton(this);
     zoomOutBtn = new QPushButton(this);
-    orderBtn = new QToolButton(this);
-    trafficBtn = new QToolButton(this);
+    taskBtn = new QToolButton(this);
+    uploadBtn = new QToolButton(this);
     userBtn = new QToolButton(this);
     aboutBtn = new QToolButton(this);
 
     zoomInBtn->setText("+");
     zoomOutBtn->setText("-");
-    orderBtn->setText("任务");
-    trafficBtn->setText("路况");
+    taskBtn->setText("任务");
+    uploadBtn->setText("路况");
     zoomInBtn->setFixedSize(24,24);
-    zoomOutBtn->setFixedSize(24,24);/*
-    orderBtn->setFixedSize(32,32);
-    trafficBtn->setFixedSize(32,32);
-    userBtn->setFixedSize(64,64);
-    aboutBtn->setFixedSize(32,32);*/
-    orderBtn->setIconSize(QSize(24,24));
-    trafficBtn->setIconSize(QSize(24,24));
+    zoomOutBtn->setFixedSize(24,24);
+    taskBtn->setIconSize(QSize(24,24));
+    uploadBtn->setIconSize(QSize(24,24));
     userBtn->setIconSize(QSize(64,64));
     aboutBtn->setIconSize(QSize(32, 32));
-    orderBtn->setCursor(Qt::PointingHandCursor);
-    trafficBtn->setCursor(Qt::PointingHandCursor);
+    taskBtn->setCursor(Qt::PointingHandCursor);
+    uploadBtn->setCursor(Qt::PointingHandCursor);
     userBtn->setCursor(Qt::PointingHandCursor);
     aboutBtn->setCursor(Qt::PointingHandCursor);
-    orderBtn->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    trafficBtn->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    orderBtn->setIcon(QIcon(":/images/order_32.png"));
-    trafficBtn->setIcon(QIcon(":/images/traffic_32.png"));
+    taskBtn->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    uploadBtn->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    taskBtn->setIcon(QIcon(":/images/order_32.png"));
+    uploadBtn->setIcon(QIcon(":/images/traffic_32.png"));
     userBtn->setIcon(QIcon(":/images/user_64.png"));
     aboutBtn->setIcon(QIcon(":/images/about_48.png"));
-    orderBtn->setStyleSheet("QToolButton{padding:2px}");
-    trafficBtn->setStyleSheet("QToolButton{padding:2px}");
+    taskBtn->setStyleSheet("QToolButton{padding:2px}");
+    uploadBtn->setStyleSheet("QToolButton{padding:2px}");
     userBtn->setStyleSheet("QToolButton{border:0}");
     aboutBtn->setStyleSheet("QToolButton{border:0}");
 
@@ -63,8 +65,8 @@ MainWindow::MainWindow(QWidget *parent, ClientSocket *cli)
     QHBoxLayout *toolLayout = new QHBoxLayout;
     toolLayout->setSpacing(0);
     toolLayout->setMargin(0);
-    toolLayout->addWidget(orderBtn);
-    toolLayout->addWidget(trafficBtn);
+    toolLayout->addWidget(taskBtn);
+    toolLayout->addWidget(uploadBtn);
     toolLayout->addSpacing(10);
     toolLayout->addWidget(userBtn);
     QGridLayout *gridLayout = new QGridLayout;
@@ -81,31 +83,48 @@ MainWindow::MainWindow(QWidget *parent, ClientSocket *cli)
 
     connect(zoomInBtn, SIGNAL(clicked(bool)), view, SLOT(zoomIn()));
     connect(zoomOutBtn, SIGNAL(clicked(bool)), view, SLOT(zoomOut()));
-    connect(orderBtn, SIGNAL(clicked(bool)), this, SLOT(getOrder()));
-    connect(trafficBtn, SIGNAL(clicked(bool)), this, SLOT(UploadTraffic()));
-    connect(userBtn, SIGNAL(clicked(bool)), this, SLOT(userSetting()));
-    connect(aboutBtn, SIGNAL(clicked(bool)), this, SLOT(about()));
+    connect(taskBtn, SIGNAL(clicked(bool)), this, SLOT(on_taskBtn_clicked()));
+    connect(taskBtn, SIGNAL(clicked(bool)), taskDlg, SLOT(update()));
+    connect(uploadBtn, SIGNAL(clicked(bool)), this, SLOT(on_uploadBtn_clicked()));
+    connect(userBtn, SIGNAL(clicked(bool)), this, SLOT(on_userBtn_clicked()));
+    connect(aboutBtn, SIGNAL(clicked(bool)), this, SLOT(on_aboutBtn_clicked()));
 
 }
 
-void MainWindow::getOrder()
+void MainWindow::on_taskBtn_clicked()
 {
-
+    taskDlg->show();
 }
 
-void MainWindow::UploadTraffic()
+void MainWindow::on_uploadBtn_clicked()
 {
-
+    if(uploadDlgShowed)
+        return;
+    UploadDlg *uploadDlg = new UploadDlg(client, this);
+    uploadDlg->setAttribute(Qt::WA_DeleteOnClose);
+    connect(uploadDlg, SIGNAL(closed()), this, SLOT(uploadDlgClosed()));
+    uploadDlg->show();
+    uploadDlgShowed = true;
 }
 
-void MainWindow::userSetting()
+void MainWindow::on_userBtn_clicked()
 {
-
+    if(userDlgShowed)
+        return;
+    UserDlg *userDlg = new UserDlg(this);
+    userDlg->setAttribute(Qt::WA_DeleteOnClose);
+    connect(userDlg, SIGNAL(closed()), this, SLOT(userDlgClosed()));
+    userDlg->show();
+    userDlgShowed = true;
 }
 
-void MainWindow::about()
+void MainWindow::on_aboutBtn_clicked()
 {
-    AboutDlg *dlg = new AboutDlg(this);
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
-    dlg->show();
+    if(aboutDlgShowed)
+        return;
+    AboutDlg *aboutDlg = new AboutDlg(this);
+    aboutDlg->setAttribute(Qt::WA_DeleteOnClose);
+    connect(aboutDlg, SIGNAL(closed()), this, SLOT(aboutDlgClosed()));
+    aboutDlg->show();
+    aboutDlgShowed = true;
 }

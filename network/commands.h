@@ -5,10 +5,23 @@
 // 命令类型定义
 enum commandType {
     cmd_default,    // 缺省命令
+
     cmd_signIn,     // 登陆请求
     cmd_signUp,     // 注册请求
-    cmd_preLoad,    // 预加载地图信息
-    cmd_getTile,    //获取切片
+
+    cmd_preLoad,      // 预加载地图信息
+    cmd_getTile,        //获取切片
+    cmd_getSymbol,  // 获取标记
+
+    cmd_getTask,     // 客户端获取任务
+    cmd_acceptTask,     // 客户端接受任务
+    cmd_startDelv,      // 客户端开始配送
+    cmd_sendPos,       // 客户端发送当前位置
+    cmd_makeRecv,           // 客户端确认送达
+    cmd_taskFinish,     // 客户端完成任务
+
+    cmd_submitRoad,     //客户端提交路况
+
     cmd_closeClient,    // 服务器切断连接
 };
 

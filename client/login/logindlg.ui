@@ -108,7 +108,7 @@
     </font>
    </property>
    <property name="text">
-    <string>登陆</string>
+    <string>登录</string>
    </property>
   </widget>
   <widget class="QPushButton" name="exitBtn">

@@ -10,6 +10,7 @@ class QPushButton;
 class MapView;
 class ClientSocket;
 class PathWidget;
+class TaskDlg;
 QT_END_NAMESPACE
 
 
@@ -26,16 +27,31 @@ private:
 
     QPushButton *zoomInBtn;
     QPushButton *zoomOutBtn;
-    QToolButton *orderBtn;
-    QToolButton *trafficBtn;
+    QToolButton *taskBtn;
+    QToolButton *uploadBtn;
     QToolButton *userBtn;
     QToolButton *aboutBtn;
 
+    TaskDlg *taskDlg;
+
+     bool uploadDlgShowed;
+     bool userDlgShowed;
+     bool aboutDlgShowed;
+
 private slots:
-    void getOrder();
-    void UploadTraffic();
-    void userSetting();
-    void about();
+    void on_taskBtn_clicked();
+    void on_uploadBtn_clicked();
+    void on_userBtn_clicked();
+    void on_aboutBtn_clicked();
+    void uploadDlgClosed() {
+        uploadDlgShowed = false;
+    }
+    void userDlgClosed() {
+        userDlgShowed = false;
+    }
+    void aboutDlgClosed() {
+        aboutDlgShowed = false;
+    }
 
 };
 

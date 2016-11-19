@@ -7,11 +7,11 @@
 #include <QPixmap>
 #include <QGraphicsPixmapItem>
 
-
-class PixmapItem : public QGraphicsItem
+// 地图瓦片
+class MapTileItem : public QGraphicsItem
 {
 public:
-    PixmapItem();
+    MapTileItem();
     void setPixmap(const QPixmap &pix);
     void setOffset(qreal x, qreal y);
 
@@ -23,8 +23,28 @@ private:
     qreal top, left;
     qreal width, height;
     QPixmap pixmap;
-
 };
+
+// 标记
+class SymbolItem : public QGraphicsItem
+{
+public:
+    SymbolItem();
+    void setCoord(qreal x1, qreal y1);
+    void setPixmap(QPixmap &pix);
+    void setTitile(QString &t);
+
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget);
+
+private:
+    qreal x, y;
+    qreal width, height;
+    QPixmap pixmap;
+    QString title;
+};
+
 
 // 返回缩放时固定尺寸的坐标矩阵
 QMatrix stableMatrix(const QMatrix &matrix, const QPointF &p);

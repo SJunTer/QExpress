@@ -1,35 +1,39 @@
-#include "commands.h"
-#include "packet.h"
+#include "../network/commands.h"
+#include "../network/packet.h"
 #include "mapview.h"
 #include "pixmapitem.h"
+#include "tileloader.h"
 #include <string>
 #include <cstdio>
 #include <QFont>
 #include <QDir>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QPixmap>
+#include <QThread>
 #include <QWheelEvent>
 #include <QMessageBox>
 #include <QDebug>
 
-#define MAX(a, b) ((a)>(b)?(a):(b))
-#define MIN(a, b) ((a)<(b)?(a):(b))
 
-MapView::MapView(QWidget *parent, ClientSocket *cli)
-    : QGraphicsView(parent)
-    , client(cli)
-    , preLoaded(false)
+MapView::MapView(QWidget *parent, ClientSocket *cli) :
+    QGraphicsView(parent),
+    client(cli),
+    tileLoading(false),
+    threadWaiting(false),
+    preLoaded(false)
 {
     scene = new QGraphicsScene(this);
 
     for(int i = MIN_LEVEL; i <= MAX_LEVEL; ++i)
     {
         QGraphicsItemGroup *group = new QGraphicsItemGroup;
-        basemap.push_back(group);
+        layers.push_back(group);
         scene->addItem(group);
     }
 
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setDragMode(QGraphicsView::ScrollHandDrag); //手型拖动
 
     // preload geographical informatioin
@@ -42,9 +46,27 @@ MapView::MapView(QWidget *parent, ClientSocket *cli)
     setScene(scene);
     centerOn(center);
 
+    QString s("tmp");
+    makeDir(s);
+
     getTiles();
+
 }
 
+MapView::~MapView()
+{
+    for(auto n : layers)
+    {
+        QGraphicsItemGroup *g = layers.takeFirst();
+        delete g;
+    }
+}
+
+
+
+/*********************************
+ *                     Private Functions                     *
+ * ********************************/
 int MapView::getPreGeoInfo()
 {
     std::string data;
@@ -70,6 +92,7 @@ int MapView::getPreGeoInfo()
     return 0;
 }
 
+//创建文件夹
 void MapView::makeDir(QString &folderName)
 {
     QDir dir(folderName);
@@ -79,105 +102,55 @@ void MapView::makeDir(QString &folderName)
     }
 }
 
-bool MapView::isExisted(QString &fileName)
-{
-    QFile file(fileName);
-    return file.exists();
-}
 
+
+// 加载地图
 int MapView::getTiles()
 {
     if(!preLoaded)
         return -1;
 
-    std::string data;
-    commandType cmd;
-
-    int paddingH = (256-(int)(bound.width())%256)/2;
-    int paddingV = (256-(int)(bound.height())%256)/2;
-    int sceneLeft = bound.x() - paddingH;
-    int sceneTop = bound.y() - paddingV;
-    int sceneRight = bound.x() + bound.width() + paddingH;
-    int sceneBottom = bound.y() +bound.height() + paddingV;
-    int step = (bound.height()+2*paddingV) / pow(2, zoomLevel-MIN_LEVEL);
-
+    // 切片线程
+    thread = new QThread;
     QPoint corner = this->viewport()->rect().bottomRight();
     int viewRight = mapToScene(corner).x();
     int viewBottom = mapToScene(corner).y();
     int viewLeft = mapToScene(0, 0).x();
     int viewTop = mapToScene(0, 0).y();
+    QRect viewRect(viewLeft, viewTop, viewRight-viewLeft, viewBottom-viewTop);
+    TileLoader *tileLoader = new TileLoader(client->sock(), zoomLevel, bound, viewRect, tiles);
+    tileLoader->moveToThread(thread);
+    connect(thread, SIGNAL(started()), tileLoader, SLOT(doWork()));
+    connect(tileLoader, SIGNAL(taskFinished()), thread, SLOT(quit()));
+    connect(thread, SIGNAL(finished()), tileLoader, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 
-    qDebug() << step;
-    qDebug() << bound.width() << bound.height();
-    qDebug() << sceneLeft << sceneRight << sceneTop << sceneBottom;
-    qDebug() << viewLeft << viewRight << viewTop << viewBottom;
+    connect(tileLoader, SIGNAL(taskFinished()), this, SLOT(setLoadFlag()));
+    connect(tileLoader, SIGNAL(drawPixmap(QString,int,int,int)), this, SLOT(drawPixmap(QString,int,int,int)));
+    connect(this, SIGNAL(stopLoading()), tileLoader, SLOT(stop()), Qt::DirectConnection);
 
-    QString s("tmp");
-    makeDir(s);
-    //*********增加判断切片是否已显示
-    viewTop = MAX(viewTop, sceneTop);
-    viewLeft = MAX(viewLeft, sceneLeft);
-    for(int y = viewTop - (viewTop-sceneTop)%256; y < MIN(viewBottom, sceneBottom); y += step)
+    if(tileLoading)
     {
-        int row = (y-sceneTop) / step;
-        for(int x = viewLeft - (viewLeft-sceneLeft)%256; x < MIN(viewRight, sceneRight); x += step)
-        {
-            int col = (x-sceneLeft) / step;
-            QString fileName = QString("tmp/%1_%2_%3.png").arg(zoomLevel).arg(row).arg(col);
-            qDebug() << fileName;
-            PixmapItem *pix = new PixmapItem;
-
-            if(!isExisted(fileName))
-            {
-//                qDebug() << fileName<<"not existed";
-                data.clear();
-                data += toByteString(zoomLevel) + toByteString(row) + toByteString(col);
-                if(sendPacket(client->sock(), cmd_getTile, data) != 0)
-                    return SEND_ERROR;
-                if(recvPacket(client->sock(), &cmd, data) != 0)
-                    return RECV_ERROR;
-                int len = fromByteString<int>(data);
-                if(len == 0)
-                    continue;
-                FILE *fp;
-                if((fp = fopen(fileName.toStdString().c_str(), "wb")) == NULL)
-                {
-                    qDebug() << "cannot create file";
-                    continue;   //无法创建文件
-                }
-                for(int i = 0; i < len; ++i)
-                {
-                    fwrite((char*)&data[i], sizeof(char), 1, fp);
-                }
-                fclose(fp);
-            }
-            QPixmap p(fileName);
-            pix->setPixmap(p);
-            pix->setOffset(x, y);
-            basemap[zoomLevel-MIN_LEVEL]->addToGroup(pix);
-        }
+        qDebug() << "set thread waiting";
+        threadWaiting = true;
+        emit stopLoading();
     }
+    else
+    {
+        threadWaiting = false;
+        tileLoading = true;
+        thread->start();
+    }
+
     //************增加缓冲保护（缩放动画显示，再加载图片）
 
     return 0;
 }
 
-int MapView::getSymbols()
-{
 
-}
-
-void MapView::setLayerVisible()
-{
-    for(int i = MIN_LEVEL; i <= MAX_LEVEL; ++i)
-    {
-        if(i == zoomLevel)
-            basemap[i-MIN_LEVEL]->setVisible(true);
-        else
-            basemap[i-MIN_LEVEL]->setVisible(false);
-    }
-}
-
+/*********************************
+ *                       Event Overload                      *
+ * ********************************/
 void MapView::wheelEvent(QWheelEvent *event)
 {
     center = mapToScene((event->pos()+rect().center())/2);
@@ -191,14 +164,53 @@ void MapView::wheelEvent(QWheelEvent *event)
 void MapView::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
-/*   QGraphicsView::mouseReleaseEvent(event);
-    qDebug() << center;
-    qDebug() << mapToScene(viewport()->rect().center());
-    if(center == mapToScene(viewport()->rect().center()))
-        return;
-    qDebug() <<"view changed";
-    getTiles();*/
+
+    center = mapToScene(viewport()->rect().center());
+    centerOn(center);
+    getTiles();
+    setLayerVisible();
+//    update();
 }
+
+void MapView::setLoadFlag()
+{
+    tileLoading = false;
+    qDebug() << "set load flag";
+    qDebug() << "thread waiting: " << threadWaiting;
+    if(threadWaiting)
+    {
+        threadWaiting = false;
+        tileLoading = true;
+        thread->start();
+    }
+}
+
+/*
+void MapView::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+
+    getTiles();
+    setLayerVisible();
+}
+
+
+void MapView::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+
+    center = mapToScene(viewport()->rect().center());
+    centerOn(center);
+    QGraphicsView::mouseMoveEvent(event);
+    getTiles();
+    setLayerVisible();
+}*/
+
+
+
+/*********************************
+ *                         Public Slots                          *
+ * ********************************/
 
 // 放大视图
 void MapView::zoomIn()
@@ -224,4 +236,37 @@ void MapView::zoomOut()
         getTiles();
         setLayerVisible();
     }
+}
+
+void MapView::setLayerVisible()
+{
+    for(int i = MIN_LEVEL; i <= MAX_LEVEL; ++i)
+    {
+        if(i == zoomLevel)
+            layers[i-MIN_LEVEL]->setVisible(true);
+        else
+            layers[i-MIN_LEVEL]->setVisible(false);
+    }
+}
+
+
+void MapView::drawPixmap(QString fileName, int lv, int x, int y)
+{
+    MapTileItem *pix = new MapTileItem;
+    QPixmap p(fileName);
+    pix->setPixmap(p);
+    pix->setOffset(x, y);
+//    qDebug() << x << y;
+    tiles.push_back(fileName);
+    layers[lv-MIN_LEVEL]->addToGroup(pix);
+}
+
+void MapView::drawSymbol(QString symbolName, int lv, int x, int y)
+{
+    SymbolItem *symbol = new SymbolItem;
+    QPixmap p(";/images/symbol_24.png");
+    symbol->setPixmap(p);
+    symbol->setCoord(x, y);
+    symbol->setTitile(symbolName);
+    layers[lv-MIN_LEVEL]->addToGroup(symbol);
 }

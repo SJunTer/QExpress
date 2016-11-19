@@ -24,15 +24,15 @@ void TileMaker::doWork()
     int cornerX = scene->itemsBoundingRect().x() - paddingH;
     int cornerY = scene->itemsBoundingRect().y() - paddingV;
     const int grid[] = { 10,10,10,10,10,10,10,12,16,23,32,45 };
-    qDebug() << cornerX << cornerY;
+//    qDebug() << cornerX << cornerY;
 
     makeDir("tiles");
-    for(currLevel = MIN_LEVEL; !stopped && currLevel <= maxLevel; ++currLevel)
+    for(currLevel = /*MIN_LEVEL*/14; !stopped && currLevel <= maxLevel; ++currLevel)
     {
         makeDir(QString("tiles/%1").arg(currLevel));
         emit setLayerVisible(currLevel);
         int step = (scene->itemsBoundingRect().height()+2*paddingV) / pow(2, currLevel-MIN_LEVEL);
-        qDebug() << step;
+//        qDebug() << step;
         //make dirs
         for(int row = 0; !stopped && row*grid[currLevel-MIN_LEVEL] < pow(2, currLevel-MIN_LEVEL); ++row)
         {
@@ -51,12 +51,13 @@ void TileMaker::doWork()
                 if(stopped)
                     break;
                 pix.fill(Qt::white);
+//                qDebug() << cornerX+col*step << cornerY+row*step;
                 scene->render(&painter, QRectF(), QRect(cornerX+col*step, cornerY+row*step, step, step));
                 QString filename = QString("tiles/%1/%2_%3/%4_%5.png").arg(currLevel).
                         arg(row/grid[currLevel-MIN_LEVEL]).arg(col/grid[currLevel-MIN_LEVEL]).arg(row).arg(col);
                 pix.save(filename);
                 ++cnt;
-                if(cnt % 10 == 0)
+                //if(cnt % 10 == 0)
                     emit updateProgress(cnt);
             }
         }
@@ -132,6 +133,7 @@ int TilesDlg::getTotalCnt(int maxLevel)
     int sum = 0;
     for(int lv = MIN_LEVEL; lv <= maxLevel; ++lv)
         sum += pow(4, lv-MIN_LEVEL);
+    qDebug() << sum;
     return sum;
 }
 
@@ -141,7 +143,7 @@ void TilesDlg::start()
     startBtn->setEnabled(false);
     running = true;
     nComplete = 0;
-    int maxLevel = 12;
+    int maxLevel = 18;
     nTotal = getTotalCnt(maxLevel);
     proBar->setRange(0, nTotal-1);
     label->setText(QString("0/%1--0%").arg(nTotal));

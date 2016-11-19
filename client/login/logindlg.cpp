@@ -1,6 +1,6 @@
-#include "commands.h"
-#include "packet.h"
-#include "socket.h"
+#include "../network/commands.h"
+#include "../network/packet.h"
+#include "../network/socket.h"
 #include "logindlg.h"
 #include "regdlg.h"
 #include "settingdlg.h"
@@ -21,8 +21,7 @@ LoginDlg::LoginDlg(QWidget *parent)
 {
     ui->setupUi(this);
     cli = new ClientSocket;
-
-
+    setWindowTitle("登录");
 }
 
 LoginDlg::~LoginDlg()

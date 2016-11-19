@@ -18,6 +18,7 @@ RegDlg::RegDlg(QWidget *parent)
     setTabOrder(ui->agreeBox, ui->regBtn);
     setTabOrder(ui->regBtn, ui->cancelBtn);
     setTabOrder(ui->cancelBtn, ui->usrLineEdit);
+    setWindowTitle("注册");
 }
 
 RegDlg::~RegDlg()

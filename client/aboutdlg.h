@@ -15,6 +15,12 @@ public:
     explicit AboutDlg(QWidget *parent = 0);
     ~AboutDlg();
 
+signals:
+    void closed();
+
+private slots:
+    void on_okBtn_clicked();
+
 private:
     Ui::AboutDlg *ui;
 };

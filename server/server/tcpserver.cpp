@@ -1,5 +1,5 @@
 #include "tcpserver.h"
-#include "commands.h"
+#include "../network/commands.h"
 #include "connection.h"
 #include <QThread>
 #include <QDebug>
