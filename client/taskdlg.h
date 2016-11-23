@@ -2,8 +2,9 @@
 #define TASKDLG_H
 
 #include <QDialog>
+#include <QList>
 #include <QStringList>
-
+#include "deliverypath.h"
 
 QT_BEGIN_NAMESPACE
 class ClientSocket;
@@ -27,8 +28,7 @@ private:
     Ui::TaskDlg *ui;
 
     ClientSocket *client;
-    QStringList cargos;
-    int truckId;
+    DeliveryPath path;
     bool accepted;
     bool taskLoaded;
 
@@ -37,12 +37,15 @@ private:
 
 signals:
     void acptTask();
+    void sendPath(QList<Place> &ps);
+    void endTask();
 
 private slots:
     void on_acptBtn_clicked();
+    void on_endBtn_clicked();
 
 public slots:
-    void update();
+    void update();  // 更新任务
 };
 
 #endif // TASKDLG_H

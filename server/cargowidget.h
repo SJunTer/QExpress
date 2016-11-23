@@ -1,5 +1,5 @@
-#ifndef INVENTORYWIDGET_H
-#define INVENTORYWIDGET_H
+#ifndef CARGOWIDGET_H
+#define CARGOWIDGET_H
 
 #include <QWidget>
 #include <QList>
@@ -9,6 +9,7 @@
 QT_BEGIN_NAMESPACE
 class QPushButton;
 class QTableWidget;
+class Dbsql;
 QT_END_NAMESPACE
 
 
@@ -21,16 +22,16 @@ class CargoInfo : public QObject
 {
     Q_OBJECT
 public:
-    CargoInfo() : m_isSelect(false), m_index(0), m_descrip(""),
-        m_dest(""), m_reciver(""), m_status(InRepo) {}
+    CargoInfo() : m_isSelect(false), id(0), descrip(""),
+        dest(""), reciver(""), status(InRepo) {}
 
     bool m_isSelect;
 
-    int m_index;
-    QString m_descrip;
-    QString m_dest;
-    QString m_reciver;
-    cargoStatus m_status;
+    int id;
+    QString descrip;
+    QString dest;
+    QString reciver;
+    int status;
 
 public slots:
     // 响应复选框
@@ -38,12 +39,14 @@ public slots:
 };
 
 
-class InventoryWidget : public QWidget
+class CargoWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit InventoryWidget(QWidget *parent = 0);
-    ~InventoryWidget();
+    explicit CargoWidget(Dbsql *d, QWidget *parent = 0);
+    ~CargoWidget();
+
+    void readInfo();
 
     void setSelectMode(bool mode) {
         selectMode = mode;
@@ -52,11 +55,11 @@ public:
 private:
     void initTable();
 
+    Dbsql *dbsql;
     QTableWidget *cargoTable;
     QPushButton *addBtn;
     QPushButton *delBtn;
     QPushButton *applyBtn;
-    QPushButton *cancelBtn;
     QPushButton *selectBtn;
 
     CargoInfo *temp;
@@ -75,12 +78,11 @@ private slots:
     void addRecord();
     void delRecord();
     void applyRecord();
-    void cancelRecord();
     void selectCargo();
 
 public slots:
-    void complete(int index);
+    void complete(int i);
 
 };
 
-#endif // INVENTORYWIDGET_H
+#endif // CARGOWIDGET_H

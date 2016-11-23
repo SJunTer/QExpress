@@ -11,6 +11,7 @@ class MapView;
 class ClientSocket;
 class PathWidget;
 class TaskDlg;
+class AboutDlg;
 QT_END_NAMESPACE
 
 
@@ -33,10 +34,10 @@ private:
     QToolButton *aboutBtn;
 
     TaskDlg *taskDlg;
+    AboutDlg *aboutDlg;
 
-     bool uploadDlgShowed;
-     bool userDlgShowed;
-     bool aboutDlgShowed;
+    bool uploadDlgShowed;
+    bool userDlgShowed;
 
 private slots:
     void on_taskBtn_clicked();
@@ -48,9 +49,6 @@ private slots:
     }
     void userDlgClosed() {
         userDlgShowed = false;
-    }
-    void aboutDlgClosed() {
-        aboutDlgShowed = false;
     }
 
 };

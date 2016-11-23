@@ -27,6 +27,7 @@ LoginDlg::LoginDlg(QWidget *parent)
 LoginDlg::~LoginDlg()
 {
     delete ui;
+    delete cli;
 }
 
 
@@ -37,28 +38,6 @@ int LoginDlg::testUsrPw(const QString &usr, const QString &pwd)
     data += toByteString(usr.size()) + usr.toStdString().c_str();
     data += toByteString(pwd.size()) + pwd.toStdString().c_str();
     if(sendPacket(cli->sock(), cmd_signIn, data) != 0)
-        return SEND_ERROR;
-    if(recvPacket(cli->sock(), &cmd, data) != 0)
-        return RECV_ERROR;
-    int ret = fromByteString<int>(data);
-    return ret;
-}
-
-int LoginDlg::sendRegInfo(Account &a)
-{
-    std::string data;
-    commandType cmd;
-    data += toByteString(a.username.size());
-    data += a.username.toStdString().c_str();
-    data += toByteString(a.password.size());
-    data += a.password.toStdString().c_str();
-    data += toByteString(a.name.size());
-    data += a.name.toStdString().c_str();
-    data += toByteString(a.phone.size());
-    data += a.phone.toStdString().c_str();
-    data += toByteString(a.email.size());
-    data += a.email.toStdString().c_str();
-    if(sendPacket(cli->sock(), cmd_signUp, data) != 0)
         return SEND_ERROR;
     if(recvPacket(cli->sock(), &cmd, data) != 0)
         return RECV_ERROR;
@@ -117,14 +96,20 @@ void LoginDlg::on_loginBtn_clicked()
         cli->closeSock();
         return;
     }
+    else if(ret == LOGIN_OL)
+    {
+        QMessageBox::warning(this, tr("错误"), tr("帐号处于在线状态，无法登录！"), QMessageBox::Ok);
+        ui->usrLineEdit->setFocus();
+        cli->closeSock();
+        return;
+    }
     QDialog::accept();
 }
 
 // 注册
 void LoginDlg::on_signupBtn_clicked()
 {
-    RegDlg *dlg = new RegDlg(this);
-    connect(dlg, SIGNAL(reg(Account&)), this, SLOT(reg(Account&)));
+    RegDlg *dlg = new RegDlg(port, ip, this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->exec();
 }
@@ -142,33 +127,6 @@ void LoginDlg::on_toolButton_clicked()
 /*******************************
 //---------------------公有槽函数--------------------------
 *******************************/
-
-//注册帐号
-bool LoginDlg::reg(Account &a)
-{
-    // 连接服务器
-    if(cli->init(port, ip.toStdString().c_str()) != 0)
-    {
-        cli->closeSock();
-        return false;
-    }
-    if(cli->connectTo() != 0)
-    {
-        cli->closeSock();
-        return false;
-    }
-    if(sendRegInfo(a) == REG_NO)    // 发送注册信息
-    {
-        cli->closeSock();
-        return false;
-    }
-    else
-    {
-        cli->closeSock();
-        return true;
-    }
-}
-
 //设置网络信息
 void LoginDlg::setInfo(QString &s, int p)
 {

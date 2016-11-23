@@ -1,12 +1,14 @@
 <RCC>
     <qresource prefix="/">
         <file>images/background.jpg</file>
-        <file>images/info.png</file>
+        <file>images/about.png</file>
         <file>images/map_marker_48.png</file>
         <file>images/repo_marker_48.png</file>
         <file>images/TabBar_icon_0.png</file>
         <file>images/truck_icon_48.png</file>
         <file>images/symbol_24.png</file>
         <file>images/symbol_32.png</file>
+        <file>images/msg_32.png</file>
+        <file>images/msg_new_32.png</file>
     </qresource>
 </RCC>

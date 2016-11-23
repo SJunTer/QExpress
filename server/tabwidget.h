@@ -14,14 +14,14 @@
 #define TAB_HEIGHT 33
 #define TAB_SPACING 5
 #define TAB_MARGIN 20
-#define ICON_SIZE 48
-#define LEFT_INDENT 30
+#define ICON_SIZE 0//48
+#define LEFT_INDENT 15
 
-/* ***************************************** *
+/* ********************* *
  * ----------------------------------------- *
- * |                TabItem                | *
+ * |            TabItem              | *
  * ----------------------------------------- *
- * ***************************************** */
+ * ********************* */
 
 class TabItem : public QObject
 {

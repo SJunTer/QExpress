@@ -25,9 +25,7 @@ TileLoader::TileLoader(int sock, int lv, QRectF sr, QRectF vr, QVector<QString> 
 //执行切片任务
 void TileLoader::doWork()
 {
-    qDebug() << "start work";
-    std::string data;
-    commandType cmd;
+//    qDebug() << "start work";
 
     int paddingH = (256-(int)(sceneRect.width())%256)/2;
     int paddingV = (256-(int)(sceneRect.height())%256)/2;
@@ -42,9 +40,9 @@ void TileLoader::doWork()
     int viewLeft = viewRect.left();
     int viewTop = viewRect.top();
 
-    qDebug() << sceneRect.width() << sceneRect.height();
-    qDebug() << sceneLeft << sceneRight << sceneTop << sceneBottom;
-    qDebug() << viewLeft << viewRight << viewTop << viewBottom;
+//    qDebug() << sceneRect.width() << sceneRect.height();
+//    qDebug() << sceneLeft << sceneRight << sceneTop << sceneBottom;
+//    qDebug() << viewLeft << viewRight << viewTop << viewBottom;
 //    qDebug() << mapFromScene(viewLeft, viewTop) << mapFromScene(viewRight, viewBottom);
 
     viewTop = MAX(viewTop, sceneTop);
@@ -52,6 +50,9 @@ void TileLoader::doWork()
     if(zoomLevel == 9)
         int n = 0;
     stopped = false;
+
+    std::string data;
+    commandType cmd;
     for(int y = viewTop - (viewTop-sceneTop)%step; !stopped && y < MIN(viewBottom, sceneBottom); y += step)
     {
         int row = (y-sceneTop) / step;
@@ -108,7 +109,7 @@ void TileLoader::doWork()
                 return;
             }
             int len = fromByteString<int>(data);
-            qDebug() << len;
+//            qDebug() << len;
             if(len == 0)    // 没有图片则跳过
                 continue;
             FILE *fp;
@@ -121,5 +122,7 @@ void TileLoader::doWork()
 
         }//for x,y
     }
+
+
     emit taskFinished();
 }

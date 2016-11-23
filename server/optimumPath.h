@@ -26,121 +26,83 @@ using namespace std;
 
 struct dist
 {
-	long vertexA;
-
+    long vertexA;
     long vertexB;
-
     double length;
 };
 
 struct Node
 {
-	long vertexNum;
-
+    long vertexNum;
     double edge;
 };
 
 struct ListNode
 {
-	long vertexNum;
-
+    long vertexNum;
     double edge;
-
     ListNode *next;
 };
 
 struct Vertex
 {
-	ListNode *adj;
-
-	bool known;
-
+    ListNode *adj;
+    bool known;
     double dist;
-
     long path;
 
 public:
-	Vertex();
-
-	void newMyListNode(long n, double m);
-
-	~Vertex();
+    Vertex();
+    void newMyListNode(long n, double m);
+    ~Vertex();
 };
 
 struct myPoint
 {
-	long numSrc;
+    long numSrc;
     long to;
-	double distance;
+    double distance;
 };
 
 struct Path
 {
-	int *citys;
-
-	double len;
+    int *citys;
+    double len;
 };
 
 class Graph
 {
 private:
-	long numVertex, numEdge;
-
-	long origin, destination;
-
-	int numPoint;
-
-	double theDist;
-
-	priority_queue<Node> myQueue;
-
-	struct Vertex *myVertex;
-
-	myPoint* pointArray;
-
-	Path actualPath;
-
+    long numVertex, numEdge;
+    long origin, destination;
+    int numPoint;
+    double theDist;
+    priority_queue<Node> myQueue;
+    struct Vertex *myVertex;
+    myPoint* pointArray;
+    Path actualPath;
     QVector<long> SectionalPath;
-
     bool found;
-
-	void InitmyVertex();
-
-	void InitOriDes();
-
-	void Dijkstra();
-
+    void InitmyVertex();
+    void InitOriDes();
+    void Dijkstra();
     void ClearMyRoom(QVector<long> &path);
-
     void Print(QVector<long> &path);
-
     void PrintPath(int vertex, QVector<long> &path);
-
     void SavePath(QVector<long> &path);
-
-
-
     void CleanRoom(QVector<long> &vPath);
-
     void InitNum(QVector<long> &point);
-
-	void Initdis();
-
-	void InitOriPath_Cal();
-
+    void Initdis();
+    void InitOriPath_Cal();
     void SavaBestPath(QVector<long> &path);
-
-	Path GetNext(Path &p);
-
-	void SA();
+    Path GetNext(Path &p);
+    void SA();
 
 public:
 
     void GenerateGraph(long n, long m, QList<dist> &myList);
     void GetDist(long n, long m, QVector<long> &path, double &theDist);
     void BestPath(QVector<long> &point, QVector<long> &path);
-
-
     ~Graph();
 };
 

@@ -49,10 +49,10 @@ MapView::MapView(QWidget *parent = 0)
     centerOn(center);
 
     // store as algorithm style
-//    convertData();
-//    graph->GenerateGraph(vertexs.size(), distances.size(), distances);
+    convertData();
+    graph->GenerateGraph(vertexs.size(), distances.size(), distances);
 
-
+    qDebug() << scene->itemsBoundingRect();
 }
 
 MapView::~MapView()
@@ -73,8 +73,9 @@ void MapView::initLayers(QString filePath)
     gstFile->openFile(filePath.toStdString().c_str());
     gstFile->getGeoDefn(originCenter, zoom);
     center = originCenter;
+    qDebug() << center;
     //-------------设置初始缩放等级
-    levelToZoom(zoomLevel);
+    zoom = levelToZoom(zoomLevel);
     gstFile->getTableDefn(layers);
     gstFile->closeFile();
 }
@@ -99,14 +100,14 @@ void MapView::layerVisible(double zoom)
         layer->setVisible(zoom);
 }
 
-void MapView::levelToZoom(int level)
+double MapView::levelToZoom(int level)
 {
-    zoom = pow(2, (MAX_LEVEL-level))*0.75;
+    return pow(2, (MAX_LEVEL-level))*0.75;
 }
 
-void MapView::zoomToLevel()
+int MapView::zoomToLevel(double zoom)
 {
-    zoomLevel = MAX_LEVEL - log2(zoom);
+    return MAX_LEVEL - log2(zoom);
 }
 
 
@@ -271,23 +272,23 @@ void MapView::clearMarker()
 void MapView::drawPath(DeliveryPath *path)
 {
     Polyline *line = new Polyline;
-    for(auto p : path->m_path)
-        line->addPoint(vertexs[p.index].x(), vertexs[p.index].y());
+    for(auto p : path->places)
+        line->addPoint(p.coord.x(), p.coord.y());
+
     line->setBounds();
     QPen pen;
     pen.setColor(Qt::red);
     pen.setWidth(5);
     pen.setCosmetic(true);
     line->setPen(pen);
-
     scene->addItem(line);
     paths.append(line);
 
     PixmapItem *car = new PixmapItem;
     car->setZValue(1);
     car->setPixmap(QPixmap(":/images/truck_icon_48.png"));
-    int index = path->m_path[0].index;
-    car->setOffset(vertexs[index].x()-ICON_SIZE/2, vertexs[index].y()-ICON_SIZE/2);
+    QPointF p = path->places[0].coord;
+    car->setOffset(p.x()-ICON_SIZE/2, p.y()-ICON_SIZE/2);
     car->setAlignPos(PixmapItem::Center);
     cars.push_back(car);
     scene->addItem(car);
@@ -307,11 +308,11 @@ void MapView::removePath(int index)
 
 void MapView::updatePath(int index, DeliveryPath *path)
 {
-    if(path->m_pos > 1)
+    if(path->pos > 0)
     {
         Polyline *line = new Polyline;
-        line->addPoint(vertexs[path->m_path[path->m_pos-2].index].x(),vertexs[path->m_path[path->m_pos-2].index].y());
-        line->addPoint(vertexs[path->m_path[path->m_pos-1].index].x(),vertexs[path->m_path[path->m_pos-1].index].y());
+        line->addPoint(path->places[path->pos-2].coord.x(), path->places[path->pos-2].coord.y());
+        line->addPoint(path->places[path->pos-1].coord.x(), path->places[path->pos-1].coord.y());
         line->setBounds();
         QPen pen;
         pen.setColor(Qt::blue);
@@ -320,10 +321,30 @@ void MapView::updatePath(int index, DeliveryPath *path)
         line->setPen(pen);
 
         scene->addItem(line);
-        int v_index = path->m_path[path->m_pos-1].index;
-        cars[index]->setOffset(vertexs[v_index].x()-ICON_SIZE/2, vertexs[v_index].y()-ICON_SIZE/2);
+        QPointF p = path->places[path->pos-1].coord;
+        cars[index]->setOffset(p.x()-ICON_SIZE/2, p.y()-ICON_SIZE/2);
         scene->update();
     }
+}
+
+//返回矩形范围内的可见标记
+QList<Point *> MapView::getVsibleSymbols(QRectF rect, int level)
+{
+    QList<Point *> points;
+    double zm = levelToZoom(level);
+    for(int i = 0; i < layers.size(); ++i)
+    {
+        if(layers[i]->isVisible(zm))    // 获得可见图层
+        {
+            QList<Point *> ps = layers[i]->m_points;
+            for(int j = 0; j < ps.size(); ++j)  // 遍历标记
+            {
+                if(rect.contains(ps[j]->points[0])) // 如果在矩形内
+                    points.push_back(ps[j]);
+            }
+        }
+    }
+    return points;
 }
 
 
@@ -444,6 +465,7 @@ void MapView::removePoint()
     }
 }
 
+// 计算路径
 void MapView::calculatePath()
 {
     if(!repoSelected) {
@@ -456,29 +478,94 @@ void MapView::calculatePath()
     }
 
     QVector<long> path, points;
-    QStringList nameList;
-
-    for(auto n : selectedPoints)
+    QList<Place> tempPlaces, places;
+    qDebug() << "start selectedPoints";
+    for(int index = 0; index < selectedPoints.size(); ++index)
     {
-        //获得途径点名称
-        nameList << n->getName();
+        Place p;
+        p.title = selectedPoints[index]->getName();
+        if(index == 0)
+            p.type = IsRepo;
+        else
+            p.type = IsDely;
+        p.coord = selectedPoints[index]->points[0];
+        tempPlaces.push_back(p);
 
+        //查找离标记点最近的路径点
         double min = 1000000000.0;
-        long index = -1;
-        for(auto iter = vertexs.begin(); iter != vertexs.end(); ++iter)
+        long p_id = -1;
+        for(int i = 0; i < vertexs.size(); ++i)
         {
-            double len = getLen(*iter, n->points[0]);
+            double len = getLen(vertexs[i], selectedPoints[index]->points[0]);
             if(len < min)
             {
                 min = len;
-                index = (iter-vertexs.begin());
+                p_id = i;
             }
         }
-        points.push_back(index);
+        if(p_id == -1)  //  异常
+            return;
+        points.push_back(p_id);
+
+        p.coord = vertexs[p_id];
+        p.title = "";
+        p.type = IsPass;
+        tempPlaces.push_back(p);
     }
+    qDebug() << "end selectedPoints";
+    qDebug() << "start caculate";
+    qDebug() << points.size();
     graph->BestPath(points, path);
-//    double a;
-//    graph->GetDist(points[0], points[1], path, a);
+
+    qDebug() << "end caculate";
+    qDebug() << "start places";
+    for(int i = 0; i < path.size(); ++i)    //path为返回路径点
+    {
+        Place p;
+        int index = -1;
+        for(int j = 0; j < tempPlaces.size(); ++j)
+        {
+            if(tempPlaces[j].coord == vertexs[path[i]])
+            {
+                index = j;
+                break;
+            }
+        }
+        if(index == -1) //  路径点不在配送点中
+        {
+            if(i == path.size() -1)   //终点
+            {
+                places.push_back(places[1]);
+                places.push_back(places[0]);
+            }
+            else
+            {
+                p.coord = vertexs[path[i]];
+                p.title = "";
+                p.type = IsPass;
+                places.push_back(p);
+            }
+        }
+        else
+        {
+            if(i == 0)  // 起点
+            {
+                places.push_back(tempPlaces[index-1]);  //标记点
+                places.push_back(tempPlaces[index]);    //路径点
+                tempPlaces.takeAt(index);
+                tempPlaces.takeAt(index-1);
+            }
+            else    //配送点
+            {
+                places.push_back(tempPlaces[index]);    //路径点
+                places.push_back(tempPlaces[index-1]);  //标记点
+                places.push_back(tempPlaces[index]);    //路径点
+                tempPlaces.takeAt(index);
+                tempPlaces.takeAt(index-1);
+            }
+        }
+    }//while path
+    qDebug() << "end places";
 
     //释放selectedPoints中所有元素
     selectedPoints.clear();
@@ -487,7 +574,7 @@ void MapView::calculatePath()
     setSelectMode(false);
 
     //发送信号
-    emit transferData(points, path, nameList);
+    emit transferData(places);
 
 }
 
@@ -500,7 +587,7 @@ void MapView::zoomOut()
     if(zoomLevel > MIN_LEVEL) // 缩小视图
     {
         --zoomLevel;
-        levelToZoom(zoomLevel);
+        zoom = levelToZoom(zoomLevel);
         qDebug() << zoom;
         scale(0.5,0.5);
         layerVisible(zoom);
@@ -513,9 +600,9 @@ void MapView::zoomOut()
 void MapView::setLayerVisible(int level)
 {
     if(level == 0)
-        levelToZoom(zoomLevel);
+        zoom = levelToZoom(zoomLevel);
     else
-        levelToZoom(level);
+        zoom = levelToZoom(level);
     layerVisible(zoom);
 }
 
@@ -524,7 +611,7 @@ void MapView::zoomIn()
     if(zoomLevel < MAX_LEVEL)
     {
         ++zoomLevel;
-        levelToZoom(zoomLevel);
+        zoom = levelToZoom(zoomLevel);
         qDebug() << zoom;
         scale(2,2);
         layerVisible(zoom);

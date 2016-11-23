@@ -222,7 +222,7 @@ void Point::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 
     painter->setRenderHint(QPainter::Antialiasing, true);
     QPointF p = points[0];
-//    painter->setMatrix(stableMatrix(painter->worldMatrix(), p));
+    painter->setMatrix(stableMatrix(painter->worldMatrix(), p));
     /*
     QPen pen;
     pen.setCosmetic(true);
@@ -230,7 +230,7 @@ void Point::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     if(getName() != "")
     {
         painter->drawPixmap(p.x()-width/2, p.y()-height/2, width, height, pixmap);
-        //            painter->drawText(QPointF(points[0].x(), points[0].y()),getName());
+        painter->drawText(QPointF(points[0].x(), points[0].y()),getName());
     }
 }
 
@@ -240,6 +240,11 @@ void Point::setBounds()
     maxX = points[0].x() + POS_ICON_SIZE;
     minY = points[0].y() - POS_ICON_SIZE;
     maxY = points[0].y() + POS_ICON_SIZE;
+}
+
+QPointF Point::getPoint()
+{
+    return points[0];
 }
 
 void Point::setPixmap(const QPixmap &pix)

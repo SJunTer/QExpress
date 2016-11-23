@@ -67,10 +67,12 @@ void MapLayer::addToScene(QGraphicsScene *scene)
 
 void MapLayer::setVisible(double zoom)
 {
-    if(zoom >= minZoom && zoom <= maxZoom)
-        group->setVisible(true);
-    else
-        group->setVisible(false);
+    group->setVisible(isVisible(zoom));
+}
+
+bool MapLayer::isVisible(double zoom)
+{
+    return (zoom >= minZoom && zoom <= maxZoom);
 }
 
 
@@ -79,4 +81,7 @@ void coordTransform(double &x, double &y)
 {
     x = x / 360 * 256 * pow(2,18);
     y = -log(tan((90+y)/360*PI)) / (2*PI) * 256 * pow(2,18);
+
+/*    x = (x-116.0) / 360 * 256 * pow(2,18);
+    y = -(y-28.6) / 360 * 256 * pow(2,18);*/
 }

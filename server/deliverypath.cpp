@@ -1,7 +1,7 @@
 #include "deliverypath.h"
 #include <QTimer>
 #include <QDebug>
-
+/*
 DeliveryPath::DeliveryPath()
     : m_truck("")
     , m_cargo("")
@@ -84,3 +84,4 @@ void DeliveryPath::clear()
     m_path.clear();
     m_points.clear();
 }
+*/

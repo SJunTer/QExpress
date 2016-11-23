@@ -4,26 +4,14 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
+#include <QList>
 #include <QTime>
 #include <QStringList>
 
 QT_BEGIN_NAMESPACE
-class QTimer;
 QT_END_NAMESPACE
 
-enum PointType {
-    IsRepo, IsDely, IsPass
-};
-
-// 途经点
-struct point
-{
-    long index;
-    QString name;
-    PointType type;
-    QTime time;
-};
-
+/*
 struct s_path
 {
     long index;
@@ -63,10 +51,10 @@ private:
 signals:
     void posChange(int m_pos, int index);
 
-/*计时器*/
+/*计时器
 private slots:
     void updateStatus();
 
 };
-
+*/
 #endif // DELIVERYPATH_H

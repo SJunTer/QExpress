@@ -57,7 +57,12 @@ T fromByteString(std::string &s)
     {
         temp[index] = s[index];
     }
-    s = s.substr(sizeof(T), s.size()-1);
+    std::string tmp;
+    for(int i = sizeof(T); i < s.size(); ++i)
+    {
+        tmp.push_back(s[i]);
+    }
+    s = tmp;
     memcpy(&n, temp, sizeof(T));
     return n;
 }

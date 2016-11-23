@@ -50,11 +50,16 @@ void UploadDlg::on_submitBtn_clicked()
         QMessageBox::warning(this, "提示", "请填写详细情况", QMessageBox::Ok);
         return;
     }
-    string s;
-    s += toByteString(type);
-    s += toByteString(address.size()) + address.toStdString();
-    s += toByteString(detail.size()) + detail.toStdString();
-    if(sendPacket(client->sock(), cmd_submitRoad, s) != 0)
+    string data, s;
+    int len;
+    data += toByteString(type);
+    s = address.toStdString();
+    len = s.size();
+    data += toByteString(len) + s;
+    s = detail.toStdString();
+    len = s.size();
+    data += toByteString(len) + s;
+    if(sendPacket(client->sock(), cmd_submitRoad, data) != 0)
     {
         QMessageBox::warning(this, "提示", "数据传输错误", QMessageBox::Ok);
         return;

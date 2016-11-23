@@ -116,11 +116,17 @@ int recvPacket(int sockfd, commandType *cmd, std::string &s_data)
 std::string fromByteString(std::string &s, int len)
 {
     std::string str;
+
     for(int index = 0; index < len; ++index)
     {
         str.push_back(s[index]);
     }
-    s = s.substr(len, s.size()-1);
+    std::string temp;
+    for(int i = len; i < s.size(); ++i)
+    {
+        temp.push_back(s[i]);
+    }
+    s = temp;
     return str;
 }
 

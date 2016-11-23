@@ -37,15 +37,13 @@ private:
     int port;
 
     int testUsrPw(const QString &usr, const QString &pw);
-    int sendRegInfo(Account &a);
 
 private slots:
     void on_loginBtn_clicked();
-    void on_toolButton_clicked();
     void on_signupBtn_clicked();
+    void on_toolButton_clicked();
 
 public slots:
-    bool reg(Account &a);
     void setInfo(QString &s, int p);
 };
 

@@ -11,6 +11,8 @@
 
 QT_BEGIN_NAMESPACE
 class MapView;
+class DeliveryPath;
+class Dbsql;
 QT_END_NAMESPACE
 
 
@@ -18,21 +20,34 @@ class TcpServer : public QObject
 {
     Q_OBJECT
 public:
-    TcpServer(MapView *v) : view(v),running(false) {}
+    TcpServer(ServerSocket *s,Dbsql *d, MapView *v);
 
 private:
+    Dbsql *dbsql;
     MapView *view;
-    ServerSocket server;
+    ServerSocket *server;
     bool running;
 
     void newConn(int sockfd);
 
 signals:
+    void initFail();
     void taskFinished();
     void closeClient();
-    void signIn(int i);
-    void signUp(Account &a);
-    void signOut(int i);
+
+    void sg_signIn(int i);
+    void sg_signUp(Account a);
+    void sg_signOut(int i);
+    void sg_changeInfo(Account a);
+
+    void sg_acptTask();
+    void sg_posChange();
+    void sg_taskFinish();
+    void sg_taskFail();
+
+    void sg_upload(QString usr, int type, QString addr, QString detail);
+
+    void sendTask(DeliveryPath *path);  // 发送任务到客户端线程
 
 public slots:
     void start();   // 开启服务器

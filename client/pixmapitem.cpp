@@ -12,6 +12,7 @@
 MapTileItem::MapTileItem()
 {
     top = left = width = height = 0.0;
+    setCursor(Qt::UpArrowCursor);
 }
 
 void MapTileItem::setPixmap(const QPixmap &pix)
@@ -30,6 +31,7 @@ void MapTileItem::setOffset(qreal x, qreal y)
 QRectF MapTileItem::boundingRect() const
 {
     return QRectF(left, top, width, height);
+ //   return rect;
 }
 
 void MapTileItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -38,7 +40,8 @@ void MapTileItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    painter->setMatrix(stableMatrix(painter->worldMatrix(), QPointF(left, top)));
+    QMatrix oldMatrix = painter->worldMatrix();
+    painter->setMatrix(stableMatrix(oldMatrix, QPointF(left, top)));
     painter->drawPixmap(left, top, width, height, pixmap);
     painter->drawRect(boundingRect());
 }
@@ -54,9 +57,12 @@ QMatrix stableMatrix(const QMatrix &matrix, const QPointF &p)
     newMatrix.scale(1.0/scaleX, 1.0/scaleY);
 
     qreal offsetX, offsetY;
-    offsetX = p.x()*(scaleX-1.0);
-    offsetY = p.y()*(scaleY-1.0);
+    offsetX = (p.x())*(scaleX-1.0);
+    offsetY = (p.y())*(scaleY-1.0);
+    qDebug("%10f\t%10f", p.x(), p.y());
+    qDebug("%10f\t%10f\n", offsetX, offsetY);
     newMatrix.translate(offsetX, offsetY);
+//     newMatrix.translate(-p.x(), -p.y());
 
     return newMatrix;
 }
@@ -103,7 +109,8 @@ void SymbolItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
      painter->setRenderHint(QPainter::Antialiasing, true);
      painter->setMatrix(stableMatrix(painter->worldMatrix(), QPointF(x, y)));
 
-     painter->drawPixmap(x-width/2, y-height/2, width, height, pixmap);
+     painter->drawEllipse(x, y, 10, 10);
+//     painter->drawPixmap(x-width/2, y-height/2, width, height, pixmap);
      /*     QPen pen;
               pen.setCosmetic(true);
               painter->setPen(pen);

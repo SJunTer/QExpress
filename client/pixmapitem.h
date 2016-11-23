@@ -23,6 +23,7 @@ private:
     qreal top, left;
     qreal width, height;
     QPixmap pixmap;
+    QRectF rect;
 };
 
 // 标记

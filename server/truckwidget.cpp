@@ -1,7 +1,9 @@
 #include "truckwidget.h"
 #include "nofocusdelegate.h"
 #include "../security/des.h"
-
+#include "database/operatesql.h"
+#include "database/operatedefine.h"
+#include <vector>
 #include <string>
 #include <sstream>
 #include <QTableWidget>
@@ -13,17 +15,18 @@
 #include <QTableWidgetItem>
 #include <QMessageBox>
 #include <QDebug>
+using namespace std;
 
-TruckWidget::TruckWidget(QWidget *parent)
-    : QWidget(parent)
-    , editMode(false)
+TruckWidget::TruckWidget(Dbsql *d, QWidget *parent) :
+    QWidget(parent),
+    dbsql(d),
+    editMode(false)
 {
 
     truckTable = new QTableWidget(this);
     addBtn = new QPushButton(this);
     delBtn = new QPushButton(this);
     applyBtn = new QPushButton(this);
-    cancelBtn = new QPushButton(this);
     initTable();
 
     QFont font;
@@ -37,9 +40,6 @@ TruckWidget::TruckWidget(QWidget *parent)
     applyBtn->setText("应用");
     applyBtn->setFont(font);
     applyBtn->setFixedSize(60, 35);
-    cancelBtn->setText("取消");
-    cancelBtn->setFont(font);
-    cancelBtn->setFixedSize(60, 35);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
@@ -49,10 +49,10 @@ TruckWidget::TruckWidget(QWidget *parent)
     QHBoxLayout *btnLayout = new QHBoxLayout;
     btnLayout->setSpacing(0);
     btnLayout->setContentsMargins(0, 5, 0, 0);
+    btnLayout->addStretch();
     btnLayout->addWidget(addBtn);
     btnLayout->addWidget(delBtn);
     btnLayout->addWidget(applyBtn);
-    btnLayout->addWidget(cancelBtn);
 
     layout->addLayout(btnLayout);
     setLayout(layout);
@@ -60,7 +60,7 @@ TruckWidget::TruckWidget(QWidget *parent)
     connect(addBtn, SIGNAL(clicked(bool)), this, SLOT(addRecord()));
     connect(delBtn, SIGNAL(clicked(bool)), this, SLOT(delRecord()));
     connect(applyBtn, SIGNAL(clicked(bool)), this, SLOT(applyRecord()));
-    connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelRecord()));
+
 }
 
 TruckWidget::~TruckWidget()
@@ -79,7 +79,7 @@ void TruckWidget::initTable()
     truckTable->horizontalHeader()->setSectionsClickable(false);
 
     QStringList header;
-    header << tr("车辆编号") << tr("车辆型号") << tr("驾驶员") << tr("是否空闲");
+    header << tr("序号") << tr("型号") << tr("车牌号") << tr("是否空闲");
     truckTable->setHorizontalHeaderLabels(header);
 
     QFont font = truckTable->horizontalHeader()->font();
@@ -102,16 +102,65 @@ void TruckWidget::initTable()
     truckTable->setItemDelegate(new NoFocusDelegate(this));  // 消除选中虚框
 }
 
+void TruckWidget::readInfo()
+{
+    vector<string> ts;
+    if(dbsql->AllSearch(TABLE_TRUCK, ts) != 0)
+    {
+        qDebug() << "ERROR on search";
+        return;
+    }
+    for(unsigned i = 0; i < ts.size(); i+=TRUCK_COL_NUM)
+    {
+        TruckInfo *truck = new TruckInfo;
+        truck->id = stoi(ts[i]);
+        truck->brand = QString::fromStdString(ts[i+1]);
+        truck->LPN = QString::fromStdString(ts[i+2]);
+        truck->status = stoi(ts[i+3]);
+        trucks.push_back(truck);
+
+        int rowCnt = truckTable->rowCount();
+        truckTable->insertRow(rowCnt);
+
+        QTableWidgetItem *item1 = new QTableWidgetItem;
+        QTableWidgetItem *item2 = new QTableWidgetItem;
+        QTableWidgetItem *item3 = new QTableWidgetItem;
+        QTableWidgetItem *item4 = new QTableWidgetItem;
+
+        item1->setText(QString::number(truck->id));
+        item1->setFlags(item1->flags() & (~Qt::ItemIsEditable));
+        item2->setText(truck->brand);
+        item3->setText(truck->LPN);
+        item4->setText(truck->status==FREE?"空闲":"运行中");
+        item4->setFlags(item4->flags() & (~Qt::ItemIsEditable));
+
+        truckTable->setItem(rowCnt, 0, item1);
+        truckTable->setItem(rowCnt, 1, item2);
+        truckTable->setItem(rowCnt, 2, item3);
+        truckTable->setItem(rowCnt, 3, item4);
+        truckTable->setCurrentCell(rowCnt, 0);
+
+        emit addTruck(truck);
+    }
+}
+
 void TruckWidget::addRecord()
 {
     if(editMode)
+    {
+        QMessageBox::warning(this, tr("警告"), tr("请先应用新建项目！"));
         return;
+    }
+
     editMode = true;
 
     temp = new TruckInfo;
 
     int rowCnt = truckTable->rowCount();
-    temp->m_id = rowCnt;
+    if(trucks.empty())
+        temp->id = 0;
+    else
+        temp->id = trucks.back()->id + 1;
     truckTable->insertRow(rowCnt);
 
     QTableWidgetItem *item1 = new QTableWidgetItem;
@@ -119,11 +168,11 @@ void TruckWidget::addRecord()
     QTableWidgetItem *item3 = new QTableWidgetItem;
     QTableWidgetItem *item4 = new QTableWidgetItem;
 
-    item1->setText(QString::number(rowCnt+1));
+    item1->setText(QString::number(temp->id));
     item1->setFlags(item1->flags() & (~Qt::ItemIsEditable));
-    item2->setText(temp->m_brand);
-    item3->setText(temp->m_driver);
-    item4->setText(temp->m_isFree?"是":"否");
+    item2->setText("");
+    item3->setText("");
+    item4->setText("NULL");
     item4->setFlags(item4->flags() & (~Qt::ItemIsEditable));
 
     truckTable->setItem(rowCnt, 0, item1);
@@ -136,26 +185,38 @@ void TruckWidget::addRecord()
 
 void TruckWidget::delRecord()
 {
-    if(editMode)
-        return;
-
-    int index = truckTable->currentRow();
-    if(index == -1)
-        return;
-    if(!trucks.at(index)->m_isFree)
+    int i = truckTable->currentRow();
+    if(i == -1)
     {
-        QMessageBox::warning(this, tr("警告"), tr("车辆正在运行，请稍后再试！"));
+        QMessageBox::warning(this, tr("错误"), tr("未选中项！"));
         return;
     }
-    truckTable->removeRow(index);
-    TruckInfo *t = trucks.takeAt(index);
-    delete t;
-    emit delTruck(index);
-
-    for(int i = index; i < trucks.size(); ++i)
+    else if(i == trucks.size()) // 如果是编辑项
     {
-        trucks[i]->m_id += 1;
-        truckTable->item(i,0)->setText(QString::number(i+1));
+        delete temp;
+        truckTable->removeRow(truckTable->currentRow());
+        editMode = false;
+    }
+    else
+    {
+        if(trucks.at(i)->status == MOVE)
+        {
+            QMessageBox::warning(this, tr("警告"), tr("车辆正在运行，无法删除！"));
+            return;
+        }
+        if(QMessageBox::warning(this, "警告", "确定删除改信息吗？",
+                                QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
+            return;
+        if(dbsql->Delete(TABLE_TRUCK, TRUCK_ID, QString::number(trucks[i]->id).toStdString()) != 0)
+        {
+            QMessageBox::warning(this, tr("错误"), tr("删除异常！"));
+            return;
+        }
+        truckTable->removeRow(i);
+        TruckInfo *t = trucks.takeAt(i);
+        delete t;
+        emit delTruck(i);
+        QMessageBox::information(this, tr("提示"), tr("删除成功！"));
     }
 }
 
@@ -165,27 +226,29 @@ void TruckWidget::applyRecord()
         return;
 
     int index = truckTable->currentRow();
-    temp->m_brand = truckTable->item(index, 1)->text();
-    temp->m_driver = truckTable->item(index, 2)->text();
-    if(temp->m_brand == "" || temp->m_driver == "")
+    temp->brand = truckTable->item(index, 1)->text();
+    temp->LPN = truckTable->item(index, 2)->text();
+    temp->status = FREE;
+    if(temp->brand == "" || temp->LPN == "")
     {
         QMessageBox::warning(this, tr("警告"), tr("请完善信息后重试！"));
         return;
     }
+    vector<string> truck;
+    truck.push_back(QString::number(temp->id).toStdString());
+    truck.push_back(temp->brand.toStdString());
+    truck.push_back(temp->LPN.toStdString());
+    truck.push_back(QString::number(temp->status).toStdString());
+    if(dbsql->Insert(TABLE_TRUCK, truck) != 0)
+    {
+        QMessageBox::warning(this, tr("错误"), tr("添加数据异常！"));
+        return;
+    }
+    truckTable->item(index, 3)->setText("空闲");
     trucks.append(temp);
     emit addTruck(temp);
     editMode = false;
     QMessageBox::information(this, tr("提示"), tr("添加成功！"));
-}
-
-void TruckWidget::cancelRecord()
-{
-    if(!editMode)
-        return;
-
-    delete temp;
-    truckTable->removeRow(truckTable->currentRow());
-    editMode = false;
 }
 
 
@@ -193,11 +256,22 @@ void TruckWidget::truckBack(QString &truckId)
 {
     for(auto &t : trucks)
     {
-        if(t->m_id+1 == truckId.toInt())
+        if(t->id == truckId.toInt())
         {
-            t->m_isFree = true;
-            truckTable->item(t->m_id, 3)->setText("是");
-            return;
+            t->status = FREE;
+            truckTable->item(t->id, 3)->setText("空闲");
+
+            vector<string> truck;
+            truck.push_back("");
+            truck.push_back("");
+            truck.push_back("");
+            truck.push_back(QString::number(t->status).toStdString());
+            if(dbsql->Alter(TABLE_TRUCK, TRUCK_ID, QString::number(t->id).toStdString(), truck) != 0)
+            {
+                QMessageBox::warning(this, tr("错误"), tr("无法修改货车状态！"));
+                return;
+            }
+            break;
         }
     }
 }
@@ -206,12 +280,22 @@ void TruckWidget::truckGo(QString &truckId)
 {
     for(auto &t : trucks)
     {
-        if(t->m_id+1 == truckId.toInt())
+        if(t->id == truckId.toInt())
         {
-            if(!t->m_isFree)
+            if(t->status == MOVE)
                 break;
-            t->m_isFree = false;
-            truckTable->item(t->m_id, 3)->setText("否");
+            t->status = MOVE;
+            truckTable->item(t->id, 3)->setText("配送中");
+
+            vector<string> truck;
+            truck.push_back("");
+            truck.push_back("");
+            truck.push_back("");
+            truck.push_back(QString::number(t->status).toStdString());
+            if(dbsql->Alter(TABLE_TRUCK, TRUCK_ID, QString::number(t->id).toStdString(), truck) != 0)
+            {
+                QMessageBox::warning(this, tr("错误"), tr("无法修改货车状态！"));
+            }
             break;
         }
     }

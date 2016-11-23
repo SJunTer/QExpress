@@ -15,13 +15,13 @@ MainWindow::MainWindow(QWidget *parent, ClientSocket *cli) :
     QMainWindow(parent),
     client(cli),
     uploadDlgShowed(false),
-    userDlgShowed(false),
-    aboutDlgShowed(false)
+    userDlgShowed(false)
 {
     setWindowTitle(tr("QExpress"));
     setMinimumSize(800, 600);
 
     taskDlg = new TaskDlg(client, this);
+    aboutDlg = new AboutDlg(this);
 
     view = new MapView(this, client);
     pathWidget = new PathWidget(this);
@@ -111,7 +111,7 @@ void MainWindow::on_userBtn_clicked()
 {
     if(userDlgShowed)
         return;
-    UserDlg *userDlg = new UserDlg(this);
+    UserDlg *userDlg = new UserDlg(client, this);
     userDlg->setAttribute(Qt::WA_DeleteOnClose);
     connect(userDlg, SIGNAL(closed()), this, SLOT(userDlgClosed()));
     userDlg->show();
@@ -120,11 +120,5 @@ void MainWindow::on_userBtn_clicked()
 
 void MainWindow::on_aboutBtn_clicked()
 {
-    if(aboutDlgShowed)
-        return;
-    AboutDlg *aboutDlg = new AboutDlg(this);
-    aboutDlg->setAttribute(Qt::WA_DeleteOnClose);
-    connect(aboutDlg, SIGNAL(closed()), this, SLOT(aboutDlgClosed()));
     aboutDlg->show();
-    aboutDlgShowed = true;
 }

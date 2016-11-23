@@ -1,4 +1,4 @@
-TARGET = client
+TARGET = QExpress
 
 TEMPLATE = app
 CONFIG += c++11
@@ -13,7 +13,8 @@ FORMS += \
     aboutdlg.ui \
     taskdlg.ui \
     uploaddlg.ui \
-    userdlg.ui
+    userdlg.ui \
+    pwddlg.ui
 
 HEADERS += \
     mainwindow.h \
@@ -32,7 +33,9 @@ HEADERS += \
     tileloader.h \
     taskdlg.h \
     uploaddlg.h \
-    userdlg.h
+    userdlg.h \
+    deliverypath.h \
+    pwddlg.h
 
 SOURCES += \
     main.cpp \
@@ -50,7 +53,8 @@ SOURCES += \
     tileloader.cpp \
     taskdlg.cpp \
     uploaddlg.cpp \
-    userdlg.cpp
+    userdlg.cpp \
+    pwddlg.cpp
 
 RESOURCES += \
     icon.qrc

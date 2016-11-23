@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QFileInfo>
 #include "optimumPath.h"
+#include "deliverywidget.h"
 
 #define BTN_SIZE 30
 #define MARK_REPO 1
@@ -17,7 +18,6 @@
 
 
 QT_BEGIN_NAMESPACE
-class DeliveryPath;
 class MapLayer;
 class MifFile;
 class GstFile;
@@ -42,6 +42,7 @@ public:
     void updatePath(int index, DeliveryPath *path);
 
     QGraphicsScene  *getScene() const { return scene; }
+    QList<Point *> getVsibleSymbols(QRectF rect, int level);
 
 private:
     void initLayers(QString filePath);
@@ -58,8 +59,8 @@ private:
     int zoomLevel;
     int originLevel;
     void layerVisible(double zoom);
-    void levelToZoom(int level);
-    void zoomToLevel();
+    double levelToZoom(int level);
+    int zoomToLevel(double zoom);
 
     double getLen(QPointF &p1, QPointF &p2);
 
@@ -75,7 +76,7 @@ private:
     QList<Polyline *> paths;
     QList<PixmapItem *> cars;
 
-    // 储存标记图层
+    // 储存标记
     QList<PixmapItem *> markers;
     void addMarker(QPointF p, int type);
     void removeMarker(int index);
@@ -94,7 +95,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event); // 菜单事件
 
 signals:
-    void transferData(QVector<long> &points, QVector<long> &path, QStringList &nameList);
+    void transferData(QList<Place> &places);
 
 /* 私有槽函数，用来响应菜单 */
 private slots:

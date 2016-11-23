@@ -127,11 +127,12 @@ int MapView::getTiles()
 
     connect(tileLoader, SIGNAL(taskFinished()), this, SLOT(setLoadFlag()));
     connect(tileLoader, SIGNAL(drawPixmap(QString,int,int,int)), this, SLOT(drawPixmap(QString,int,int,int)));
+    connect(tileLoader, SIGNAL(drawSymbol(QString,int,int,int)), this, SLOT(drawSymbol(QString,int,int,int)));
     connect(this, SIGNAL(stopLoading()), tileLoader, SLOT(stop()), Qt::DirectConnection);
 
     if(tileLoading)
     {
-        qDebug() << "set thread waiting";
+//        qDebug() << "set thread waiting";
         threadWaiting = true;
         emit stopLoading();
     }
@@ -161,28 +162,18 @@ void MapView::wheelEvent(QWheelEvent *event)
         zoomIn();
 }
 
+
+
 void MapView::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
 
+    QGraphicsView::mouseReleaseEvent(event);
     center = mapToScene(viewport()->rect().center());
     centerOn(center);
     getTiles();
     setLayerVisible();
-//    update();
-}
-
-void MapView::setLoadFlag()
-{
-    tileLoading = false;
-    qDebug() << "set load flag";
-    qDebug() << "thread waiting: " << threadWaiting;
-    if(threadWaiting)
-    {
-        threadWaiting = false;
-        tileLoading = true;
-        thread->start();
-    }
+    scene->update();
 }
 
 /*
@@ -192,12 +183,13 @@ void MapView::resizeEvent(QResizeEvent *event)
 
     getTiles();
     setLayerVisible();
-}
+}*/
 
-
+/*
 void MapView::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
+//    qDebug() << event->buttons() & Qt::
 
     center = mapToScene(viewport()->rect().center());
     centerOn(center);
@@ -207,6 +199,22 @@ void MapView::mouseMoveEvent(QMouseEvent *event)
 }*/
 
 
+
+/*********************************
+ *                       Private Slots                          *
+ * ********************************/
+void MapView::setLoadFlag()
+{
+    tileLoading = false;
+//    qDebug() << "set load flag";
+//    qDebug() << "thread waiting: " << threadWaiting;
+    if(threadWaiting)
+    {
+        threadWaiting = false;
+        tileLoading = true;
+        thread->start();
+    }
+}
 
 /*********************************
  *                         Public Slots                          *
@@ -252,6 +260,7 @@ void MapView::setLayerVisible()
 
 void MapView::drawPixmap(QString fileName, int lv, int x, int y)
 {
+//    qDebug() << fileName << lv << x << y;
     MapTileItem *pix = new MapTileItem;
     QPixmap p(fileName);
     pix->setPixmap(p);
@@ -259,14 +268,18 @@ void MapView::drawPixmap(QString fileName, int lv, int x, int y)
 //    qDebug() << x << y;
     tiles.push_back(fileName);
     layers[lv-MIN_LEVEL]->addToGroup(pix);
+    scene->update();
 }
 
 void MapView::drawSymbol(QString symbolName, int lv, int x, int y)
 {
+//    qDebug() << symbolName << lv << x << y;
     SymbolItem *symbol = new SymbolItem;
     QPixmap p(";/images/symbol_24.png");
     symbol->setPixmap(p);
     symbol->setCoord(x, y);
     symbol->setTitile(symbolName);
+    symbol->setZValue(2);
     layers[lv-MIN_LEVEL]->addToGroup(symbol);
+    scene->update();
 }

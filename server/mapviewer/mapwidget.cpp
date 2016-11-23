@@ -51,8 +51,7 @@ MapWidget::MapWidget(QWidget *parent)
 
     setCentralWidget(view);
 
-    connect(view, SIGNAL(transferData(QVector<long>&, QVector<long>&, QStringList&)),
-            this, SIGNAL(transferData(QVector<long>&, QVector<long>&, QStringList&)));
+    connect(view, SIGNAL(transferData(QList<Place>&)), this, SIGNAL(transferData(QList<Place>&)));
 
 }
 

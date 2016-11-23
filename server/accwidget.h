@@ -9,6 +9,7 @@
 QT_BEGIN_NAMESPACE
 class QTableWidget;
 class QPushButton;
+class Dbsql;
 QT_END_NAMESPACE
 
 #define ONLINE 1
@@ -24,29 +25,27 @@ struct Account
     QString phone;
     QString email;
     QTime last_time;
-    bool status;
+    int status;
 };
 
 class AccWidget : public QWidget
 {
     Q_OBJECT
 public:
-    AccWidget(QWidget *parent = 0);
+    AccWidget(Dbsql *d, QWidget *parent = 0);
     ~AccWidget();
+
+    void readInfo();
 
 private:
     void initTable();
-
     QTableWidget *accTable;
     QPushButton *addBtn;
     QPushButton *delBtn;
-    QPushButton *sendBtn;
     QPushButton *closeBtn;
 
-    QList<Account *> accounts;
-
-
-signals:
+    QList<Account> accounts;
+    Dbsql *dbsql;
 
 private slots:
     void addAccount();
@@ -56,8 +55,9 @@ private slots:
 
 public slots:
     void signIn(int id);
-    void signUp(Account &a);
+    void signUp(Account a);
     void signOut(int id);
+    void changeInfo(Account a);
 };
 
 

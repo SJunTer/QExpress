@@ -26,6 +26,7 @@ public:
     void setBrush(QBrush &brush) { m_brush = brush; }
     void setPen(QPen &pen) { m_pen = pen; }
     QString getName() { return name; }
+    bool isVisible(double zoom);
 //    void setFeatureCnt(int cnt) { m_featureCnt = cnt;  }
 
 private:

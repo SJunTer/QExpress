@@ -75,6 +75,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget);
     void setBounds(void);
+    QPointF getPoint();
     int featureClass;
 
     void setPixmap(const QPixmap &pix);

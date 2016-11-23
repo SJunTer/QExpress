@@ -5,7 +5,7 @@
 #include <QVector>
 #include <QList>
 #include <QStringList>
-
+#include "deliverywidget.h"
 
 QT_BEGIN_NAMESPACE
 class DeliveryPath;
@@ -34,7 +34,7 @@ private:
     QPushButton *zoomOutBtn; //缩小按钮
 
 signals:
-    void transferData(QVector<long> &points, QVector<long> &path, QStringList &nameList);
+    void transferData(QList<Place> &places);
 
 private slots:
     void makeTile();

@@ -17,17 +17,19 @@
 //开始执行切片任务
 void TileMaker::doWork()
 {
+    qDebug() << "do work";
     QPixmap pix(256, 256);
     QPainter painter(&pix);
-    int paddingH = (256-(int)(scene->itemsBoundingRect().width())%256)/2;
-    int paddingV = (256-(int)(scene->itemsBoundingRect().height())%256)/2;
+    int max_side = pow(2, 18);
+    int paddingH = (256-max_side%256)/2;
+    int paddingV = (256-max_side%256)/2;
     int cornerX = scene->itemsBoundingRect().x() - paddingH;
     int cornerY = scene->itemsBoundingRect().y() - paddingV;
     const int grid[] = { 10,10,10,10,10,10,10,12,16,23,32,45 };
 //    qDebug() << cornerX << cornerY;
 
     makeDir("tiles");
-    for(currLevel = /*MIN_LEVEL*/14; !stopped && currLevel <= maxLevel; ++currLevel)
+    for(currLevel = MIN_LEVEL; !stopped && currLevel <= maxLevel; ++currLevel)
     {
         makeDir(QString("tiles/%1").arg(currLevel));
         emit setLayerVisible(currLevel);
@@ -43,6 +45,7 @@ void TileMaker::doWork()
                 makeDir(QString("tiles/%1/%2_%3").arg(currLevel).arg(row).arg(col));
             }
         }
+        qDebug() << "after make dirs";
         //make tiles
         for(int row = 0; !stopped && row < pow(2, currLevel-MIN_LEVEL); ++row)
         {
@@ -52,9 +55,12 @@ void TileMaker::doWork()
                     break;
                 pix.fill(Qt::white);
 //                qDebug() << cornerX+col*step << cornerY+row*step;
+                qDebug() << "start render";
                 scene->render(&painter, QRectF(), QRect(cornerX+col*step, cornerY+row*step, step, step));
+                qDebug() << "after render";
                 QString filename = QString("tiles/%1/%2_%3/%4_%5.png").arg(currLevel).
                         arg(row/grid[currLevel-MIN_LEVEL]).arg(col/grid[currLevel-MIN_LEVEL]).arg(row).arg(col);
+                qDebug() << filename;
                 pix.save(filename);
                 ++cnt;
                 //if(cnt % 10 == 0)
@@ -143,7 +149,7 @@ void TilesDlg::start()
     startBtn->setEnabled(false);
     running = true;
     nComplete = 0;
-    int maxLevel = 18;
+    int maxLevel = 14;
     nTotal = getTotalCnt(maxLevel);
     proBar->setRange(0, nTotal-1);
     label->setText(QString("0/%1--0%").arg(nTotal));

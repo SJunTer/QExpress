@@ -4,22 +4,28 @@
 #include <QMainWindow>
 #include <QVector>
 #include <QStringList>
+#include "deliverywidget.h"
 
 QT_BEGIN_NAMESPACE
 class TabWidget;
 class MapWidget;
 class DeliveryWidget;
 class TruckWidget;
-class InventoryWidget;
+class CargoWidget;
 class AccWidget;
 class TcpServer;
+class AboutDlg;
+class MessageDlg;
+class QToolButton;
+class Dbsql;
+class ServerSocket;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(ServerSocket *s, Dbsql *d, QWidget *parent = 0);
     ~MainWindow();
 
 private:
@@ -28,9 +34,18 @@ private:
     DeliveryWidget *deliveryWidget;
     AccWidget *accWidget;
     TruckWidget *truckWidget;
-    InventoryWidget *inventoryWidget;
-    TcpServer *server;
+    CargoWidget *inventoryWidget;
+
+    MessageDlg *msgDlg;
+    QToolButton *msgBtn;
+    AboutDlg *aboutDlg;
+    QToolButton *aboutBtn;
+
+    ServerSocket *servSock;
+    TcpServer *tcpServer;
+    Dbsql *dbsql;
     void runServer();
+
 
 protected:
     void resizeEvent(QResizeEvent *);
@@ -40,9 +55,14 @@ signals:
     void stopServer();
 
 private slots:
+    void initFail();
+
+    void showMsgDlg();
+    void showAboutDlg();
+
     void enterSelectMode();
     void enterCargoMode();
-    void transferData(QVector<long> &points, QVector<long> &path, QStringList &nameList);
+    void transferData(QList<Place> &places);
     void sendTitles(QStringList &titles);
 };
 

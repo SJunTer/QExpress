@@ -164,9 +164,9 @@ void TabBar::paintEvent(QPaintEvent *event)
     painter.fillRect(rect(), QColor(255,255,255,210));
 
     //draw icon
-    QPixmap pic(":/images/info.png");
-    painter.drawPixmap(LEFT_INDENT,(TAB_HEIGHT+2*TAB_MARGIN-ICON_SIZE)/2,
-                        ICON_SIZE, ICON_SIZE,pic);
+//    QPixmap pic(":/images/info.png");
+//    painter.drawPixmap(LEFT_INDENT,(TAB_HEIGHT+2*TAB_MARGIN-ICON_SIZE)/2,
+ //                       ICON_SIZE, ICON_SIZE,pic);
 
     for(int i = 0; i < m_tabs.count(); ++i)
             paintTab(&painter, i);

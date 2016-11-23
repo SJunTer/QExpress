@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>375</width>
-    <height>318</height>
+    <width>342</width>
+    <height>315</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>342</width>
+    <height>315</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>342</width>
+    <height>315</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
@@ -16,11 +28,16 @@
   <widget class="QPushButton" name="submitBtn">
    <property name="geometry">
     <rect>
-     <x>80</x>
+     <x>50</x>
      <y>270</y>
-     <width>80</width>
-     <height>20</height>
+     <width>91</width>
+     <height>25</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>提交</string>
@@ -29,37 +46,34 @@
   <widget class="QPushButton" name="cancelBtn">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>200</x>
      <y>270</y>
-     <width>80</width>
-     <height>20</height>
+     <width>91</width>
+     <height>25</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>取消</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>200</y>
-     <width>141</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
   <widget class="QTextEdit" name="detailText">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>170</y>
-     <width>261</width>
-     <height>71</height>
+     <x>30</x>
+     <y>160</y>
+     <width>281</width>
+     <height>91</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="placeholderText">
     <string>请输入详细情况</string>
@@ -68,11 +82,16 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>90</y>
+     <x>30</x>
+     <y>80</y>
      <width>51</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>地址</string>
@@ -81,11 +100,16 @@
   <widget class="QLineEdit" name="addrLineEdit">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>110</y>
-     <width>261</width>
+     <x>30</x>
+     <y>100</y>
+     <width>281</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="placeholderText">
     <string>请输入地址</string>
@@ -94,11 +118,16 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>150</y>
+     <x>30</x>
+     <y>140</y>
      <width>51</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>详情</string>
@@ -107,11 +136,16 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>30</y>
+     <x>30</x>
+     <y>20</y>
      <width>51</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>路况</string>
@@ -120,11 +154,16 @@
   <widget class="QRadioButton" name="accRadioBtn">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>50</y>
+     <x>30</x>
+     <y>40</y>
      <width>51</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>事故</string>
@@ -133,11 +172,16 @@
   <widget class="QRadioButton" name="jamRadioBtn">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>50</y>
+     <x>110</x>
+     <y>40</y>
      <width>51</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>拥堵</string>
@@ -146,11 +190,16 @@
   <widget class="QRadioButton" name="blockRadioBtn">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>50</y>
+     <x>190</x>
+     <y>40</y>
      <width>71</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>封路</string>
