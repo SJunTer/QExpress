@@ -34,7 +34,7 @@ private:
     DeliveryWidget *deliveryWidget;
     AccWidget *accWidget;
     TruckWidget *truckWidget;
-    CargoWidget *inventoryWidget;
+    CargoWidget *cargoWidget;
 
     MessageDlg *msgDlg;
     QToolButton *msgBtn;
@@ -55,15 +55,11 @@ signals:
     void stopServer();
 
 private slots:
-    void initFail();
-
     void showMsgDlg();
     void showAboutDlg();
 
     void enterSelectMode();
-    void enterCargoMode();
-    void transferData(QList<Place> &places);
-    void sendTitles(QStringList &titles);
+    void selectDone(QList<Place> &places);
 };
 
 #endif // MAINWINDOW_H

@@ -12,7 +12,6 @@ SettingDlg::SettingDlg(QString &s, int p, QWidget *parent) :
     ui->setupUi(this);
     ui->ipLineEdit->setText(ip);
     ui->portLineEdit->setText(QString::number(port));
-    setWindowTitle("设置");
 }
 
 SettingDlg::~SettingDlg()

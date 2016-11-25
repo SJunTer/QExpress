@@ -10,6 +10,7 @@
 #include <QTableWidgetItem>
 #include <QBoxLayout>
 #include <QMessageBox>
+#include <QDateTime>
 #include <QDebug>
 using namespace std;
 
@@ -23,15 +24,15 @@ AccWidget::AccWidget(Dbsql *d, QWidget *parent) :
     closeBtn = new QPushButton(this);
 
     QFont font;
-    font.setPixelSize(16);
-    addBtn->setText("+");
+    font.setPixelSize(13);
+    addBtn->setText("添加");
     addBtn->setEnabled(false);
-    addBtn->setFont(font);
+//    addBtn->setFont(font);
     addBtn->setFixedSize(35,35);
-    delBtn->setText("-");
+    delBtn->setText("删除");
     delBtn->setFixedSize(35,35);
-    delBtn->setFont(font);
-    closeBtn->setText("切断连接");
+//    delBtn->setFont(font);
+    closeBtn->setText("断开连接");
     closeBtn->setFixedSize(60,35);
 
     initTable();
@@ -104,8 +105,9 @@ void AccWidget::readInfo()
         a.name = QString::fromStdString(accs[i+4]);
         a.phone = QString::fromStdString(accs[i+5]);
         a.email = QString::fromStdString(accs[i+6]);
-        a.status = stoi(accs[i+7]);
-        a.last_time = QTime::fromString(QString::fromStdString(accs[i+8]));
+//        a.status = stoi(accs[i+7]);
+        a.status = OFFLINE;
+        a.last_time = QString::fromStdString(accs[i+8]);
         accounts.push_back(a);
 
         int rowCnt = accTable->rowCount();
@@ -127,9 +129,14 @@ void AccWidget::readInfo()
         item4->setFlags(item4->flags() & (~Qt::ItemIsEditable));
         item5->setText(a.email);
         item5->setFlags(item5->flags() & (~Qt::ItemIsEditable));
-        item6->setText(a.status==ONLINE?"在线":"离线");
+        switch(a.status)
+        {
+        case OFFLINE: item6->setText("离线"); break;
+        case ONLINE: item6->setText("在线"); break;
+        case WORK: item6->setText("执行任务中"); break;
+        }
         item6->setFlags(item6->flags() & (~Qt::ItemIsEditable));
-        item7->setText(a.last_time.toString());
+        item7->setText(a.last_time);
         item7->setFlags(item7->flags() & (~Qt::ItemIsEditable));
 
         accTable->setItem(rowCnt, 0, item1);
@@ -141,25 +148,82 @@ void AccWidget::readInfo()
         accTable->setItem(rowCnt, 6, item7);
         accTable->setCurrentCell(0, 0);
     }
+    emit sendAccounts(&accounts);
 }
 
 void AccWidget::addAccount()
 {
-
+    // TODO
 }
 
+// 删除用户
 void AccWidget::delAccount()
 {
+    int index = accTable->currentRow();
+    if(index == -1)
+    {
+        QMessageBox::warning(this, tr("错误"), tr("未选中项！"));
+        return;
+    }
+    else
+    {
+        if(QMessageBox::warning(this, "警告", "确定删除改用户吗？",
+                                QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
+            return;
 
+        emit closeClient(accounts[index].id);
+        if(dbsql->Delete(TABLE_ACCOUNT, ACCOUNT_ID, QString::number(accounts[index].id).toStdString()) != 0)
+        {
+            QMessageBox::warning(this, tr("错误"), tr("删除异常！"));
+            return;
+        }
+        accTable->removeRow(index);
+        accounts.takeAt(index);
+        emit sendAccounts(&accounts);
+        QMessageBox::information(this, tr("提示"), tr("删除成功！"));
+    }
 }
 
-void AccWidget::sendMsg()
-{
-
-}
-
+// 切断连接
 void AccWidget::closeConn()
 {
+    qDebug() << "close client";
+
+    int index = accTable->currentRow();
+    if(index == -1)
+    {
+        QMessageBox::warning(this, tr("错误"), tr("未选中项！"));
+        return;
+    }
+
+    if(accounts[index].status == OFFLINE)   // 如果用户未上线
+    {
+        QMessageBox::warning(this, tr("错误"), tr("该用户处于离线状态！"));
+        return;
+    }
+    if(QMessageBox::warning(this, "警告","切断客户端连接可能丢失信息，是否继续？",
+                            QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
+    {
+        return;
+    }
+    accounts[index].status = OFFLINE;
+    accTable->item(index, 5)->setText("离线");
+    emit sendAccounts(&accounts);
+
+    vector<string> acc;
+    acc.push_back("");
+    acc.push_back("");
+    acc.push_back("");
+    acc.push_back("");
+    acc.push_back("");
+    acc.push_back("");
+    acc.push_back("");
+    acc.push_back(QString::number(OFFLINE).toStdString());
+    acc.push_back("");
+    if(dbsql->Alter(TABLE_ACCOUNT, ACCOUNT_ID, QString::number(accounts[index].id).toStdString(), acc) != 0)
+        qDebug() << "ERROR on alter";
+
+    emit closeClient(accounts[index].id);
 
 }
 
@@ -171,11 +235,11 @@ void AccWidget::signIn(int id)
     {
         if(accounts[i].id == id)
         {
-            QTime t = QTime::currentTime();
             accounts[i].status = ONLINE;
-            accounts[i].last_time = t;
+            accounts[i].last_time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
             accTable->item(i, 5)->setText("上线");
-            accTable->item(i, 6)->setText(t.toString());
+            accTable->item(i, 6)->setText(accounts[i].last_time);
+            emit sendAccounts(&accounts);
 
             vector<string> acc;
             acc.push_back("");
@@ -186,7 +250,7 @@ void AccWidget::signIn(int id)
             acc.push_back("");
             acc.push_back("");
             acc.push_back(QString::number(ONLINE).toStdString());
-            acc.push_back(accounts[i].last_time.toString().toStdString());
+            acc.push_back(accounts[i].last_time.toStdString());
             if(dbsql->Alter(TABLE_ACCOUNT, ACCOUNT_ID, QString::number(id).toStdString(), acc) != 0)
                 qDebug() << "ERROR on alter";
             break;
@@ -219,6 +283,8 @@ void AccWidget::signUp(Account a)
         return;
     }
     accounts.push_back(a);
+    emit sendAccounts(&accounts);
+
     int rowCnt = accTable->rowCount();
     accTable->insertRow(rowCnt);
     QTableWidgetItem *item1 = new QTableWidgetItem;
@@ -240,7 +306,7 @@ void AccWidget::signUp(Account a)
     item5->setFlags(item5->flags() & (~Qt::ItemIsEditable));
     item6->setText(a.status==ONLINE?"在线":"离线");
     item6->setFlags(item6->flags() & (~Qt::ItemIsEditable));
-    item7->setText(a.last_time.toString());
+    item7->setText(a.last_time);
     item7->setFlags(item7->flags() & (~Qt::ItemIsEditable));
 
     accTable->setItem(rowCnt, 0, item1);
@@ -263,6 +329,7 @@ void AccWidget::signOut(int id)
         {
             accounts[i].status = OFFLINE;
             accTable->item(i, 5)->setText("离线");
+            emit sendAccounts(&accounts);
 
             vector<string> acc;
             acc.push_back("");
@@ -293,6 +360,7 @@ void AccWidget::changeInfo(Account a)
             accTable->item(i, 2)->setText(a.name);
             accTable->item(i, 3)->setText(a.phone);
             accTable->item(i, 4)->setText(a.email);
+            emit sendAccounts(&accounts);
             break;
         }
     }
@@ -310,4 +378,62 @@ void AccWidget::changeInfo(Account a)
     if(dbsql->Alter(TABLE_ACCOUNT, ACCOUNT_ID, QString::number(a.id).toStdString(), acc) != 0)
         qDebug() << "ERROR on alter";
 
+}
+
+void AccWidget::driverWork(int id)
+{
+    for(int i = 0; i < accounts.size(); ++i)
+    {
+        if(accounts[i].id == id)
+        {
+            accounts[i].status = WORK;
+            accTable->item(i, 5)->setText("执行任务中");
+            emit sendAccounts(&accounts);
+
+            vector<string> info;
+            info.push_back("");
+            info.push_back("");
+            info.push_back("");
+            info.push_back("");
+            info.push_back("");
+            info.push_back("");
+            info.push_back("");
+            info.push_back(QString::number(accounts[i].status).toStdString());
+            info.push_back("");
+            if(dbsql->Alter(TABLE_ACCOUNT, ACCOUNT_ID, QString::number(accounts[i].id).toStdString(), info) != 0)
+            {
+                QMessageBox::warning(this, tr("错误"), tr("无法修改账户状态！"));
+            }
+            break;
+        }
+    }
+}
+
+void AccWidget::driverFree(int id)
+{
+    for(int i = 0; i < accounts.size(); ++i)
+    {
+        if(accounts[i].id == id)
+        {
+            accounts[i].status = ONLINE;
+            accTable->item(i, 5)->setText("在线");
+            emit sendAccounts(&accounts);
+
+            vector<string> info;
+            info.push_back("");
+            info.push_back("");
+            info.push_back("");
+            info.push_back("");
+            info.push_back("");
+            info.push_back("");
+            info.push_back("");
+            info.push_back(QString::number(accounts[i].status).toStdString());
+            info.push_back("");
+            if(dbsql->Alter(TABLE_ACCOUNT, ACCOUNT_ID, QString::number(accounts[i].id).toStdString(), info) != 0)
+            {
+                QMessageBox::warning(this, tr("错误"), tr("无法修改账户状态！"));
+            }
+            break;
+        }
+    }
 }

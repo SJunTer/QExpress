@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>上传路况</string>
   </property>
   <widget class="QPushButton" name="submitBtn">
    <property name="geometry">

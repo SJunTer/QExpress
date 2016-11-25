@@ -25,7 +25,7 @@ struct DeliveryPath
     QStringList cargos;
     QList<Place> places;
     int pos;    // 当前位置
-    int mins;   // 运行时间
+    int secs;   // 运行时间
 };
 
 

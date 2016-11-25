@@ -8,6 +8,7 @@
 #include <QVector>
 #include <QGraphicsView>
 #include <QGraphicsItemGroup>
+#include "deliverypath.h"
 #include "../network/socket.h"
 
 #define MIN_LEVEL 8
@@ -15,6 +16,7 @@
 
 QT_BEGIN_NAMESPACE
 class QThread;
+class PixmapItem;
 QT_END_NAMESPACE
 
 
@@ -35,6 +37,9 @@ private:
 
     QVector<QString> tiles;
     QVector<QGraphicsItemGroup *> layers;
+    QList<Place> places;
+    QVector<QGraphicsItem *> path;
+    PixmapItem *car;
 
     //*****控制多线程socket复用****//
     bool tileLoading;
@@ -45,7 +50,6 @@ private:
     int getPreGeoInfo();
     bool preLoaded;
     void makeDir(QString &folderName);
-
     int getTiles();     //重新加载切片
 
 protected:
@@ -66,6 +70,10 @@ public slots:
     void setLayerVisible();
     void drawPixmap(QString fileName, int lv, int x, int y);  //绘制切片(响应线程)
     void drawSymbol(QString symbolName, int lv,  int x, int y);  //绘制标记
+
+    void drawPath(QList<Place> &ps);
+    void updatePath(int pos);
+    void cancelPath();
 
 };
 

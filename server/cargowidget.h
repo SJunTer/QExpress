@@ -17,25 +17,14 @@ enum cargoStatus {
     InRepo, IsMove, IsComplete
 };
 
-
-class CargoInfo : public QObject
+struct CargoInfo
 {
-    Q_OBJECT
-public:
-    CargoInfo() : m_isSelect(false), id(0), descrip(""),
-        dest(""), reciver(""), status(InRepo) {}
-
-    bool m_isSelect;
-
     int id;
     QString descrip;
     QString dest;
     QString reciver;
     int status;
 
-public slots:
-    // 响应复选框
-    void stateChanged(int flag) { m_isSelect = flag; }
 };
 
 
@@ -48,10 +37,6 @@ public:
 
     void readInfo();
 
-    void setSelectMode(bool mode) {
-        selectMode = mode;
-    }
-
 private:
     void initTable();
 
@@ -60,28 +45,26 @@ private:
     QPushButton *addBtn;
     QPushButton *delBtn;
     QPushButton *applyBtn;
-    QPushButton *selectBtn;
 
     CargoInfo *temp;
     QList<CargoInfo *> cargos;
 
     QStringList titles;
 
-    bool selectMode;
     bool editMode;
 
-
 signals:
-    void sendTitles(QStringList &titles);
+    void sendCargos(QList<CargoInfo*>*cs);
 
 private slots:
     void addRecord();
     void delRecord();
     void applyRecord();
-    void selectCargo();
 
 public slots:
-    void complete(int i);
+    void cargoMove(QStringList cs);
+    void cargoReach(QStringList cs);
+    void cargofail(QStringList cs);
 
 };
 

@@ -3,7 +3,7 @@
 #include "miffile.h"
 #include "gstfile.h"
 #include "pixmapitem.h"
-#include "deliverypath.h"
+#include "deliverywidget.h"
 #include <QDir>
 #include <QPalette>
 #include <QMenu>
@@ -266,11 +266,16 @@ void MapView::clearMarker()
 
 
 /*******************************************
- **                             路径相关                             **
- ******************************************/
+ **                             路径相关                                           **
+ *******************************************/
 
 void MapView::drawPath(DeliveryPath *path)
 {
+    PathMarker pathMarker;
+    pathMarker.id = path->id;
+    pathMarker.pos = 0;
+
+    // 路线
     Polyline *line = new Polyline;
     for(auto p : path->places)
         line->addPoint(p.coord.x(), p.coord.y());
@@ -281,51 +286,106 @@ void MapView::drawPath(DeliveryPath *path)
     pen.setWidth(5);
     pen.setCosmetic(true);
     line->setPen(pen);
+    pathMarker.lines.append(line);
     scene->addItem(line);
-    paths.append(line);
 
+    // 配送点标记
+    for(int i = 0; i < path->places.size(); ++i)
+    {
+        QPointF p = path->places[i].coord;
+        if(path->places[i].type == IsRepo)
+        {
+            PixmapItem *mark = new PixmapItem;
+            mark->setPixmap(QPixmap(":/images/repo_marker_48.png"));
+            mark->setOffset(p.x()-ICON_SIZE/2+1, p.y()-ICON_SIZE);
+            mark->setAlignPos(PixmapItem::BottomCenter);
+            pathMarker.marker.append(mark);
+            scene->addItem(mark);
+        }
+        else if(path->places[i].type == IsDely)
+        {
+            PixmapItem *mark = new PixmapItem;
+            mark->setPixmap(QPixmap(":/images/map_marker_48.png"));
+            mark->setOffset(p.x()-ICON_SIZE/2+1, p.y()-ICON_SIZE);
+            mark->setAlignPos(PixmapItem::BottomCenter);
+            pathMarker.marker.append(mark);
+            scene->addItem(mark);
+        }
+    }
+
+    // 车辆标记
     PixmapItem *car = new PixmapItem;
-    car->setZValue(1);
+    car->setZValue(2);
     car->setPixmap(QPixmap(":/images/truck_icon_48.png"));
     QPointF p = path->places[0].coord;
     car->setOffset(p.x()-ICON_SIZE/2, p.y()-ICON_SIZE/2);
     car->setAlignPos(PixmapItem::Center);
-    cars.push_back(car);
+    pathMarker.car = car;
     scene->addItem(car);
+
     scene->update();
+    paths.append(pathMarker);
 }
 
-void MapView::removePath(int index)
+void MapView::updatePath(DeliveryPath *path)
 {
-    scene->removeItem(paths.at(index));
-    Polyline *l = paths.takeAt(index);
-    delete l;
-
-    scene->removeItem(cars.at(index));
-    PixmapItem *p = cars.takeAt(index);
-    delete p;
-}
-
-void MapView::updatePath(int index, DeliveryPath *path)
-{
-    if(path->pos > 0)
+    for(int i = 0; i < paths.size(); ++i)
     {
-        Polyline *line = new Polyline;
-        line->addPoint(path->places[path->pos-2].coord.x(), path->places[path->pos-2].coord.y());
-        line->addPoint(path->places[path->pos-1].coord.x(), path->places[path->pos-1].coord.y());
-        line->setBounds();
-        QPen pen;
-        pen.setColor(Qt::blue);
-        pen.setWidth(5);
-        pen.setCosmetic(true);
-        line->setPen(pen);
+        if(paths[i].id == path->id)
+        {
+            for(int j = paths[i].pos; j < path->pos; ++j)
+            {
+                Polyline *line = new Polyline;
+                line->addPoint(path->places[j].coord.x(), path->places[j].coord.y());
+                line->addPoint(path->places[j+1].coord.x(), path->places[j+1].coord.y());
+                line->setBounds();
+                QPen pen;
+                pen.setColor(Qt::blue);
+                pen.setWidth(5);
+                pen.setCosmetic(true);
+                line->setPen(pen);
+                paths[i].lines.append(line);
+                scene->addItem(line);
+            }
+            paths[i].pos = path->pos;
 
-        scene->addItem(line);
-        QPointF p = path->places[path->pos-1].coord;
-        cars[index]->setOffset(p.x()-ICON_SIZE/2, p.y()-ICON_SIZE/2);
-        scene->update();
+            QPointF p = path->places[path->pos].coord;
+            paths[i].car->setOffset(p.x()-ICON_SIZE/2, p.y()-ICON_SIZE/2);
+            scene->update();
+            break;
+        }
     }
 }
+
+void MapView::removePath(int id)
+{
+    for(int i = 0; i < paths.size(); ++i)
+    {
+        if(paths[i].id == id)
+        {
+            for(auto n : paths[i].lines)
+            {
+                scene->removeItem(paths[i].lines.front());
+                Polyline *l = paths[i].lines.takeFirst();
+                delete l;
+            }
+
+            for(auto n : paths[i].marker)
+            {
+                scene->removeItem(paths[i].marker.front());
+                PixmapItem *l = paths[i].marker.takeFirst();
+                delete l;
+            }
+
+            scene->removeItem(paths[i].car);
+            delete paths[i].car;
+
+            paths.takeAt(i);
+            break;
+        }
+    }
+}
+
 
 //返回矩形范围内的可见标记
 QList<Point *> MapView::getVsibleSymbols(QRectF rect, int level)
@@ -399,7 +459,7 @@ void MapView::contextMenuEvent(QContextMenuEvent *event)
     QAction *action1 = menu.addAction("标记为仓库");
     QAction *action2 = menu.addAction("标记为配送点");
     QAction *action3 = menu.addAction("删除标记");
-    QAction *action4 = menu.addAction("计算路径");
+    QAction *action4 = menu.addAction("确定选择");
 
     if(!isPoint) // 如果当前选中图形不是点
     {
@@ -574,7 +634,7 @@ void MapView::calculatePath()
     setSelectMode(false);
 
     //发送信号
-    emit transferData(places);
+    emit selectDone(places);
 
 }
 

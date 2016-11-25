@@ -21,7 +21,6 @@ LoginDlg::LoginDlg(QWidget *parent)
 {
     ui->setupUi(this);
     cli = new ClientSocket;
-    setWindowTitle("登录");
 }
 
 LoginDlg::~LoginDlg()

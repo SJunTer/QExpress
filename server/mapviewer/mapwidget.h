@@ -27,22 +27,21 @@ public:
 
 private:
     MapView *view;
-    QList<DeliveryPath *> paths;
 
     QPushButton *tileBtn;   //切片窗口
     QPushButton *zoomInBtn; //放大按钮
     QPushButton *zoomOutBtn; //缩小按钮
 
 signals:
-    void transferData(QList<Place> &places);
+    void selectDone(QList<Place> &places);
 
 private slots:
     void makeTile();
 
 public slots:
     void addPath(DeliveryPath *path);
-    void removePath(int index);
-    void updatePath(int index, DeliveryPath *path);
+    void updatePath(DeliveryPath *path);
+    void removePath(int id);
 };
 
 #endif // MAPWIDGET_H

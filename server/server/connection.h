@@ -4,6 +4,7 @@
 #include <QObject>
 #include <string>
 #include "accwidget.h"
+#include "deliverywidget.h"
 
 
  // 任务状态
@@ -30,7 +31,7 @@ public:
 private:
     int sockfd;
     Account acc;
-    DeliveryPath *path;
+    DeliveryPath path;
     TaskState taskState;
     MapView *view;
     Dbsql *dbsql;
@@ -50,11 +51,11 @@ private:
     int getTile(std::string &data);
     int getSymbol(std::string &data);
 
-    int getTask(std::string &data);
-    int acptTask(std::string &data);
-    int posChange(std::string &data);
-    int taskFinish(std::string &data);
-    int taskFail(std::string &data);
+    int sendTask(std::string &data);
+    void acptTask(std::string &data);
+    void posChange(std::string &data);
+    void taskFinish(std::string &data);
+    void taskFail(std::string &data);
 
     int submitRoad(std::string &data);
 
@@ -69,18 +70,19 @@ signals:
     void sg_changeInfo(Account a);
 
     // Task related
-    void sg_acptTask();
-    void sg_posChange();
-    void sg_taskFinish();
-    void sg_taskFail();
+    void sg_acptTask(int id);
+    void sg_posChange(int id, int pos);
+    void sg_taskFinish(int id);
+    void sg_taskFail(int id);
 
     void sg_upload(QString usr, int type, QString addr, QString detail);
 
 public slots:
     void start();
     void stop();
+    void stop(int id);
 
-    void getTask(DeliveryPath *p);
+    void getTask(DeliveryPath p);
 };
 
 #endif // CONNECTION_H

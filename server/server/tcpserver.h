@@ -7,6 +7,7 @@
 #include <QObject>
 #include "accwidget.h"
 #include "../network/socket.h"
+#include "deliverywidget.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -31,23 +32,23 @@ private:
     void newConn(int sockfd);
 
 signals:
-    void initFail();
     void taskFinished();
     void closeClient();
+    void closeClient(int id);
 
     void sg_signIn(int i);
     void sg_signUp(Account a);
     void sg_signOut(int i);
     void sg_changeInfo(Account a);
 
-    void sg_acptTask();
-    void sg_posChange();
-    void sg_taskFinish();
-    void sg_taskFail();
+    void sg_acptTask(int id);
+    void sg_posChange(int id, int pos);
+    void sg_taskFinish(int id);
+    void sg_taskFail(int id);
 
     void sg_upload(QString usr, int type, QString addr, QString detail);
 
-    void sendTask(DeliveryPath *path);  // 发送任务到客户端线程
+    void sendTask(DeliveryPath path);  // 发送任务到客户端线程
 
 public slots:
     void start();   // 开启服务器

@@ -47,8 +47,7 @@ private:
     bool editMode;
 
 signals:
-    void addTruck(TruckInfo *truck);
-    void delTruck(int index);
+    void sendTrucks(QList<TruckInfo*>*ts);
 
 private slots:
     void addRecord();
@@ -56,8 +55,8 @@ private slots:
     void applyRecord();
 
 public slots:
-    void truckBack(QString &truckId);
-    void truckGo(QString &truckId);
+    void truckMove(int id);
+    void truckFree(int id);
 };
 
 #endif // TRUCKWIDGET_H

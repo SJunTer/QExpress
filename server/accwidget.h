@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QString>
-#include <QTime>
 #include <QList>
 
 QT_BEGIN_NAMESPACE
@@ -12,6 +11,7 @@ class QPushButton;
 class Dbsql;
 QT_END_NAMESPACE
 
+#define WORK 2
 #define ONLINE 1
 #define OFFLINE 0
 
@@ -24,7 +24,7 @@ struct Account
     QString name;
     QString phone;
     QString email;
-    QTime last_time;
+    QString last_time;
     int status;
 };
 
@@ -47,10 +47,13 @@ private:
     QList<Account> accounts;
     Dbsql *dbsql;
 
+signals:
+    void closeClient(int id);
+    void sendAccounts(QList<Account> *as);
+
 private slots:
     void addAccount();
     void delAccount();
-    void sendMsg();
     void closeConn();
 
 public slots:
@@ -58,6 +61,9 @@ public slots:
     void signUp(Account a);
     void signOut(int id);
     void changeInfo(Account a);
+
+    void driverWork(int id);
+    void driverFree(int id);
 };
 
 

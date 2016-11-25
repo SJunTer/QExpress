@@ -37,10 +37,10 @@ MainWindow::MainWindow(ServerSocket *s, Dbsql *d, QWidget *parent) :
 
     tabWidget = new TabWidget(this);
     mapWidget = new MapWidget(this);
-    deliveryWidget = new DeliveryWidget(this);
+    deliveryWidget = new DeliveryWidget(dbsql, this);
     accWidget = new AccWidget(dbsql, this);
     truckWidget = new TruckWidget(dbsql, this);
-    inventoryWidget = new CargoWidget(dbsql, this);
+    cargoWidget = new CargoWidget(dbsql, this);
 
 
     msgDlg = new MessageDlg(this);
@@ -75,33 +75,37 @@ MainWindow::MainWindow(ServerSocket *s, Dbsql *d, QWidget *parent) :
     tabWidget->setTabEnabled(ACCWIDGET_INDEX, true);
     tabWidget->insertTab(TRKWIDGET_INDEX, truckWidget, "车辆", "Vehicle");
     tabWidget->setTabEnabled(TRKWIDGET_INDEX, true);
-    tabWidget->insertTab(INVYWIDGET_INDEX, inventoryWidget, "货物", "Inventory");
+    tabWidget->insertTab(INVYWIDGET_INDEX, cargoWidget, "货物", "Inventory");
     tabWidget->setTabEnabled(INVYWIDGET_INDEX, true);
 
     tabWidget->setCurrentIndex(0);
 
-    connect(mapWidget, SIGNAL(transferData(QList<Place>&)), this, SLOT(transferData(QList<Place>&)));
-
+    connect(mapWidget, SIGNAL(selectDone(QList<Place>&)), this, SLOT(selectDone(QList<Place>&)));
     connect(deliveryWidget, SIGNAL(selectMode()), this, SLOT(enterSelectMode()));
-    connect(deliveryWidget, SIGNAL(cargoMode()), this, SLOT(enterCargoMode()));
+
     connect(deliveryWidget, SIGNAL(drawPath(DeliveryPath*)), mapWidget, SLOT(addPath(DeliveryPath*)));
+    connect(deliveryWidget, SIGNAL(updatePath(DeliveryPath*)), mapWidget, SLOT(updatePath(DeliveryPath*)));
     connect(deliveryWidget, SIGNAL(removePath(int)), mapWidget, SLOT(removePath(int)));
-    connect(deliveryWidget, SIGNAL(updatePath(int,DeliveryPath*)), mapWidget, SLOT(updatePath(int,DeliveryPath*)));
-    connect(deliveryWidget, SIGNAL(truckGo(QString&)), truckWidget, SLOT(truckGo(QString&)));
-    connect(deliveryWidget, SIGNAL(truckBack(QString&)), truckWidget, SLOT(truckBack(QString&)));
-    connect(deliveryWidget, SIGNAL(sendTask(DeliveryPath*)), tcpServer, SIGNAL(sendTask(DeliveryPath*)));
 
-    connect(inventoryWidget, SIGNAL(sendTitles(QStringList&)), this, SLOT(sendTitles(QStringList&)));
+    connect(deliveryWidget, SIGNAL(driverWork(int)), accWidget, SLOT(driverWork(int)));
+    connect(deliveryWidget, SIGNAL(driverFree(int)), accWidget, SLOT(driverFree(int)));
+    connect(deliveryWidget, SIGNAL(cargoMove(QStringList)), cargoWidget, SLOT(cargoMove(QStringList)));
+    connect(deliveryWidget, SIGNAL(cargoReach(QStringList)), cargoWidget, SLOT(cargoReach(QStringList)));
+    connect(deliveryWidget, SIGNAL(cargoFail(QStringList)), cargoWidget, SLOT(cargofail(QStringList)));
+    connect(deliveryWidget, SIGNAL(truckMove(int)), truckWidget, SLOT(truckMove(int)));
+    connect(deliveryWidget, SIGNAL(truckFree(int)), truckWidget, SLOT(truckFree(int)));
 
-    connect(truckWidget, SIGNAL(addTruck(TruckInfo*)), deliveryWidget, SLOT(addTruck(TruckInfo*)));
-    connect(truckWidget, SIGNAL(delTruck(int)), deliveryWidget, SLOT(delTruck(int)));
+    connect(accWidget, SIGNAL(sendAccounts(QList<Account>*)), deliveryWidget, SLOT(setAccounts(QList<Account>*)));
+    connect(cargoWidget, SIGNAL(sendCargos(QList<CargoInfo*>*)), deliveryWidget, SLOT(setCargos(QList<CargoInfo*>*)));
+    connect(truckWidget, SIGNAL(sendTrucks(QList<TruckInfo*>*)), deliveryWidget, SLOT(setTrucks(QList<TruckInfo*>*)));
 
     connect(msgDlg, SIGNAL(signUp(Account)), accWidget, SLOT(signUp(Account)));
 
     /*-------------   读取信息   -----------------*/
+    deliveryWidget->readInfo();
     accWidget->readInfo();
     truckWidget->readInfo();
-    inventoryWidget->readInfo();
+    cargoWidget->readInfo();
 }
 
 MainWindow::~MainWindow()
@@ -119,17 +123,19 @@ void MainWindow::runServer()
     connect(thread, SIGNAL(finished()), tcpServer, SLOT(deleteLater()));
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     connect(this, SIGNAL(stopServer()), tcpServer, SLOT(stop()), Qt::DirectConnection);
+    connect(accWidget, SIGNAL(closeClient(int)), tcpServer, SIGNAL(closeClient(int)), Qt::DirectConnection);
+    connect(deliveryWidget, SIGNAL(sendTask(DeliveryPath)), tcpServer, SIGNAL(sendTask(DeliveryPath)), Qt::DirectConnection);
     // 服务器进程和主进程通信
-    connect(tcpServer, SIGNAL(initFail()), this, SLOT(initFail()));
     connect(tcpServer, SIGNAL(sg_signIn(int)), accWidget, SLOT(signIn(int)));
     connect(tcpServer, SIGNAL(sg_signUp(Account)), msgDlg, SLOT(signUpReq(Account)));
     connect(tcpServer, SIGNAL(sg_signOut(int)), accWidget, SLOT(signOut(int)));
     connect(tcpServer, SIGNAL(sg_changeInfo(Account)), accWidget, SLOT(changeInfo(Account)));
 
-    connect(tcpServer, SIGNAL(sg_acptTask()), deliveryWidget, SLOT());
-    connect(tcpServer, SIGNAL(sg_posChange()), deliveryWidget, SLOT());
-    connect(tcpServer, SIGNAL(sg_taskFinish()), deliveryWidget, SLOT());
-    connect(tcpServer, SIGNAL(sg_taskFail()), deliveryWidget, SLOT());
+    ///////////////////////////////////////////////////////////////////////////
+    connect(tcpServer, SIGNAL(sg_acptTask(int)), deliveryWidget, SLOT(acptTask(int)));
+    connect(tcpServer, SIGNAL(sg_posChange(int,int)), deliveryWidget, SLOT(posChanged(int,int)));
+    connect(tcpServer, SIGNAL(sg_taskFinish(int)), deliveryWidget, SLOT(taskFinish(int)));
+    connect(tcpServer, SIGNAL(sg_taskFail(int)), deliveryWidget, SLOT(taskFail(int)));
 
     connect(tcpServer, SIGNAL(sg_upload(QString,int,QString,QString)), msgDlg, SLOT(getUpload(QString,int,QString,QString)));
 
@@ -144,24 +150,12 @@ void MainWindow::enterSelectMode()
     mapWidget->enterSelectMode();
 }
 
-void MainWindow::enterCargoMode()
-{
-    tabWidget->setCurrentIndex(INVYWIDGET_INDEX);
-    inventoryWidget->setSelectMode(true);
-}
 
 //传递数据并切换界面
-void MainWindow::transferData(QList<Place> &places)
+void MainWindow::selectDone(QList<Place> &places)
 {
     tabWidget->setCurrentIndex(DELYWIDGET_INDEX);
     deliveryWidget->setPath(places);
-}
-
-
-void MainWindow::sendTitles(QStringList &titles)
-{
-    tabWidget->setCurrentIndex(DELYWIDGET_INDEX);
-    deliveryWidget->setCargo(titles);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *)
@@ -190,11 +184,6 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
 }
 
-void MainWindow::initFail()
-{
-    QMessageBox::warning(this, tr("错误"), tr("服务器启动失败！"),
-                            QMessageBox::Ok);
-}
 
 void MainWindow::showMsgDlg()
 {

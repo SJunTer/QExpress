@@ -1,6 +1,7 @@
 #include "tcpserver.h"
 #include "../network/commands.h"
 #include "connection.h"
+#include "deliverywidget.h"
 #include <QThread>
 #include <QDebug>
 
@@ -13,6 +14,7 @@ TcpServer::TcpServer(ServerSocket *s, Dbsql *d, MapView *v) :
 {
     qRegisterMetaType<Account>("Account");
     qRegisterMetaType<QString>("QString");
+    qRegisterMetaType<DeliveryPath>("DeliveryPath");
 }
 
 void TcpServer::newConn(int sockfd)
@@ -26,18 +28,20 @@ void TcpServer::newConn(int sockfd)
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     // 切断客户端连接
     connect(this, SIGNAL(closeClient()), conn, SLOT(stop()), Qt::DirectConnection);
+    connect(this, SIGNAL(closeClient(int)), conn, SLOT(stop(int)), Qt::DirectConnection);
+    connect(this, SIGNAL(sendTask(DeliveryPath)), conn, SLOT(getTask(DeliveryPath)), Qt::DirectConnection);
     // 客户端断开连接
-    connect(conn, SIGNAL(close(int)), this, SLOT(close(int)));
+    connect(conn, SIGNAL(close(int)), this, SLOT(close(int)), Qt::DirectConnection);
 
     connect(conn, SIGNAL(sg_signIn(int)), this, SIGNAL(sg_signIn(int)), Qt::DirectConnection);
     connect(conn, SIGNAL(sg_signUp(Account)), this, SIGNAL(sg_signUp(Account)), Qt::DirectConnection);
     connect(conn, SIGNAL(sg_signOut(int)), this, SIGNAL(sg_signOut(int)), Qt::DirectConnection);
     connect(conn, SIGNAL(sg_changeInfo(Account)), this, SIGNAL(sg_changeInfo(Account)), Qt::DirectConnection);
 
-    connect(conn, SIGNAL(sg_acptTask()), this, SIGNAL(sg_acptTask()), Qt::DirectConnection);
-    connect(conn, SIGNAL(sg_posChange()), this, SIGNAL(sg_posChange()), Qt::DirectConnection);
-    connect(conn, SIGNAL(sg_taskFinish()), this, SIGNAL(sg_taskFinish()), Qt::DirectConnection);
-    connect(conn, SIGNAL(sg_taskFail()), this, SIGNAL(sg_taskFail()), Qt::DirectConnection);
+    connect(conn, SIGNAL(sg_acptTask(int)), this, SIGNAL(sg_acptTask(int)), Qt::DirectConnection);
+    connect(conn, SIGNAL(sg_posChange(int,int)), this, SIGNAL(sg_posChange(int,int)), Qt::DirectConnection);
+    connect(conn, SIGNAL(sg_taskFinish(int)), this, SIGNAL(sg_taskFinish(int)), Qt::DirectConnection);
+    connect(conn, SIGNAL(sg_taskFail(int)), this, SIGNAL(sg_taskFail(int)), Qt::DirectConnection);
 
     connect(conn, SIGNAL(sg_upload(QString,int,QString,QString)), this, SIGNAL(sg_upload(QString,int,QString,QString)), Qt::DirectConnection);
 

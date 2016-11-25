@@ -1,7 +1,6 @@
 #include "mapwidget.h"
 #include "mapview.h"
 #include "tilesdlg.h"
-#include "deliverypath.h"
 #include <QColor>
 #include <QFont>
 #include <QCheckBox>
@@ -51,7 +50,7 @@ MapWidget::MapWidget(QWidget *parent)
 
     setCentralWidget(view);
 
-    connect(view, SIGNAL(transferData(QList<Place>&)), this, SIGNAL(transferData(QList<Place>&)));
+    connect(view, SIGNAL(selectDone(QList<Place>&)), this, SIGNAL(selectDone(QList<Place>&)));
 
 }
 
@@ -67,20 +66,18 @@ void MapWidget::makeTile()
     dlg->exec();
 }
 
+//////////路径相关///////////
 void MapWidget::addPath(DeliveryPath *path)
 {
-    paths.append(path);
     view->drawPath(path);
 }
 
-void MapWidget::removePath(int index)
+void MapWidget::updatePath(DeliveryPath *path)
 {
-    paths.takeAt(index);
-    view->removePath(index);
+    view->updatePath(path);
 }
 
-void MapWidget::updatePath(int index, DeliveryPath *path)
+void MapWidget::removePath(int id)
 {
-    paths[index] = path;
-    view->updatePath(index, path);
+    view->removePath(id);
 }

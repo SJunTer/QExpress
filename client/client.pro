@@ -19,7 +19,6 @@ FORMS += \
 HEADERS += \
     mainwindow.h \
     mapview.h \
-    pathwidget.h \
     pixmapitem.h \
     account.h \
     login/logindlg.h \
@@ -41,7 +40,6 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     mapview.cpp \
-    pathwidget.cpp \
     pixmapitem.cpp \
     login/logindlg.cpp \
     login/regdlg.cpp \

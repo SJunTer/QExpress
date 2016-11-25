@@ -26,7 +26,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>QExpress</string>
+   <string>登录</string>
   </property>
   <widget class="QLabel" name="usrLabel">
    <property name="geometry">
@@ -132,8 +132,8 @@
   <widget class="QToolButton" name="toolButton">
    <property name="geometry">
     <rect>
-     <x>371</x>
-     <y>0</y>
+     <x>360</x>
+     <y>10</y>
      <width>24</width>
      <height>24</height>
     </rect>

@@ -3,6 +3,7 @@
 #include "../network/commands.h"
 #include "../network/packet.h"
 #include "../network/socket.h"
+#include <QTimer>
 #include <string>
 #include <QListWidgetItem>
 #include <QMessageBox>
@@ -18,12 +19,33 @@ TaskDlg::TaskDlg(ClientSocket *cli, QWidget *parent)  :
     taskLoaded(false)
 {
     ui->setupUi(this);
-    setWindowTitle("任务");
+    timer = new QTimer(this);
 }
 
 TaskDlg::~TaskDlg()
 {
     delete ui;
+}
+
+//更新任务信息
+void TaskDlg::update()
+{
+    if(accepted || taskLoaded)
+        return;
+
+    if(getTask() == 0)
+    {
+        updateUi();
+        taskLoaded = true;
+    }
+    else if(getTask() == NO_TASK)
+    {
+        QMessageBox::warning(this, "提示", "无配送任务", QMessageBox::Ok);
+    }
+    else
+    {
+        QMessageBox::warning(this, "错误", "数据传输异常！", QMessageBox::Ok);
+    }
 }
 
 int TaskDlg::getTask()
@@ -43,6 +65,7 @@ int TaskDlg::getTask()
     // 接收车辆编号
     path.truckId = fromByteString<int>(data);
     // 接收配送点信息
+    path.places.clear();
     int cnt = fromByteString<int>(data), len;
     string s;
     Place p;
@@ -68,11 +91,20 @@ int TaskDlg::getTask()
         cargo = fromByteString(data, len);
         path.cargos.push_back(QString::fromStdString(cargo));
     }
+    path.pos = path.secs = 0;
+    ui->acptBtn->setEnabled(true);
+
     return 0;
 }
 
 void TaskDlg::updateUi()
 {
+    ui->placeListWidget->clear();
+    for(int i = 0; i < path.places.size(); ++i)
+    {
+        if(path.places[i].type != IsPass)
+            ui->placeListWidget->addItem(path.places[i].title);
+    }
     ui->cargoListWidget->clear();
     ui->cargoListWidget->addItems(path.cargos);
     ui->truckLabel->setText(QString::number(path.truckId));
@@ -80,7 +112,7 @@ void TaskDlg::updateUi()
 
 
 
-//响应按钮点击事件
+//开始配送
 void TaskDlg::on_acptBtn_clicked()
 {
     if(!taskLoaded)
@@ -88,15 +120,19 @@ void TaskDlg::on_acptBtn_clicked()
         QMessageBox::information(this, "提示", "当前无配送任务", QMessageBox::Ok);
         return;
     }
+    emit drawPath(path.places);
+    emit setTaskState(true);
+    // 模拟行车路线
+    connect(timer, SIGNAL(timeout()), this, SLOT(updatePath()));
+    timer->start(1000);
+
     string s = toByteString(0);
     if(sendPacket(client->sock(), cmd_acceptTask, s) != 0)
     {
         QMessageBox::warning(this, "错误", "数据传输失败", QMessageBox::Ok);
         return;
     }
-    emit acptTask();
-    emit sendPath(path.places);
-    QMessageBox::information(this, "成功", "已接受配送任务", QMessageBox::Ok);
+    QMessageBox::information(this, "成功", "开始配送", QMessageBox::Ok);
     ui->acptBtn->setEnabled(false);
     ui->endBtn->setEnabled(true);
     accepted = true;
@@ -109,6 +145,10 @@ void TaskDlg::on_endBtn_clicked()
                             QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
         return;
 
+    emit endTask();
+    emit setTaskState(false);
+    timer->stop();
+
     string s = toByteString(0);
     if(sendPacket(client->sock(), cmd_taskFail, s) != 0)
     {
@@ -116,31 +156,40 @@ void TaskDlg::on_endBtn_clicked()
         return;
     }
     QMessageBox::information(this, "提示", "已结束任务", QMessageBox::Ok);
-    emit endTask();
-    ui->acptBtn->setEnabled(true);
+
     ui->endBtn->setEnabled(false);
     taskLoaded = false;
     accepted = false;
 }
 
-
-//更新任务
-void TaskDlg::update()
+//更新路径
+void TaskDlg::updatePath()
 {
-    if(accepted || taskLoaded)
-        return;
+    path.pos += 1;
+    path.secs += 2;
+    emit updatePath(path.pos);
 
-    if(getTask() == 0)
+    string s = toByteString(path.pos);
+    if(sendPacket(client->sock(), cmd_posChange, s) != 0)
     {
-        updateUi();
-        taskLoaded = true;
+        QMessageBox::warning(this, "错误", "数据传输失败", QMessageBox::Ok);
+        return;
     }
-    else if(getTask() == NO_TASK)
+    if(path.pos == path.places.size()-1)    // 如果到达终点
     {
-        QMessageBox::warning(this, "提示", "无配送任务", QMessageBox::Ok);
-    }
-    else
-    {
-        QMessageBox::warning(this, "错误", "数据传输异常！", QMessageBox::Ok);
+        timer->stop();
+        emit setTaskState(false);
+        ui->endBtn->setEnabled(false);
+        taskLoaded = false;
+        accepted = false;
+        QMessageBox::information(0, "提示", "任务完成！", QMessageBox::Ok);
+
+        s = toByteString(0);
+        if(sendPacket(client->sock(), cmd_taskFinish, s) != 0)
+        {
+            QMessageBox::warning(this, "错误", "数据传输失败", QMessageBox::Ok);
+            return;
+        }
     }
 }
+

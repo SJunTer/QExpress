@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>连接设置</string>
   </property>
   <widget class="QLabel" name="ipLabel">
    <property name="geometry">

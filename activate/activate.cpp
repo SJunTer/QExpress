@@ -1,32 +1,46 @@
+#include "activate.h"
+#include "../security/sha256.h"
+#include <math.h>
 #include <cstdio>
 #include <cstring>
-#include "activate.h"
-
 using namespace std;
 
-bool Activate::WriteToFile()
+bool IfPrime(int i)
+{
+    bool temp = true;
+    for(int j = 2; j <= pow(i, 0.5); ++j)
+    {
+        if(i % j == 0)
+        {
+            temp = false;
+        }
+    }
+    if(i != 1)
+    {
+        return temp;
+    }
+}
+
+int Activate::WriteToFile()
 {
     FILE *fp;
 
-    if((fp=fopen("sec.key", "w"))==NULL)
+    if((fp=fopen("sec.key", "wb"))==NULL)
     {
-        return 0;
+        return -1;
     }
 
     fwrite(key, sizeof(key), 1, fp);
 
     if(fclose(fp))
     {
-             return 0;
+             return -1;
     }
-    return 1;
+    return 0;
 }
-
 
 void Activate::GenerateKey()
 {
-    MD5Init(&md5);
-
     unsigned char cpuid[17] = {0};
     unsigned char mac[18] = {0};
 
@@ -37,19 +51,16 @@ void Activate::GenerateKey()
     hdInfo.getcpuid(cpuid);
     hdInfo.getMAC(mac);
 
-//    cout << "cpuid = " << cpuid << endl;
- //   cout << "mac = " << mac << endl;
-
-    unsigned char encrypt[34] = {0};
+    char encrypt[34] = {0};
 
     for(int i = 0, j = 0, t = 15; i < 33; ++i)
     {
-        if(i % 2 == 0 && j < 17)
+        if(i % 2 == 0)
         {
             encrypt[i] = mac[j];
             ++j;
         }
-        else if(t > 0)
+        else
         {
             encrypt[i] = cpuid[t] + 32;
             --t;
@@ -58,26 +69,33 @@ void Activate::GenerateKey()
         encrypt[i] = ((encrypt[i] == ':') ? 'g': encrypt[i]);
     }
 
-//    cout << encrypt << endl;
-
-    for(int i = 0; i < 16; ++i)
+    for(int i = 0, t = 0; (i < 33) && (t < 16); ++i)
     {
-        id[i] = encrypt[i];
+        if((i == 0) || (i == 8) || (i == 15) || (i == 20) || (i == 28))
+        {
+            id[t] = encrypt[i];
+            ++t;
+        }
+        else if(IfPrime(i))
+        {
+            id[t] = encrypt[i];
+            ++t;
+        }
     }
     id[16] = '\0';
 
-    MD5Update(&md5, id, strlen((char*)id));
-    MD5Final(ciphertext, &md5);
+    char ciphertext[65] = {0};
+    sha_256(ciphertext, id);
 
     char asc[36] = {0};
 
     for(int i = 0; i < 10; ++i)
     {
-        asc[i] = '0' + i;
+        asc[i] = 48 + i;
     }
     for(int i = 10; i < 36; ++i)
     {
-        asc[i] = 'A' + i - 10;
+        asc[i] = 65 + i - 10;
     }
 
     for(int i = 0; i < 16; ++i)
@@ -92,7 +110,7 @@ bool Activate::KeyIsCorrect()
     bool flag = 0;
 
     unsigned char strInFile[17] = {0};
-    if((fp=fopen("sec.key", "r")) == NULL)
+    if((fp=fopen("sec.key", "rb")) == NULL)
     {
         return 0;
     }

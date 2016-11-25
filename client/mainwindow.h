@@ -9,7 +9,6 @@ class QToolButton;
 class QPushButton;
 class MapView;
 class ClientSocket;
-class PathWidget;
 class TaskDlg;
 class AboutDlg;
 QT_END_NAMESPACE
@@ -23,7 +22,6 @@ public:
 
 private:
     MapView *view;
-    PathWidget *pathWidget;
     ClientSocket *client;
 
     QPushButton *zoomInBtn;
@@ -38,6 +36,10 @@ private:
 
     bool uploadDlgShowed;
     bool userDlgShowed;
+    bool taskRun;
+
+protected:
+    void closeEvent(QCloseEvent *e);
 
 private slots:
     void on_taskBtn_clicked();
@@ -50,6 +52,9 @@ private slots:
     void userDlgClosed() {
         userDlgShowed = false;
     }
+
+public slots:
+    void setTaskState(bool b) { taskRun = b; }
 
 };
 

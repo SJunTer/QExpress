@@ -8,10 +8,19 @@
 #include <QTime>
 #include <QStringList>
 
+
+// 配送状态
+#define WAIT 0
+#define RUN 1
+#define FINISH 2
+#define INTR 3
+
+
 //地点类型
 enum PlaceType {
     IsRepo, IsDely, IsPass
 };
+
 
 // 途经点
 struct Place
@@ -24,14 +33,15 @@ struct Place
 // 路径信息
 struct DeliveryPath
 {
-    int index;
+    int id;
     int truckId;
     int driverId;
     QStringList cargos;
     QList<Place> places;
     int pos;    // 当前位置
-    QTime startTime;    // 出发时间
-    int mins;   // 运行时间
+    int status;     // 当前状态
+    QString moveTime;   // 运行时间
+    QString startTime;    // 出发时间
 };
 
 
@@ -39,7 +49,10 @@ QT_BEGIN_NAMESPACE
 class QTableWidget;
 class QListWidget;
 class QPushButton;
-class DeliveryPath;
+class Dbsql;
+class DelvDlg;
+class Account;
+class CargoInfo;
 class TruckInfo;
 QT_END_NAMESPACE
 
@@ -47,59 +60,69 @@ class DeliveryWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DeliveryWidget(QWidget *parent = 0);
+    explicit DeliveryWidget(Dbsql *d, QWidget *parent = 0);
     void setCargo(QStringList &titles);
 
+    void readInfo();
+
 private:
+    void initTable();   //初始化表格
+
+    Dbsql *dbsql;
+
     QTableWidget *deliveryTable;
     QListWidget *pathList;
 
     QPushButton *addBtn;
     QPushButton *delBtn;
-    QPushButton *selectBtn;
-    QPushButton *cargoBtn;
-    QPushButton *okBtn;
-    QPushButton *cancelBtn;
 
-    QList<TruckInfo *> trucks;
+    QList<Account> *accounts;
+    QList<CargoInfo *> *cargos;
+    QList<TruckInfo *> *trucks;
 
     QList<DeliveryPath *> paths;
-    DeliveryPath *tempPath;
 
-    bool editMode;
-
-    void initTable();   //初始化表格
-    void showPath(DeliveryPath *p);    // 显示暂存路径
-
-    void updateCombo();
+    DelvDlg *delvDlg;
+    bool delvDlgShowed;
 
 signals:
     void selectMode();   //发送切换视图信号
-    void cargoMode();
     void drawPath(DeliveryPath *path);
-    void removePath(int index);
-    void updatePath(int index, DeliveryPath *path);
-    void truckBack(QString &truckId);
-    void truckGo(QString &truckId);
-    void sendTask(DeliveryPath *path);
+    void updatePath(DeliveryPath *path);
+    void removePath(int id);
+
+    void sendTask(DeliveryPath path);
+
+    void driverWork(int id);
+    void driverFree(int id);
+    void truckMove(int id);
+    void truckFree(int id);
+    void cargoMove(QStringList cs);
+    void cargoReach(QStringList cs);
+    void cargoFail(QStringList cs);
 
 private slots:
-    void addLine(); // 添加行
-    void delLine(); // 删除行
-    void selectPoints(); // 选点模式
-    void selectCargo(); // 选择货物
-    void applyPath(); // 应用当前配送方案
-    void cancel(); // 放弃当前方案
+    void on_addBtn_clicked();
+    void on_delBtn_clicked();
 
+    void showPath(DeliveryPath *p);    // 显示暂存路径
     void showPath(int curRow, int curCol, int preRow, int preCol); // 显示路径
 
 public slots:
     void setPath(QList<Place> &places); // 创建路径对象
 
-    void posChanged(int pos, int index);
+    void acptTask(int id);
+    void posChanged(int id, int pos);
+    void taskFinish(int id);
+    void taskFail(int id);
 
-    void addTruck(TruckInfo *truck);
-    void delTruck(int index);
+    void closeDelvDLg();
+    void addPath(DeliveryPath *path);
+
+    void setAccounts(QList<Account>*as) { accounts = as; }
+    void setCargos(QList<CargoInfo*>*cs) { cargos = cs; }
+    void setTrucks(QList<TruckInfo*>*ts) { trucks = ts; }
+
 };
 
 #endif // DELIVERYWIDGET_H

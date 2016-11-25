@@ -21,31 +21,26 @@ using namespace std;
 CargoWidget::CargoWidget(Dbsql *d, QWidget *parent) :
     QWidget(parent),
     dbsql(d),
-    selectMode(false),
     editMode(false)
 {
     cargoTable = new QTableWidget(this);
     addBtn = new QPushButton(this);
     delBtn = new QPushButton(this);
     applyBtn = new QPushButton(this);
-    selectBtn = new QPushButton(this);
 
     initTable();
 
     QFont font;
     font.setPixelSize(13);
     addBtn->setText("添加");
-    addBtn->setFont(font);
+//    addBtn->setFont(font);
     addBtn->setFixedSize(60, 35);
     delBtn->setText("删除");
-    delBtn->setFont(font);
+//    delBtn->setFont(font);
     delBtn->setFixedSize(60, 35);
     applyBtn->setText("应用");
-    applyBtn->setFont(font);
+//    applyBtn->setFont(font);
     applyBtn->setFixedSize(60, 35);
-    selectBtn->setText("选择");
-    selectBtn->setFont(font);
-    selectBtn->setFixedSize(60, 35);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
@@ -55,12 +50,10 @@ CargoWidget::CargoWidget(Dbsql *d, QWidget *parent) :
     QHBoxLayout *btnLayout = new QHBoxLayout;
     btnLayout->setSpacing(0);
     btnLayout->setContentsMargins(0, 5, 0, 0);
+    btnLayout->addStretch();
     btnLayout->addWidget(addBtn);
     btnLayout->addWidget(delBtn);
     btnLayout->addWidget(applyBtn);
-    btnLayout->addStretch();
-    btnLayout->addWidget(selectBtn);
-    btnLayout->addSpacing(10);
 
     layout->addLayout(btnLayout);
     setLayout(layout);
@@ -68,7 +61,6 @@ CargoWidget::CargoWidget(Dbsql *d, QWidget *parent) :
     connect(addBtn, SIGNAL(clicked(bool)), this, SLOT(addRecord()));
     connect(delBtn, SIGNAL(clicked(bool)), this, SLOT(delRecord()));
     connect(applyBtn, SIGNAL(clicked(bool)), this, SLOT(applyRecord()));
-    connect(selectBtn, SIGNAL(clicked(bool)), this, SLOT(selectCargo()));
 
 }
 
@@ -83,12 +75,12 @@ CargoWidget::~CargoWidget()
 
 void CargoWidget::initTable()
 {
-    cargoTable->setColumnCount(6);
+    cargoTable->setColumnCount(5);
     cargoTable->horizontalHeader()->setDefaultSectionSize(150);
     cargoTable->horizontalHeader()->setSectionsClickable(false);
 
     QStringList header;
-    header << tr("选择") << tr("序号") << tr("名称") << tr("目的地") << tr("收件人") << tr("当前状态");
+    header  << tr("序号") << tr("名称") << tr("目的地") << tr("收件人") << tr("当前状态");
     cargoTable->setHorizontalHeaderLabels(header);
 
     QFont font = cargoTable->horizontalHeader()->font();
@@ -104,7 +96,7 @@ void CargoWidget::initTable()
     cargoTable->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为时每次选择一行
 //    cargoTable->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置不可编辑
     cargoTable->horizontalHeader()->setStretchLastSection(true); //设置充满表宽度
-    cargoTable->horizontalHeader()->resizeSection(0,50); //设置表头第一列的宽度为50
+//    cargoTable->horizontalHeader()->resizeSection(0,50); //设置表头第一列的宽度为50
     cargoTable->horizontalHeader()->setFixedHeight(30); //设置表头的高度
 //    cargoTable->setStyleSheet("selection-background-color:lightblue;"); //设置选中背景色
 //    cargoTable->horizontalHeader()->setStyleSheet("QHeaderView::section{background:skyblue;}"); //设置表头背景色
@@ -133,36 +125,36 @@ void CargoWidget::readInfo()
         int rowCnt = cargoTable->rowCount();
         cargoTable->insertRow(rowCnt);
 
-        QCheckBox *item1 = new QCheckBox;
+        QTableWidgetItem *item1 = new QTableWidgetItem;
         QTableWidgetItem *item2 = new QTableWidgetItem;
         QTableWidgetItem *item3 = new QTableWidgetItem;
         QTableWidgetItem *item4 = new QTableWidgetItem;
         QTableWidgetItem *item5 = new QTableWidgetItem;
-        QTableWidgetItem *item6 = new QTableWidgetItem;
 
-        item1->setText("");
-        item2->setText(QString::number(cargo->id));
+        item1->setText(QString::number(cargo->id));
+        item1->setFlags(item1->flags() & (~Qt::ItemIsEditable));
+        item2->setText(cargo->descrip);
         item2->setFlags(item2->flags() & (~Qt::ItemIsEditable));
-        item3->setText(cargo->descrip);
-        item4->setText(cargo->dest);
-        item5->setText(cargo->reciver);
+        item3->setText(cargo->dest);
+        item3->setFlags(item3->flags() & (~Qt::ItemIsEditable));
+        item4->setText(cargo->reciver);
+        item4->setFlags(item4->flags() & (~Qt::ItemIsEditable));
         switch(cargo->status)
         {
-        case InRepo: item6->setText("仓库中"); break;
-        case IsMove: item6->setText("配送中"); break;
-        case IsComplete: item6->setText("配送完成"); break;
+        case InRepo: item5->setText("仓库中"); break;
+        case IsMove: item5->setText("配送中"); break;
+        case IsComplete: item5->setText("配送完成"); break;
         }
-        item6->setFlags(item6->flags() & (~Qt::ItemIsEditable));
+        item5->setFlags(item5->flags() & (~Qt::ItemIsEditable));
 
-        cargoTable->setCellWidget(rowCnt, 0, item1);
+        cargoTable->setItem(rowCnt, 0, item1);
         cargoTable->setItem(rowCnt, 1, item2);
         cargoTable->setItem(rowCnt, 2, item3);
         cargoTable->setItem(rowCnt, 3, item4);
         cargoTable->setItem(rowCnt, 4, item5);
-        cargoTable->setItem(rowCnt, 5, item6);
         cargoTable->setCurrentCell(rowCnt, 0);
-        connect(item1, SIGNAL(stateChanged(int)), cargo, SLOT(stateChanged(int)));
     }
+    emit sendCargos(&cargos);
 }
 
 void CargoWidget::addRecord()
@@ -183,30 +175,27 @@ void CargoWidget::addRecord()
          temp->id = cargos.back()->id+1;
      cargoTable->insertRow(rowCnt);
 
-     QCheckBox *item1 = new QCheckBox;
+     QTableWidgetItem *item1 = new QTableWidgetItem;
      QTableWidgetItem *item2 = new QTableWidgetItem;
      QTableWidgetItem *item3 = new QTableWidgetItem;
      QTableWidgetItem *item4 = new QTableWidgetItem;
      QTableWidgetItem *item5 = new QTableWidgetItem;
-     QTableWidgetItem *item6 = new QTableWidgetItem;
 
-     item1->setText("");
-     item2->setText(QString::number(temp->id));
-     item2->setFlags(item2->flags() & (~Qt::ItemIsEditable));
+     item1->setText(QString::number(temp->id));
+     item1->setFlags(item2->flags() & (~Qt::ItemIsEditable));
+     item2->setText("");
      item3->setText("");
      item4->setText("");
-     item5->setText("");
-     item6->setText("NULL");
-     item6->setFlags(item6->flags() & (~Qt::ItemIsEditable));
+     item5->setText("NULL");
+     item5->setFlags(item5->flags() & (~Qt::ItemIsEditable));
 
-     cargoTable->setCellWidget(rowCnt, 0, item1);
+     cargoTable->setItem(rowCnt, 0, item1);
      cargoTable->setItem(rowCnt, 1, item2);
      cargoTable->setItem(rowCnt, 2, item3);
      cargoTable->setItem(rowCnt, 3, item4);
      cargoTable->setItem(rowCnt, 4, item5);
-     cargoTable->setItem(rowCnt, 5, item6);
      cargoTable->setCurrentCell(rowCnt, 0);
-     connect(item1, SIGNAL(stateChanged(int)), temp, SLOT(stateChanged(int)));
+
 }
 
 void CargoWidget::delRecord()
@@ -230,11 +219,6 @@ void CargoWidget::delRecord()
             QMessageBox::warning(this, tr("警告"), tr("货物正在配送，无法删除！"));
             return;
         }
-        if(cargos[index]->m_isSelect)
-        {
-            QMessageBox::warning(this, tr("警告"), tr("已选择该货物，无法删除！"));
-            return;
-        }
         if(QMessageBox::warning(this, "警告", "确定删除改信息吗？",
                                 QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
             return;
@@ -246,6 +230,7 @@ void CargoWidget::delRecord()
         cargoTable->removeRow(index);
         CargoInfo *c = cargos.takeAt(index);
         delete c;
+        emit sendCargos(&cargos);
         QMessageBox::information(this, tr("提示"), tr("删除成功！"));
     }
 }
@@ -255,10 +240,10 @@ void CargoWidget::applyRecord()
     if(!editMode)
         return;
 
-    int i = cargoTable->currentRow();
-    temp->descrip = cargoTable->item(i, 2)->text();
-    temp->dest = cargoTable->item(i, 3)->text();
-    temp->reciver = cargoTable->item(i, 4)->text();
+    int index = cargoTable->rowCount()-1;
+    temp->descrip = cargoTable->item(index, 1)->text();
+    temp->dest = cargoTable->item(index, 2)->text();
+    temp->reciver = cargoTable->item(index, 3)->text();
     temp->status = InRepo;
     if(temp->descrip == "" || temp->dest == "" || temp->reciver == "")
     {
@@ -277,68 +262,97 @@ void CargoWidget::applyRecord()
         return;
     }
     cargos.append(temp);
-    cargoTable->item(i, 5)->setText("仓库中");
+    cargoTable->item(index, 4)->setText("仓库中");
+    for(int i = 1; i <= 3; ++i)
+    {
+        QTableWidgetItem *w = cargoTable->item(index, i);
+        w->setFlags(w->flags() & (~Qt::ItemIsEditable));
+    }
     editMode = false;
+    emit sendCargos(&cargos);
     QMessageBox::information(this, tr("提示"), tr("添加成功！"));
 }
 
-
-void CargoWidget::selectCargo()
+void CargoWidget::cargoMove(QStringList cs)
 {
-    if(!selectMode)
-        return;
-    if(editMode)
+    for(int i = 0; i < cs.size(); ++i)
     {
-        QMessageBox::warning(this, tr("警告"), tr("请先完成编辑货物！"));
-        return;
-    }
-
-    for(int i = 0; i < cargos.size(); ++i)
-    {
-        if(cargos[i]->m_isSelect && cargos[i]->status == InRepo)
+        for(int j = 0; j < cargos.size(); ++j)
         {
-            vector<string> cargo;
-            cargo.push_back("");
-            cargo.push_back("");
-            cargo.push_back("");
-            cargo.push_back("");
-            cargo.push_back(QString::number(cargos[i]->status).toStdString());
-            if(dbsql->Alter(TABLE_CARGO, CARGO_ID, QString::number(cargos[i]->id).toStdString(), cargo) != 0)
+            if(cs[i] == cargos[j]->descrip)
             {
-                QMessageBox::warning(this, tr("错误"), tr("无法修改货物状态！"));
-                return;
-            }
+                cargos[j]->status = IsMove;
+                cargoTable->item(j, 4)->setText("配送中");
+                emit sendCargos(&cargos);
 
-            // 设置该行不可标记
-            cargoTable->cellWidget(i, 0)->setEnabled(false);
-            for(int j = 1; j < cargoTable->columnCount(); ++j)
-            {
-                QTableWidgetItem *item = cargoTable->item(i, j);
-                item->setFlags(item->flags() & (~Qt::ItemIsEditable));
+                vector<string> cargo;
+                cargo.push_back("");
+                cargo.push_back("");
+                cargo.push_back("");
+                cargo.push_back("");
+                cargo.push_back(QString::number(cargos[j]->status).toStdString());
+                if(dbsql->Alter(TABLE_CARGO, CARGO_ID, QString::number(cargos[j]->id).toStdString(), cargo) != 0)
+                {
+                    QMessageBox::warning(this, tr("错误"), tr("无法修改货物状态！"));
+                }
+                break;
             }
-            cargos[i]->status = IsMove;
-            cargoTable->item(i, 5)->setText("配送中");
-            titles << cargos[i]->descrip;
-        }
+        }// 查找对应货物
     }
-    emit sendTitles(titles);
-    selectMode = false;
 }
 
-
-void CargoWidget::complete(int i)
+void CargoWidget::cargoReach(QStringList cs)
 {
-    cargos[i]->status = IsComplete;
-    cargoTable->item(i, 5)->setText("配送完成");
-
-    vector<string> cargo;
-    cargo.push_back("");
-    cargo.push_back("");
-    cargo.push_back("");
-    cargo.push_back("");
-    cargo.push_back(QString::number(cargos[i]->status).toStdString());
-    if(dbsql->Alter(TABLE_CARGO, CARGO_ID, QString::number(cargos[i]->id).toStdString(), cargo) != 0)
+    for(int i = 0; i < cs.size(); ++i)
     {
-        QMessageBox::warning(this, tr("错误"), tr("无法修改货物状态！"));
+        for(int j = 0; j < cargos.size(); ++j)
+        {
+            if(cs[i] == cargos[j]->descrip)
+            {
+                cargos[j]->status = IsComplete;
+                cargoTable->item(j, 4)->setText("配送完成");
+                emit sendCargos(&cargos);
+
+                vector<string> cargo;
+                cargo.push_back("");
+                cargo.push_back("");
+                cargo.push_back("");
+                cargo.push_back("");
+                cargo.push_back(QString::number(cargos[j]->status).toStdString());
+                if(dbsql->Alter(TABLE_CARGO, CARGO_ID, QString::number(cargos[j]->id).toStdString(), cargo) != 0)
+                {
+                    QMessageBox::warning(this, tr("错误"), tr("无法修改货物状态！"));
+                }
+                break;
+            }
+        }// 查找对应货物
+    }
+}
+
+void CargoWidget::cargofail(QStringList cs)
+{
+    for(int i = 0; i < cs.size(); ++i)
+    {
+        for(int j = 0; j < cargos.size(); ++j)
+        {
+            if(cs[i] == cargos[j]->descrip)
+            {
+                cargos[j]->status = InRepo;
+                cargoTable->item(j, 4)->setText("仓库中");
+                emit sendCargos(&cargos);
+
+                vector<string> cargo;
+                cargo.push_back("");
+                cargo.push_back("");
+                cargo.push_back("");
+                cargo.push_back("");
+                cargo.push_back(QString::number(cargos[j]->status).toStdString());
+                if(dbsql->Alter(TABLE_CARGO, CARGO_ID, QString::number(cargos[j]->id).toStdString(), cargo) != 0)
+                {
+                    QMessageBox::warning(this, tr("错误"), tr("无法修改货物状态！"));
+                }
+                break;
+            }
+        }// 查找对应货物
     }
 }

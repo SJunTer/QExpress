@@ -7,8 +7,11 @@
 #include <cstdio>
 #include <QFont>
 #include <QDir>
+#include <QLineF>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QPainterPath>
+#include <QPen>
 #include <QPixmap>
 #include <QThread>
 #include <QWheelEvent>
@@ -282,4 +285,99 @@ void MapView::drawSymbol(QString symbolName, int lv, int x, int y)
     symbol->setZValue(2);
     layers[lv-MIN_LEVEL]->addToGroup(symbol);
     scene->update();
+}
+
+///////////// 路径显示相关 ///////////////
+void MapView::drawPath(QList<Place> &ps)
+{
+    if(!path.empty())
+    {
+        for(auto n : path)
+        {
+            scene->removeItem(path[0]);
+            QGraphicsItem *p = path.takeFirst();
+            delete p;
+        }
+        places.clear();
+    }
+
+    // 更新places
+    places = ps;
+    // 添加路径
+    QGraphicsPathItem *item = new QGraphicsPathItem;
+    QPainterPath n;
+    n.moveTo(places[0].coord);
+    for(int i = 1; i < places.size(); ++i)
+        n.lineTo(places[i].coord);
+    item->setPath(n);
+
+    QPen pen;
+    pen.setColor(Qt::red);
+    pen.setWidth(5);
+    pen.setCosmetic(true);
+    item->setPen(pen);
+
+    path.append(item);
+    scene->addItem(item);
+
+    // 添加标记
+    for(int i = 0; i < places.size(); ++i)
+    {
+        if(places[i].type == IsRepo)
+        {
+            PixmapItem *mark = new PixmapItem;
+            QPointF p = places[i].coord;
+            mark->setPixmap(QPixmap(":/images/repo_marker_48.png"));
+            mark->setOffset(p.x()-48/2+1, p.y()-48);
+            mark->setAlignPos(PixmapItem::BottomCenter);
+            path.push_front(mark);
+            scene->addItem(mark);
+        }
+        else if(places[i].type == IsDely)
+        {
+            PixmapItem *mark = new PixmapItem;
+            QPointF p = places[i].coord;
+            mark->setPixmap(QPixmap(":/images/map_marker_48.png"));
+            mark->setOffset(p.x()-48/2+1, p.y()-48);
+            mark->setAlignPos(PixmapItem::BottomCenter);
+            path.push_back(mark);
+            scene->addItem(mark);
+        }
+    }
+
+    //添加当前位置
+    car = new PixmapItem;
+    car->setZValue(3);
+    car->setPixmap(QPixmap(":/images/truck_icon_48.png"));
+    QPointF p = places[0].coord;
+    car->setOffset(p.x()-48/2, p.y()-48/2);
+    car->setAlignPos(PixmapItem::Center);
+    path.append(car);
+    scene->addItem(car);
+
+    scene->update();
+}
+
+void MapView::updatePath(int pos)
+{
+    qDebug() << pos;
+    QGraphicsLineItem *line = new QGraphicsLineItem;
+    line->setLine(QLineF(places[pos-1].coord, places[pos].coord));
+
+    QPen pen;
+    pen.setColor(Qt::blue);
+    pen.setWidth(5);
+    pen.setCosmetic(true);
+    line->setPen(pen);
+    scene->addItem(line);
+
+    QPointF p = places[pos].coord;
+    car->setOffset(p.x()-48/2, p.y()-48/2);
+
+    scene->update();
+}
+
+void MapView::cancelPath()
+{
+
 }

@@ -17,7 +17,6 @@ UploadDlg::UploadDlg(ClientSocket *cli, QWidget *parent) :
     type(-1)
 {
     ui->setupUi(this);
-    setWindowTitle("上报");
     buttonGroup = new QButtonGroup(this);
     buttonGroup->addButton(ui->accRadioBtn, ACCIDENT);
     buttonGroup->addButton(ui->jamRadioBtn, JAM);

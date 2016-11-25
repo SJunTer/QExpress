@@ -23,7 +23,6 @@ SOURCES += \
     mapviewer/mapview.cpp \
     deliverywidget.cpp \
     mapviewer/mapwidget.cpp \
-    deliverypath.cpp \
     truckwidget.cpp \
     mapviewer/gstfile.cpp \
     mapviewer/miffile.cpp \
@@ -43,7 +42,8 @@ SOURCES += \
     database/operatesql.cpp \
     ../security/sha256.cpp \
     messagedlg.cpp \
-    cargowidget.cpp
+    cargowidget.cpp \
+    delvdlg.cpp
 
 HEADERS += \
     optimumPath.h \
@@ -55,7 +55,6 @@ HEADERS += \
     mapviewer/mapview.h \
     deliverywidget.h \
     mapviewer/mapwidget.h \
-    deliverypath.h \
     truckwidget.h \
     nofocusdelegate.h \
     mapviewer/gstfile.h \
@@ -78,7 +77,8 @@ HEADERS += \
     database/operatesql.h \
     ../security/sha256.h \
     messagedlg.h \
-    cargowidget.h
+    cargowidget.h \
+    delvdlg.h
 
 RESOURCES += \
     map.qrc

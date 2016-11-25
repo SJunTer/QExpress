@@ -12,7 +12,6 @@
 MapTileItem::MapTileItem()
 {
     top = left = width = height = 0.0;
-    setCursor(Qt::UpArrowCursor);
 }
 
 void MapTileItem::setPixmap(const QPixmap &pix)
@@ -20,18 +19,22 @@ void MapTileItem::setPixmap(const QPixmap &pix)
     pixmap = pix;
     width = pix.width();
     height = pix.height();
+    rect.setWidth(width);
+    rect.setHeight(height);
 }
 
 void MapTileItem::setOffset(qreal x, qreal y)
 {
     left = x;
     top = y;
+    rect.setX(left);
+    rect.setY(top);
 }
 
 QRectF MapTileItem::boundingRect() const
 {
-    return QRectF(left, top, width, height);
- //   return rect;
+//    return QRectF(left, top, width, height);
+    return rect;
 }
 
 void MapTileItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -43,7 +46,10 @@ void MapTileItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     QMatrix oldMatrix = painter->worldMatrix();
     painter->setMatrix(stableMatrix(oldMatrix, QPointF(left, top)));
     painter->drawPixmap(left, top, width, height, pixmap);
-    painter->drawRect(boundingRect());
+    rect.setWidth(width*(1.0/oldMatrix.m11()));
+    rect.setHeight(height*(1.0/oldMatrix.m22()));
+    painter->drawRect(rect);
+//    qDebug() << rect;
 }
 
 
@@ -59,8 +65,8 @@ QMatrix stableMatrix(const QMatrix &matrix, const QPointF &p)
     qreal offsetX, offsetY;
     offsetX = (p.x())*(scaleX-1.0);
     offsetY = (p.y())*(scaleY-1.0);
-    qDebug("%10f\t%10f", p.x(), p.y());
-    qDebug("%10f\t%10f\n", offsetX, offsetY);
+//    qDebug("%10f\t%10f", p.x(), p.y());
+//    qDebug("%10f\t%10f\n", offsetX, offsetY);
     newMatrix.translate(offsetX, offsetY);
 //     newMatrix.translate(-p.x(), -p.y());
 
@@ -115,4 +121,58 @@ void SymbolItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
               pen.setCosmetic(true);
               painter->setPen(pen);
              painter->drawText(QPointF(points[0].x(), points[0].y()),getName());*/
+}
+
+
+
+/**************************************
+ *                                 图标                                        *
+ * ************************************/
+PixmapItem::PixmapItem()
+{
+    top = left = width = height = 0.0;
+    pos = TopLeft;
+}
+
+void PixmapItem::setPixmap(const QPixmap &pix)
+{
+    pixmap = pix;
+    width = pix.width();
+    height = pix.height();
+}
+
+void PixmapItem::setOffset(qreal x, qreal y)
+{
+    left = x;
+    top = y;
+}
+
+void PixmapItem::setAlignPos(PixmapItem::AlignPos p)
+{
+    pos = p;
+}
+
+
+QRectF PixmapItem::boundingRect() const
+{
+    return QRectF(left, top, width, height);
+}
+
+void PixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+           QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
+    QPointF p;
+    switch(pos)
+    {
+    case TopLeft: p = QPointF(left, top); break;
+    case Center: p = QPointF(left+width/2-2, top+height/2-2); break;
+    case BottomCenter: p = QPointF(left+width/2-2, top+height); break;
+    default: break;
+    }
+    painter->setMatrix(stableMatrix(painter->worldMatrix(), p));
+    painter->drawPixmap(left, top, width, height, pixmap);
+
 }

@@ -15,7 +15,6 @@ UserDlg::UserDlg(ClientSocket *cli, QWidget *parent) :
     client(cli)
 {
     ui->setupUi(this);
-    setWindowTitle("用户信息");
     if(getUserInfo() != 0)
         QMessageBox::warning(this, "错误", "无法获取用户信息", QMessageBox::Ok);
 }

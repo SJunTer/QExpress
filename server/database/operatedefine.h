@@ -21,7 +21,7 @@
 #define TRUCK_FLAG ("status")
 
 #define TABLE_ACCOUNT ("Account")
-#define ACCOUNT_COL_NUM (9)
+#define ACCOUNT_COL_NUM (9) // search alter包括salt
 #define ACCOUNT_ID ("id")
 #define ACCOUNT_USERNAME ("username")
 #define ACCOUNT_PASSWORD ("password")
@@ -32,9 +32,10 @@
 #define ACCOUNT_LAST_LOGIN_TIME ("last_login_time")
 
 #define TABLE_PATH ("Path")
-#define PATH_COL_NUM (7)
+#define PATH_COL_NUM (8)
 #define PATH_ID ("id")
 #define PATH_TRUCK ("truck")
+#define PATH_DRIVER ("driver")
 #define PATH_CARGO ("cargo")
 #define PATH_STATUS ("status")
 #define PATH_POINTS ("points")

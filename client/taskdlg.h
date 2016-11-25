@@ -8,6 +8,7 @@
 
 QT_BEGIN_NAMESPACE
 class ClientSocket;
+class QTimer;
 QT_END_NAMESPACE
 
 
@@ -32,17 +33,21 @@ private:
     bool accepted;
     bool taskLoaded;
 
+    QTimer *timer;
+
     int getTask();
     void updateUi();
 
 signals:
-    void acptTask();
-    void sendPath(QList<Place> &ps);
+    void drawPath(QList<Place> &ps);
+    void updatePath(int pos);
     void endTask();
+    void setTaskState(bool b);
 
 private slots:
     void on_acptBtn_clicked();
     void on_endBtn_clicked();
+    void updatePath();
 
 public slots:
     void update();  // 更新任务

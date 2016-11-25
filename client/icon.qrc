@@ -14,5 +14,8 @@
         <file>images/symbol_24.png</file>
         <file>images/edit_gray_24.png</file>
         <file>images/edit_black_24.png</file>
+        <file>images/map_marker_48.png</file>
+        <file>images/repo_marker_48.png</file>
+        <file>images/truck_icon_48.png</file>
     </qresource>
 </RCC>

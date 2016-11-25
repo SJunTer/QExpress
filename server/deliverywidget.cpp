@@ -1,10 +1,13 @@
 #include "deliverywidget.h"
-#include "deliverypath.h"
+#include "delvdlg.h"
 #include "nofocusdelegate.h"
-#include "truckwidget.h"
-
+#include "database/operatedefine.h"
+#include "database/operatesql.h"
+#include <vector>
+#include <string>
 #include <QFont>
 #include <QPainter>
+#include <QDateTime>
 #include <QTableWidget>
 #include <QListWidget>
 #include <QPushButton>
@@ -15,19 +18,17 @@
 #include <QMessageBox>
 #include <QComboBox>
 #include <QDebug>
+using namespace std;
 
-DeliveryWidget::DeliveryWidget(QWidget *parent)
+DeliveryWidget::DeliveryWidget(Dbsql *d, QWidget *parent)
     : QWidget(parent)
-    , editMode(false)
+    , dbsql(d)
+    , delvDlgShowed(false)
 {
     deliveryTable = new QTableWidget(this);
     pathList = new QListWidget(this);
     addBtn = new QPushButton(this);
     delBtn = new QPushButton(this);
-    selectBtn = new QPushButton(this);
-    cargoBtn = new QPushButton(this);
-    okBtn = new QPushButton(this);
-    cancelBtn = new QPushButton(this);
 
     initTable();
 
@@ -35,14 +36,6 @@ DeliveryWidget::DeliveryWidget(QWidget *parent)
     addBtn->setFixedSize(60,35);
     delBtn->setText(tr("删除"));
     delBtn->setFixedSize(60,35);
-    selectBtn->setText(tr("地图选点"));
-    selectBtn->setFixedSize(100,35);
-    cargoBtn->setText(tr("选择货物"));
-    cargoBtn->setFixedSize(100, 35);
-    okBtn->setText(tr("确定配送"));
-    okBtn->setFixedSize(100,35);
-    cancelBtn->setText(tr("取消配送"));
-    cancelBtn->setFixedSize(100,35);
 
     pathList->setFixedWidth(300);
 
@@ -55,14 +48,9 @@ DeliveryWidget::DeliveryWidget(QWidget *parent)
     QHBoxLayout *btnLayout = new QHBoxLayout;
     btnLayout->setSpacing(0);
     btnLayout->setContentsMargins(0,0,0,0);
+    btnLayout->addStretch();
     btnLayout->addWidget(addBtn);
     btnLayout->addWidget(delBtn);
-    btnLayout->addStretch();
-    btnLayout->addWidget(selectBtn);
-    btnLayout->addWidget(cargoBtn);
-    btnLayout->addSpacing(10);
-    btnLayout->addWidget(okBtn);
-    btnLayout->addWidget(cancelBtn);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(10);
@@ -71,29 +59,84 @@ DeliveryWidget::DeliveryWidget(QWidget *parent)
     mainLayout->addLayout(btnLayout);
     setLayout(mainLayout);
 
-    connect(addBtn, SIGNAL(clicked(bool)), this, SLOT(addLine()));
-    connect(delBtn, SIGNAL(clicked(bool)), this, SLOT(delLine()));
-    connect(selectBtn, SIGNAL(clicked(bool)), this, SLOT(selectPoints()));
-    connect(cargoBtn, SIGNAL(clicked(bool)), this, SLOT(selectCargo()));
-    connect(okBtn, SIGNAL(clicked(bool)), this, SLOT(applyPath()));
-    connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancel()));
+    connect(addBtn, SIGNAL(clicked(bool)), this, SLOT(on_addBtn_clicked()));
+    connect(delBtn, SIGNAL(clicked(bool)), this, SLOT(on_delBtn_clicked()));
     connect(deliveryTable, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(showPath(int,int,int,int)));
 }
 
-void DeliveryWidget::setCargo(QStringList &titles)
+
+void DeliveryWidget::readInfo()
 {
-    int index = deliveryTable->currentRow();
-    QString s;
-    for(auto t : titles)
-    {
-        s += QString("%1;").arg(t);
-    }
-    deliveryTable->item(index, 3)->setText(s);
+    vector<string> path;
+     if(dbsql->AllSearch(TABLE_PATH, path) != 0)
+     {
+         qDebug() << "ERROR on search";
+         return;
+     }
+     for(unsigned i = 0; i < path.size(); i+=PATH_COL_NUM)
+     {
+         DeliveryPath *p = new DeliveryPath;
+         p->id = stoi(path[i]);
+         p->truckId = stoi(path[i+1]);
+         p->driverId = stoi(path[i+2]);
+         QString cargos = QString::fromStdString(path[i+3]);
+         p->cargos = cargos.split(';', QString::SkipEmptyParts);
+         p->status = stoi(path[i+4]);
+         QStringList places = QString::fromStdString(path[i+5]).split(';', QString::SkipEmptyParts);
+         for(int i = 0; i < places.size(); ++i)
+         {
+             Place place;
+             place.title = places[i];
+             if(i == 0 || i == places.size()-1)
+                 place.type = IsRepo;
+             else
+                 place.type = IsDely;
+             p->places.append(place);
+         }
+         p->startTime = QString::fromStdString(path[i+6]);
+         p->moveTime = QString::fromStdString(path[i+7]);
+         paths.append(p);
+
+         int rowCnt = deliveryTable->rowCount();
+         deliveryTable->insertRow(rowCnt);
+
+         QTableWidgetItem *item1 = new QTableWidgetItem;
+         QTableWidgetItem *item2 = new QTableWidgetItem;
+         QTableWidgetItem *item3 = new QTableWidgetItem;
+         QTableWidgetItem *item4 = new QTableWidgetItem;
+         QTableWidgetItem *item5 = new QTableWidgetItem;
+         QTableWidgetItem *item6 = new QTableWidgetItem;
+
+         item1->setText(QString::number(p->id));  //Id
+         item1->setFlags(item1->flags() & (~Qt::ItemIsEditable));
+         item2->setText(QString::number(p->truckId));         // 货车
+         item2->setFlags(item2->flags() & (~Qt::ItemIsEditable));
+         item3->setText(QString::number(p->driverId));         // 驾驶员
+         item3->setFlags(item3->flags() & (~Qt::ItemIsEditable));
+         item4->setText(cargos);         // 货物
+         item4->setFlags(item4->flags() & (~Qt::ItemIsEditable));
+         item5->setText(p->startTime);     //出发时间
+         item5->setFlags(item5->flags() & (~Qt::ItemIsEditable));
+         switch(p->status)
+         {
+         case WAIT: item6->setText("等待中"); break;
+         case RUN: item6->setText("配送中"); break;
+         case FINISH: item6->setText("配送完成"); break;
+         case INTR: item6->setText("配送失败"); break;
+         }
+         item6->setFlags(item6->flags() & (~Qt::ItemIsEditable));
+
+         deliveryTable->setItem(rowCnt, 0, item1);
+         deliveryTable->setItem(rowCnt, 1, item2);
+         deliveryTable->setItem(rowCnt, 2, item3);
+         deliveryTable->setItem(rowCnt, 3, item4);
+         deliveryTable->setItem(rowCnt, 4, item5);
+         deliveryTable->setItem(rowCnt, 5, item6);
+         deliveryTable->setCurrentCell(rowCnt, 0);
+     }
 }
 
-/*****************************************
- * set TableWidget Attributes
- * *************************************/
+// 设置表格样式
 void DeliveryWidget::initTable()
 {
 
@@ -102,7 +145,7 @@ void DeliveryWidget::initTable()
     deliveryTable->horizontalHeader()->setSectionsClickable(false);
 
     QStringList header;
-    header << tr("序号") << tr("车辆") << tr("驾驶员") << tr("运送货物") << tr("出发时间") << tr("当前状态");
+    header << tr("序号") << tr("车牌号") << tr("驾驶员") << tr("运送货物") << tr("出发时间") << tr("当前状态");
     deliveryTable->setHorizontalHeaderLabels(header);
 
     QFont font = deliveryTable->horizontalHeader()->font();
@@ -118,7 +161,7 @@ void DeliveryWidget::initTable()
     deliveryTable->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为时每次选择一行
 //    deliveryTable->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置不可编辑
     deliveryTable->horizontalHeader()->setStretchLastSection(true); //设置充满表宽度
-    deliveryTable->horizontalHeader()->resizeSection(0,50); //设置表头第一列的宽度为50
+//    deliveryTable->horizontalHeader()->resizeSection(0,50); //设置表头第一列的宽度为50
     deliveryTable->horizontalHeader()->setFixedHeight(30); //设置表头的高度
 //    deliveryTable->setStyleSheet("selection-background-color:lightblue;"); //设置选中背景色
 //    deliveryTable->horizontalHeader()->setStyleSheet("QHeaderView::section{background:skyblue;}"); //设置表头背景色
@@ -126,141 +169,52 @@ void DeliveryWidget::initTable()
 }
 
 
-
-// 槽函数，添加一条新配送路径
-void DeliveryWidget::addLine()
+// 弹窗选择信息
+void DeliveryWidget::on_addBtn_clicked()
 {
-    if(editMode)
+    if(delvDlgShowed)
         return;
-
-    editMode = true;
-    tempPath = new DeliveryPath;
-
-    int rowCnt = deliveryTable->rowCount();
-    deliveryTable->insertRow(rowCnt);
-
-    QTableWidgetItem *item1 = new QTableWidgetItem;
-    QComboBox *item2 = new QComboBox;
-    QTableWidgetItem *item3 = new QTableWidgetItem;
-    QTableWidgetItem *item4 = new QTableWidgetItem;
-    QTableWidgetItem *item5 = new QTableWidgetItem;
-    QTableWidgetItem *item6 = new QTableWidgetItem;
-
-
-    item1->setText(QString::number(rowCnt+1));  //Id
-    item1->setTextAlignment(Qt::AlignCenter);
-    item1->setFlags(item1->flags() & (~Qt::ItemIsEditable));
-    for(int i = 0; i < trucks.size(); ++i)          // 车辆编号
-    {
-        if(trucks[i]->status == FREE)
-            item2->addItem(QString::number(trucks[i]->id+1));
-    }
-    item3->setText("");         //驾驶员
-    item3->setTextAlignment(Qt::AlignCenter);
-    item3->setFlags(item3->flags() & (~Qt::ItemIsEditable));
-    item4->setText("");         //货物
-    item4->setTextAlignment(Qt::AlignCenter);
-    item4->setFlags(item4->flags() & (~Qt::ItemIsEditable));
-    item5->setText("NULL");     //出发时间
-    item5->setTextAlignment(Qt::AlignCenter);
-    item5->setFlags(item5->flags() & (~Qt::ItemIsEditable));
-    item6->setText("NULL");     //当前状态
-    item6->setTextAlignment(Qt::AlignCenter);
-    item6->setFlags(item6->flags() & (~Qt::ItemIsEditable));
-
-    deliveryTable->setItem(rowCnt, 0, item1);
-    deliveryTable->setCellWidget(rowCnt, 1, item2);
-    deliveryTable->setItem(rowCnt, 2, item3);
-    deliveryTable->setItem(rowCnt, 3, item4);
-    deliveryTable->setItem(rowCnt, 4, item5);
-    deliveryTable->setItem(rowCnt, 5, item6);
-    deliveryTable->setCurrentCell(rowCnt, 0);
+    delvDlg = new DelvDlg(accounts, cargos, trucks, this);
+    delvDlg->setAttribute(Qt::WA_DeleteOnClose);
+    connect(delvDlg, SIGNAL(addPath(DeliveryPath*)), this, SLOT(addPath(DeliveryPath*)));
+    connect(delvDlg, SIGNAL(selectPoint()), this, SIGNAL(selectMode()));
+    connect(delvDlg, SIGNAL(closed()), this, SLOT(closeDelvDLg()));
+    delvDlg->show();
+    delvDlgShowed = true;
 }
 
 // 槽函数，删除指定路径
-void DeliveryWidget::delLine()
+void DeliveryWidget::on_delBtn_clicked()
 {
     int index = deliveryTable->currentRow();
-    if(editMode || index == -1)
+    if(index == -1)
         return;
-
-    if(QMessageBox::warning(this, "警告", "删除后信息将无法恢复，是否继续？",
-                            QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
-        return;
-
-    deliveryTable->removeRow(index);
-    DeliveryPath *p = paths.takeAt(index);
-    delete p;
-    emit removePath(index);
-/*    for(int i = index; i < paths.size(); ++i)
+    else
     {
-        qDebug()<<paths[i]->m_index += 1;
-        deliveryTable->item(i,0)->setText(QString::number(i+1));
-    }*/
-}
+        if(paths[index]->status == RUN)
+        {
+            QMessageBox::warning(this, "错误", "配送任务进行中，无法删除！",QMessageBox::Ok);
+            return;
+        }
+        if(QMessageBox::warning(this, "警告", "删除后信息将无法恢复，是否继续？",
+                                QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
+            return;
 
-// 接受选择按钮发送clicked信号
-void DeliveryWidget::selectPoints()
-{
-    if(!editMode)
-        return;
-
-    emit selectMode();
-}
-
-void DeliveryWidget::selectCargo()
-{
-    if(!editMode)
-        return;
-
-    emit cargoMode();
-}
-
-//应用当前配送方案
-void DeliveryWidget::applyPath()
-{
-    if(!editMode)
-        return;
-
-    int index = deliveryTable->currentRow();
-    //信息不完善则弹窗提示
-    if(static_cast<QComboBox*>(deliveryTable->cellWidget(index, 1))->currentText() == "" ||
-//            deliveryTable->item(index, 2)->text() == "" ||
-            deliveryTable->item(index, 3)->text() == "" ||
-            tempPath->places.empty())
-    {
-        QMessageBox::warning(this, tr("警告"), tr("请完善信息后重试！"));
-        return;
+        if(dbsql->Delete(TABLE_PATH, PATH_ID, QString::number(paths[index]->id).toStdString()) != 0)
+        {
+            QMessageBox::warning(this, tr("错误"), tr("删除异常！"));
+            return;
+        }
+        deliveryTable->removeRow(index);
+        emit removePath(paths[index]->id);
+        DeliveryPath *p = paths.takeAt(index);
+        delete p;
+        QMessageBox::information(this, tr("提示"), tr("删除成功！"));
+//       emit removePath(index);
     }
-    tempPath->index = paths.size();
-    tempPath->truckId = static_cast<QComboBox*>(deliveryTable->cellWidget(index, 1))->currentText().toInt();
-//    tempPath->driverId = deliveryTable->item(index, 2)->text().toInt();
-    QString s = deliveryTable->item(index, 3)->text();
-    tempPath->cargos = s.split(';', QString::SkipEmptyParts);
-    tempPath->pos = tempPath->mins = 0;
 
-/*    //设置随机时间表
-    tempPath->randomSchedule(paths.size());
-    connect(tempPath, SIGNAL(posChange(int,int)), this, SLOT(posChanged(int,int)));*/
-    paths.append(tempPath);
-    emit drawPath(tempPath);
-/*    /posChanged(0 ,deliveryTable->currentRow());
-    /emit truckGo(tempPath->m_truck);*/
-    deliveryTable->cellWidget(index, 1)->setEnabled(false);
-    editMode = false;
-    QMessageBox::information(this, tr("提示"), tr("添加成功！"));
 }
 
-void DeliveryWidget::cancel()
-{
-    if(!editMode)
-        return;
-
-    delete tempPath;
-    int index = deliveryTable->currentRow();
-    deliveryTable->removeRow(index);
-    editMode = false;
-}
 
 void DeliveryWidget::showPath(DeliveryPath *p)
 {/*
@@ -269,21 +223,6 @@ void DeliveryWidget::showPath(DeliveryPath *p)
     {
         pathList->addItem(d.name);
     }*/
-}
-
-void DeliveryWidget::updateCombo()
-{
-    int index = deliveryTable->rowCount()-1;
-    if(index == -1)
-        return;
-    QComboBox *b = static_cast<QComboBox*>(deliveryTable->cellWidget(index, 1));
-    b->clear();
-    for(int i = 0; i < trucks.size(); ++i)
-    {
-        if(trucks[i]->status == FREE)
-            b->addItem(QString::number(trucks[i]->id));
-    }
-    //b->setCurrentIndex(0);
 }
 
 void DeliveryWidget::showPath(int curRow, int curCol, int preRow, int preCol)
@@ -300,36 +239,207 @@ void DeliveryWidget::showPath(int curRow, int curCol, int preRow, int preCol)
         showPath(paths.at(curRow));*/
 }
 
-// 用于连接返回最佳路径的槽函数
+//////////////////////////TODO/////////////////////
+// 设置配送路径
 void DeliveryWidget::setPath(QList<Place> &places)
 {
-    ///////////////////////////////////////////////TODO
-    tempPath->places = places;
+    delvDlg->setPath(places);
+    delvDlg->show();
 
     // 刷新路径列表
     //    showPath(tempPath);
 }
 
-void DeliveryWidget::posChanged(int pos, int index)
-{/*
-    Q_UNUSED(pos);
-    if(pos == 1)
-        deliveryTable->item(index, 3)->setText(paths[index]->startTime);
-    deliveryTable->item(index, 4)->setText(paths[index]->m_status);
-    emit updatePath(index, paths[index]);
-//    qDebug() << pos <<  paths[index]->m_path.size();
-    if(pos == paths[index]->m_path.size())
-        emit truckBack(paths[index]->m_truck);*/
+
+//*************响应客户端****************//
+void DeliveryWidget::acptTask(int id)
+{
+    for(int i = 0; i < paths.size(); ++i)
+    {
+        if(paths[i]->id == id)
+        {
+            paths[i]->startTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+            paths[i]->status = RUN;
+            deliveryTable->item(i, 4)->setText(paths[i]->startTime);
+            deliveryTable->item(i, 5)->setText("配送中");
+
+            vector<string> path;
+            path.push_back("");
+            path.push_back("");
+            path.push_back("");
+            path.push_back("");
+            path.push_back(QString::number(paths[i]->status).toStdString());
+            path.push_back("");
+            path.push_back(paths[i]->startTime.toStdString());
+            path.push_back("");
+            if(dbsql->Alter(TABLE_PATH, PATH_ID, QString::number(id).toStdString(), path) != 0)
+                qDebug() << "ERROR on alter";
+            break;
+        }
+    }
 }
 
-void DeliveryWidget::addTruck(TruckInfo *truck)
+void DeliveryWidget::posChanged(int id, int pos)
 {
-    trucks.append(truck);
-    updateCombo();
+    for(int i = 0; i < paths.size(); ++i)
+    {
+        if(paths[i]->id == id)
+        {
+            paths[i]->pos = pos;
+            emit updatePath(paths[i]);
+        }
+    }
 }
 
-void DeliveryWidget::delTruck(int index)
+void DeliveryWidget::taskFinish(int id)
 {
-    trucks.takeAt(index);
-    updateCombo();
+    for(int i = 0; i < paths.size(); ++i)
+    {
+        if(paths[i]->id == id)
+        {
+            QDateTime start = QDateTime::fromString(paths[i]->startTime, "yyyy-MM-dd hh:mm:ss");
+            QDateTime now = QDateTime::currentDateTime();
+            paths[i]->moveTime = QString::number(start.secsTo(now));
+            paths[i]->status = FINISH;
+            deliveryTable->item(i, 5)->setText("配送完成");
+            emit removePath(id);
+
+            emit driverFree(paths[i]->driverId);
+            emit cargoReach(paths[i]->cargos);
+            emit truckFree(paths[i]->truckId);
+
+            vector<string> path;
+            path.push_back("");
+            path.push_back("");
+            path.push_back("");
+            path.push_back("");
+            path.push_back(QString::number(paths[i]->status).toStdString());
+            path.push_back("");
+            path.push_back("");
+            path.push_back(paths[i]->moveTime.toStdString());
+            if(dbsql->Alter(TABLE_PATH, PATH_ID, QString::number(id).toStdString(), path) != 0)
+                qDebug() << "ERROR on alter";
+            break;
+        }
+    }
+}
+
+void DeliveryWidget::taskFail(int id)
+{
+    for(int i = 0; i < paths.size(); ++i)
+    {
+        if(paths[i]->id == id)
+        {
+            QDateTime start = QDateTime::fromString(paths[i]->startTime, "yyyy-MM-dd hh:mm:ss");
+            QDateTime now = QDateTime::currentDateTime();
+            paths[i]->moveTime = QString::number(start.secsTo(now));
+            paths[i]->status = INTR;
+            deliveryTable->item(i, 5)->setText("配送失败");
+            emit removePath(id);
+
+            emit driverFree(paths[i]->driverId);
+            emit cargoFail(paths[i]->cargos);
+            emit truckFree(paths[i]->truckId);
+
+            vector<string> path;
+            path.push_back("");
+            path.push_back("");
+            path.push_back("");
+            path.push_back("");
+            path.push_back(QString::number(paths[i]->status).toStdString());
+            path.push_back("");
+            path.push_back("");
+            path.push_back(paths[i]->moveTime.toStdString());
+            if(dbsql->Alter(TABLE_PATH, PATH_ID, QString::number(id).toStdString(), path) != 0)
+                qDebug() << "ERROR on alter";
+            break;
+        }
+    }
+}
+
+void DeliveryWidget::closeDelvDLg()
+{
+    delvDlgShowed = false;
+}
+
+void DeliveryWidget::addPath(DeliveryPath *path)
+{
+    if(paths.empty())
+        path->id = 0;
+    else
+        path->id = paths.back()->id+1;
+    path->pos = 0;
+    path->status = WAIT;
+
+    vector<string> info;
+    info.push_back(QString::number(path->id).toStdString());
+    info.push_back(QString::number(path->truckId).toStdString());
+    info.push_back(QString::number(path->driverId).toStdString());
+    QString cargos;
+    for(int i = 0; i < path->cargos.size(); ++i)
+    {
+        cargos += path->cargos[i];
+        if(i != path->cargos.size()-1)
+            cargos += "; ";
+    }
+    info.push_back(cargos.toStdString());
+    info.push_back(QString::number(path->status).toStdString());
+    QString places;
+    for(int i = 0; i < path->places.size(); ++i)
+    {
+        if(path->places[i].type != IsPass)
+        {
+            places += path->places[i].title + ";";
+        }
+    }
+    info.push_back(places.toStdString());
+    info.push_back("");
+    info.push_back("");
+    if(dbsql->Insert(TABLE_PATH, info) != 0)
+    {
+        QMessageBox::warning(this, tr("错误"), tr("添加数据异常！"));
+        return;
+    }
+
+    int rowCnt = deliveryTable->rowCount();
+    deliveryTable->insertRow(rowCnt);
+
+    QTableWidgetItem *item1 = new QTableWidgetItem;
+    QTableWidgetItem *item2 = new QTableWidgetItem;
+    QTableWidgetItem *item3 = new QTableWidgetItem;
+    QTableWidgetItem *item4 = new QTableWidgetItem;
+    QTableWidgetItem *item5 = new QTableWidgetItem;
+    QTableWidgetItem *item6 = new QTableWidgetItem;
+
+    item1->setText(QString::number(path->id));  //Id
+    item1->setFlags(item1->flags() & (~Qt::ItemIsEditable));
+    item2->setText(QString::number(path->truckId));         // 货车
+    item2->setFlags(item2->flags() & (~Qt::ItemIsEditable));
+    item3->setText(QString::number(path->driverId));         // 驾驶员
+    item3->setFlags(item3->flags() & (~Qt::ItemIsEditable));
+    item4->setText(cargos);         // 货物
+    item4->setFlags(item4->flags() & (~Qt::ItemIsEditable));
+    item5->setText("NULL");     //出发时间
+    item5->setFlags(item5->flags() & (~Qt::ItemIsEditable));
+    item6->setText("等待中");     //当前状态
+    item6->setFlags(item6->flags() & (~Qt::ItemIsEditable));
+
+    deliveryTable->setItem(rowCnt, 0, item1);
+    deliveryTable->setItem(rowCnt, 1, item2);
+    deliveryTable->setItem(rowCnt, 2, item3);
+    deliveryTable->setItem(rowCnt, 3, item4);
+    deliveryTable->setItem(rowCnt, 4, item5);
+    deliveryTable->setItem(rowCnt, 5, item6);
+    deliveryTable->setCurrentCell(rowCnt, 0);
+
+    paths.append(path);
+    emit drawPath(path);
+
+    emit sendTask(*path);
+    emit driverWork(path->driverId);
+    emit cargoMove(path->cargos);
+    emit truckMove(path->truckId);
+
+    QMessageBox::information(this, tr("提示"), tr("添加成功！"));
+
 }

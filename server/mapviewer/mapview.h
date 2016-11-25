@@ -26,6 +26,17 @@ class Polyline;
 class Point;
 QT_END_NAMESPACE
 
+
+// 路径表示图形
+struct PathMarker
+{
+    int id;
+    int pos;
+    QList<Polyline *> lines;
+    QList<PixmapItem *> marker;
+    PixmapItem *car;
+};
+
 class MapView : public QGraphicsView
 {
     Q_OBJECT
@@ -38,8 +49,8 @@ public:
 
     // 路径相关
     void drawPath(DeliveryPath *path);
-    void removePath(int index);
-    void updatePath(int index, DeliveryPath *path);
+    void updatePath(DeliveryPath *path);
+    void removePath(int id);
 
     QGraphicsScene  *getScene() const { return scene; }
     QList<Point *> getVsibleSymbols(QRectF rect, int level);
@@ -73,8 +84,7 @@ private:
     long binarySearch(QVector<QPointF> &points, QPointF point, int xx, int yy);
 
     // 路径标示
-    QList<Polyline *> paths;
-    QList<PixmapItem *> cars;
+    QList<PathMarker> paths;
 
     // 储存标记
     QList<PixmapItem *> markers;
@@ -95,7 +105,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event); // 菜单事件
 
 signals:
-    void transferData(QList<Place> &places);
+    void selectDone(QList<Place> &places);
 
 /* 私有槽函数，用来响应菜单 */
 private slots:

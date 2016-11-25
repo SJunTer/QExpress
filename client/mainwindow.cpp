@@ -1,21 +1,24 @@
 #include "mainwindow.h"
 #include "mapview.h"
 #include "../network/socket.h"
-#include "pathwidget.h"
+#include "deliverypath.h"
 #include "taskdlg.h"
 #include "uploaddlg.h"
 #include "userdlg.h"
 #include "aboutdlg.h"
 #include <QFont>
+#include <QCloseEvent>
 #include <QToolButton>
 #include <QPushButton>
+#include <QMessageBox>
 #include <QBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent, ClientSocket *cli) :
     QMainWindow(parent),
     client(cli),
     uploadDlgShowed(false),
-    userDlgShowed(false)
+    userDlgShowed(false),
+    taskRun(false)
 {
     setWindowTitle(tr("QExpress"));
     setMinimumSize(800, 600);
@@ -24,7 +27,6 @@ MainWindow::MainWindow(QWidget *parent, ClientSocket *cli) :
     aboutDlg = new AboutDlg(this);
 
     view = new MapView(this, client);
-    pathWidget = new PathWidget(this);
     zoomInBtn = new QPushButton(this);
     zoomOutBtn = new QPushButton(this);
     taskBtn = new QToolButton(this);
@@ -72,8 +74,6 @@ MainWindow::MainWindow(QWidget *parent, ClientSocket *cli) :
     QGridLayout *gridLayout = new QGridLayout;
     gridLayout->setSpacing(0);
     gridLayout->setMargin(10);
-    gridLayout->addWidget(pathWidget, 0, 0, Qt::AlignLeft|Qt::AlignTop);
-    pathWidget->setStyleSheet("border:5px solid gray");
     gridLayout->addLayout(toolLayout, 0, 1, Qt::AlignRight|Qt::AlignTop);
     gridLayout->addWidget(aboutBtn, 1, 0, Qt::AlignLeft|Qt::AlignBottom);
     gridLayout->addLayout(btnLayout, 1, 1, Qt::AlignRight|Qt::AlignBottom);
@@ -89,6 +89,29 @@ MainWindow::MainWindow(QWidget *parent, ClientSocket *cli) :
     connect(userBtn, SIGNAL(clicked(bool)), this, SLOT(on_userBtn_clicked()));
     connect(aboutBtn, SIGNAL(clicked(bool)), this, SLOT(on_aboutBtn_clicked()));
 
+    connect(taskDlg, SIGNAL(drawPath(QList<Place>&)), view, SLOT(drawPath(QList<Place>&)));
+    connect(taskDlg, SIGNAL(updatePath(int)), view, SLOT(updatePath(int)));
+    connect(taskDlg, SIGNAL(endTask()), view, SLOT(cancelPath()));
+    connect(taskDlg, SIGNAL(setTaskState(bool)), this, SLOT(setTaskState(bool)));
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    if(taskRun)
+    {
+        QMessageBox::warning(this, tr("错误"), tr("任务进行中，无法退出！"), QMessageBox::Ok);
+        e->ignore();
+        return;
+    }
+    if(QMessageBox::warning(this, tr("关闭"), tr("是否确定退出程序？"),
+                            QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
+    {
+        e->ignore();
+    }
+    else
+    {
+        e->accept();
+    }
 }
 
 void MainWindow::on_taskBtn_clicked()

@@ -1,12 +1,12 @@
 #include"../network/packet.h"
 #include "mapviewer/mapview.h"
 #include "mapviewer/maplayer.h"
-#include "deliverywidget.h"
 #include "connection.h"
 #include "database/operatedefine.h"
 #include "database/operatesql.h"
 #include <QGraphicsItem>
 #include <QList>
+#include <QDateTime>
 #include <vector>
 #include <string>
 #include <cstdio>
@@ -17,7 +17,6 @@ using namespace std;
 
 Connection::Connection(Dbsql *d, int s, MapView *v) :
     sockfd(s),
-    path(NULL),
     taskState(Task_none),
     view(v),
     dbsql(d),
@@ -78,7 +77,7 @@ void Connection::start()
             getSymbol(data);
             break;
         case cmd_getTask:   //获得任务
-            getTask(data);
+            sendTask(data);
             break;
         case cmd_acceptTask:  //接受任务
             acptTask(data);
@@ -101,7 +100,11 @@ void Connection::start()
     if(!closed) //连接未断开
         emit close(sockfd);
     if(login)   // 注册连接不需要发送信号
+    {
+        if(taskState != Task_none)
+            emit sg_taskFail(path.id);
         emit sg_signOut(acc.id);
+    }
     emit taskFinished();
 }
 
@@ -112,11 +115,22 @@ void Connection::stop()
     closed = true;
 }
 
-void Connection::getTask(DeliveryPath *p)
+void Connection::stop(int id)
 {
-    if(path->driverId == acc.id)
+    if(acc.id == id)
+    {
+        emit close(sockfd);
+        closed = true;
+    }
+}
+
+void Connection::getTask(DeliveryPath p)
+{
+    if(p.driverId == acc.id)
+    {
         path = p;
-    taskState = Task_wait;
+        taskState = Task_wait;
+    }
 }
 
 
@@ -162,7 +176,7 @@ int Connection::signIn(string &data)
         acc.phone = QString::fromStdString(info[5]);
         acc.email = QString::fromStdString(info[6]);
         acc.status = ONLINE;
-        acc.last_time = QTime::currentTime();
+        acc.last_time = QDateTime::currentDateTime().toString();
         emit sg_signIn(acc.id);
         login = true;
     }
@@ -362,8 +376,8 @@ int Connection::getSymbol(string &data)
 /*************************************
  *                           任务部分                                     *
  * ************************************/
-//获取任务
-int Connection::getTask(string &data)
+//向客户端发送任务
+int Connection::sendTask(string &data)
 {
     data.clear();
 
@@ -373,28 +387,29 @@ int Connection::getTask(string &data)
     {
         data = toByteString(1); //标识
 
-        data += toByteString(path->truckId);    // 车辆编号
+        data += toByteString(path.truckId);    // 车辆编号
         // 配送点
-        int cnt = path->places.size();
+        int cnt = path.places.size();
         data += toByteString(cnt);
         int len;
         string s;
         for(int i = 0; i < cnt; ++i)
         {
             // coordinate
-            data += toByteString(path->places[i].coord.x()) + toByteString(path->places[i].coord.y());
+            data += toByteString(path.places[i].coord.x()) + toByteString(path.places[i].coord.y());
             // title of place
-            s = path->places[i].title.toStdString();
+            s = path.places[i].title.toStdString();
             len = s.size();
             data += toByteString(len) + s;
             // type of place
-            data += toByteString((int)path->places[i].type);
+            data += toByteString((int)path.places[i].type);
         }
         // 货物清单
-        cnt = path->cargos.size();
+        cnt = path.cargos.size();
+        data += toByteString(cnt);
         for(int i = 0; i < cnt; ++i)
         {
-            s = path->cargos[i].toStdString();
+            s = path.cargos[i].toStdString();
             len = s.size();
             data += toByteString(len) + s;
         }
@@ -405,31 +420,38 @@ int Connection::getTask(string &data)
     return 0;
 }
 
-//接受任务
-int Connection::acptTask(string &data)
+//开始任务
+void Connection::acptTask(string &data)
 {
+    data.clear();
     qDebug() << "accept task";
+    emit sg_acptTask(path.id);
     taskState = Task_run;
-    emit sg_acptTask();
 }
 
-int Connection::posChange(string &data)
+// 位置改变
+void Connection::posChange(string &data)
 {
-    /////////////////////////////TODO
-    emit sg_posChange();
+    int pos = fromByteString<int>(data);
+    emit sg_posChange(path.id, pos);
 }
 
-int Connection::taskFinish(string &data)
+// 任务完成
+void Connection::taskFinish(string &data)
 {
+    data.clear();
+    qDebug() << "task finish";
     taskState = Task_none;
-    emit sg_taskFinish();
+    emit sg_taskFinish(path.id);
 }
 
 //任务失败
-int Connection::taskFail(string &data)
+void Connection::taskFail(string &data)
 {
+    data.clear();
+    qDebug() << "task fail";
     taskState = Task_none;
-    emit sg_taskFail();
+    emit sg_taskFail(path.id);
 }
 
 
