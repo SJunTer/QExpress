@@ -101,11 +101,12 @@ signals:
     void cargoReach(QStringList cs);
     void cargoFail(QStringList cs);
 
+    void taskMsg(QString &s);
+
 private slots:
     void on_addBtn_clicked();
     void on_delBtn_clicked();
 
-    void showPath(DeliveryPath *p);    // 显示暂存路径
     void showPath(int curRow, int curCol, int preRow, int preCol); // 显示路径
 
 public slots:

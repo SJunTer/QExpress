@@ -25,10 +25,14 @@ MapWidget::MapWidget(QWidget *parent)
     tileBtn->setFont(font);
     zoomInBtn->setFont(font);
     zoomOutBtn->setFont(font);
-    tileBtn->setText("切片工具");
+    tileBtn->setText("");
+    tileBtn->setIcon(QIcon(":/images/tool_32.png"));
+    tileBtn->setIconSize(QSize(32,32));
+    tileBtn->setFixedSize(32,32);
+    tileBtn->setStyleSheet("border:0");
+    tileBtn->setCursor(Qt::PointingHandCursor);
     zoomInBtn->setText("+");
     zoomOutBtn->setText("-");
-    tileBtn->setFixedSize(100,30);
     zoomInBtn->setFixedSize(BTN_SIZE,BTN_SIZE);
     zoomOutBtn->setFixedSize(BTN_SIZE,BTN_SIZE);
 

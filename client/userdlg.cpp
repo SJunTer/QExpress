@@ -5,6 +5,7 @@
 #include "../network/packet.h"
 #include "../network/socket.h"
 #include <QMessageBox>
+#include <QCloseEvent>
 #include <string>
 #include <QDebug>
 using namespace std;
@@ -51,6 +52,17 @@ int UserDlg::getUserInfo()
 
     return 0;
 }
+
+void UserDlg::keyPressEvent(QKeyEvent *e)
+{
+    if(e->key() != Qt::Key_Escape)
+        QDialog::keyPressEvent(e);
+    else
+    {
+        e->ignore();
+    }
+}
+
 
 void UserDlg::on_usrEditBtn_clicked()
 {

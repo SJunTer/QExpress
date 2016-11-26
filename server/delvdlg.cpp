@@ -1,18 +1,20 @@
 #include "delvdlg.h"
-#include "ui_delvdlg.h"
 #include "accwidget.h"
 #include "cargowidget.h"
 #include "truckwidget.h"
 #include <QFont>
 #include <QLabel>
+#include <QPushButton>
 #include <QCheckBox>
 #include <QStringList>
 #include <QListWidget>
+#include <QHeaderView>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QBoxLayout>
 #include <QStackedLayout>
 #include <QMessageBox>
+#include <QKeyEvent>
 #include <QDebug>
 
 
@@ -36,6 +38,7 @@ DelvDlg::DelvDlg(QList<Account>*as, QList<CargoInfo*>*cs,
     QDialog(parent)
 {
     setWindowTitle(tr("配送任务选择面板"));
+    setFixedSize(650,450);
 
     path = new DeliveryPath;
 
@@ -55,7 +58,7 @@ DelvDlg::DelvDlg(QList<Account>*as, QList<CargoInfo*>*cs,
     // 创建布局
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setSpacing(0);
-    layout->setMargin(0);
+    layout->setMargin(10);
     layout->addLayout(stackLayout);
     setLayout(layout);
 
@@ -77,6 +80,17 @@ DelvDlg::DelvDlg(QList<Account>*as, QList<CargoInfo*>*cs,
 void DelvDlg::setPath(QList<Place> &places)
 {
     pointSelectWidget->setPath(places);
+}
+
+void DelvDlg::keyPressEvent(QKeyEvent *e)
+{
+    if(e->key() != Qt::Key_Escape)
+        QDialog::keyPressEvent(e);
+    else
+    {
+        e->ignore();
+    }
+
 }
 
 void DelvDlg::closeDlg()
@@ -112,19 +126,24 @@ CargoSelectWidget::CargoSelectWidget(DeliveryPath *p, QList<CargoInfo *> *cs, QW
     cancelBtn  = new QPushButton(this);
     cargoTable = new QTableWidget(this);
 
+    QFont font;
+    font.setPixelSize(15);
+//    font.setBold(true);
     tipLabel->setText("请选择需要进行配送的货物");
+    tipLabel->setFont(font);
+    tipLabel->setFixedHeight(35);
     prevBtn->setText("上一步");
-    prevBtn->setFixedSize(60,25);
+    prevBtn->setFixedSize(80,25);
     prevBtn->setEnabled(false);
     nextBtn->setText("下一步");
-    nextBtn->setFixedSize(60,25);
+    nextBtn->setFixedSize(80,25);
     cancelBtn->setText("取消");
-    cancelBtn->setFixedSize(60,25);
+    cancelBtn->setFixedSize(80,25);
     initTable();
 
     QHBoxLayout *btnLayout = new QHBoxLayout;
     btnLayout->setMargin(0);
-    btnLayout->setSpacing(0);
+    btnLayout->setSpacing(5);
     btnLayout->addStretch();
     btnLayout->addWidget(prevBtn);
     btnLayout->addWidget(nextBtn);
@@ -135,11 +154,21 @@ CargoSelectWidget::CargoSelectWidget(DeliveryPath *p, QList<CargoInfo *> *cs, QW
     layout->setSpacing(0);
     layout->addWidget(tipLabel);
     layout->addWidget(cargoTable);
+    layout->addSpacing(6);
     layout->addLayout(btnLayout);
     setLayout(layout);
 
     connect(nextBtn, SIGNAL(clicked(bool)), this, SLOT(on_nextBtn_clicked()));
     connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(on_cancelBtn_clicked()));
+}
+
+CargoSelectWidget::~CargoSelectWidget()
+{
+    for(int i = 0; i < boxes.size(); ++i)
+    {
+        CheckPair *c = boxes[i];
+        delete c;
+    }
 }
 
 void CargoSelectWidget::initTable()
@@ -202,6 +231,7 @@ void CargoSelectWidget::initTable()
     }
 }
 
+
 void CargoSelectWidget::on_nextBtn_clicked()
 {
     bool none = true;
@@ -246,18 +276,22 @@ TruckSelectWidget::TruckSelectWidget(DeliveryPath *p, QList<TruckInfo *> *ts, QW
     cancelBtn  = new QPushButton(this);
     truckTable = new QTableWidget(this);
 
+    QFont font;
+    font.setPixelSize(15);
     tipLabel->setText("请选择配送车辆");
+    tipLabel->setFont(font);
+    tipLabel->setFixedHeight(35);
     prevBtn->setText("上一步");
-    prevBtn->setFixedSize(60,25);
+    prevBtn->setFixedSize(80,25);
     nextBtn->setText("下一步");
-    nextBtn->setFixedSize(60,25);
+    nextBtn->setFixedSize(80,25);
     cancelBtn->setText("取消");
-    cancelBtn->setFixedSize(60,25);
+    cancelBtn->setFixedSize(80,25);
     initTable();
 
     QHBoxLayout *btnLayout = new QHBoxLayout;
     btnLayout->setMargin(0);
-    btnLayout->setSpacing(0);
+    btnLayout->setSpacing(5);
     btnLayout->addStretch();
     btnLayout->addWidget(prevBtn);
     btnLayout->addWidget(nextBtn);
@@ -268,12 +302,23 @@ TruckSelectWidget::TruckSelectWidget(DeliveryPath *p, QList<TruckInfo *> *ts, QW
     layout->setSpacing(0);
     layout->addWidget(tipLabel);
     layout->addWidget(truckTable);
+    layout->addSpacing(6);
     layout->addLayout(btnLayout);
     setLayout(layout);
 
     connect(prevBtn, SIGNAL(clicked(bool)), this, SLOT(on_prevBtn_clicked()));
     connect(nextBtn, SIGNAL(clicked(bool)), this, SLOT(on_nextBtn_clicked()));
     connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(on_cancelBtn_clicked()));
+}
+
+TruckSelectWidget::~TruckSelectWidget()
+{
+
+    for(int i = 0; i < boxes.size(); ++i)
+    {
+        CheckPair *c = boxes[i];
+        delete c;
+    }
 }
 
 void TruckSelectWidget::initTable()
@@ -382,17 +427,21 @@ AccSelectWidget::AccSelectWidget(DeliveryPath *p, QList<Account> *as, QWidget *p
     accTable = new QTableWidget(this);
     initTable();
 
+    QFont font;
+    font.setPixelSize(15);
     tipLabel->setText("请选择配送员");
+    tipLabel->setFont(font);
+    tipLabel->setFixedHeight(35);
     prevBtn->setText("上一步");
-    prevBtn->setFixedSize(60,25);
+    prevBtn->setFixedSize(80,25);
     nextBtn->setText("下一步");
-    nextBtn->setFixedSize(60,25);
+    nextBtn->setFixedSize(80,25);
     cancelBtn->setText("取消");
-    cancelBtn->setFixedSize(60,25);
+    cancelBtn->setFixedSize(80,25);
 
     QHBoxLayout *btnLayout = new QHBoxLayout;
     btnLayout->setMargin(0);
-    btnLayout->setSpacing(0);
+    btnLayout->setSpacing(5);
     btnLayout->addStretch();
     btnLayout->addWidget(prevBtn);
     btnLayout->addWidget(nextBtn);
@@ -403,12 +452,23 @@ AccSelectWidget::AccSelectWidget(DeliveryPath *p, QList<Account> *as, QWidget *p
     layout->setSpacing(0);
     layout->addWidget(tipLabel);
     layout->addWidget(accTable);
+    layout->addSpacing(6);
     layout->addLayout(btnLayout);
     setLayout(layout);
 
     connect(prevBtn, SIGNAL(clicked(bool)), this, SLOT(on_prevBtn_clicked()));
     connect(nextBtn, SIGNAL(clicked(bool)), this, SLOT(on_nextBtn_clicked()));
     connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(on_cancelBtn_clicked()));
+}
+
+AccSelectWidget::~AccSelectWidget()
+{
+
+    for(int i = 0; i < boxes.size(); ++i)
+    {
+        CheckPair *c = boxes[i];
+        delete c;
+    }
 }
 
 void AccSelectWidget::initTable()
@@ -514,6 +574,7 @@ void AccSelectWidget::boxSelected(bool b, int index)
 
 /***********地点选择***********/
 PointSelectWidget::PointSelectWidget(DeliveryPath *p, QWidget *parent) :
+    QWidget(parent),
     path(p)
 {
     tipLabel = new QLabel(this);
@@ -523,20 +584,23 @@ PointSelectWidget::PointSelectWidget(DeliveryPath *p, QWidget *parent) :
     cancelBtn  = new QPushButton(this);
     pointList = new QListWidget(this);
 
-    tipLabel->setText("请选择地点（本步需要跳转到地图界面）");
+    QFont font;
+    font.setPixelSize(15);
+    tipLabel->setText("请选择配送地点");
+    tipLabel->setFont(font);
     selectBtn->setText("地图选点");
     selectBtn->setFixedSize(100,25);
     prevBtn->setText("上一步");
-    prevBtn->setFixedSize(60,25);
+    prevBtn->setFixedSize(80,25);
     finishBtn->setText("完成");
-    finishBtn->setFixedSize(60,25);
+    finishBtn->setFixedSize(80,25);
     cancelBtn->setText("取消");
-    cancelBtn->setFixedSize(60,25);
+    cancelBtn->setFixedSize(80,25);
     initList();
 
     QHBoxLayout *btnLayout = new QHBoxLayout;
     btnLayout->setMargin(0);
-    btnLayout->setSpacing(0);
+    btnLayout->setSpacing(5);
     btnLayout->addStretch();
     btnLayout->addWidget(prevBtn);
     btnLayout->addWidget(finishBtn);
@@ -553,7 +617,9 @@ PointSelectWidget::PointSelectWidget(DeliveryPath *p, QWidget *parent) :
     layout->setMargin(0);
     layout->setSpacing(0);
     layout->addLayout(topLayout);
+    layout->addSpacing(4);
     layout->addWidget(pointList);
+    layout->addSpacing(6);
     layout->addLayout(btnLayout);
     setLayout(layout);
 

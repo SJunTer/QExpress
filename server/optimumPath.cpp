@@ -279,6 +279,8 @@ void Graph::BestPath(QVector<long> &point, QVector<long> &path)
         SA();	//模拟退火
 
         SavaBestPath(path);	//存储最终路径
+
+        delete[] actualPath.citys;
     }
     else if (numPoint == 2)
     {
@@ -289,7 +291,6 @@ void Graph::BestPath(QVector<long> &point, QVector<long> &path)
         path.append(tmp);
     }
     delete[] pointArray;
-    delete[] actualPath.citys;
 }
 
 Path Graph::GetNext(Path &p)

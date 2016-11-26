@@ -10,5 +10,7 @@
         <file>images/symbol_32.png</file>
         <file>images/msg_32.png</file>
         <file>images/msg_new_32.png</file>
+        <file>images/tool_32.png</file>
+        <file>images/tool_48.png</file>
     </qresource>
 </RCC>

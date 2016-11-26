@@ -182,7 +182,6 @@ void TaskDlg::updatePath()
         ui->endBtn->setEnabled(false);
         taskLoaded = false;
         accepted = false;
-        QMessageBox::information(0, "提示", "任务完成！", QMessageBox::Ok);
 
         s = toByteString(0);
         if(sendPacket(client->sock(), cmd_taskFinish, s) != 0)
@@ -190,6 +189,7 @@ void TaskDlg::updatePath()
             QMessageBox::warning(this, "错误", "数据传输失败", QMessageBox::Ok);
             return;
         }
+        QMessageBox::information(0, "提示", "任务完成！", QMessageBox::Ok);
     }
 }
 

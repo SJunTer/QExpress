@@ -33,9 +33,9 @@ DeliveryWidget::DeliveryWidget(Dbsql *d, QWidget *parent)
     initTable();
 
     addBtn->setText(tr("添加"));
-    addBtn->setFixedSize(60,35);
+    addBtn->setFixedSize(80,35);
     delBtn->setText(tr("删除"));
-    delBtn->setFixedSize(60,35);
+    delBtn->setFixedSize(80,35);
 
     pathList->setFixedWidth(300);
 
@@ -46,7 +46,7 @@ DeliveryWidget::DeliveryWidget(Dbsql *d, QWidget *parent)
     topLayout->addWidget(pathList);
 
     QHBoxLayout *btnLayout = new QHBoxLayout;
-    btnLayout->setSpacing(0);
+    btnLayout->setSpacing(5);
     btnLayout->setContentsMargins(0,0,0,0);
     btnLayout->addStretch();
     btnLayout->addWidget(addBtn);
@@ -205,8 +205,14 @@ void DeliveryWidget::on_delBtn_clicked()
             QMessageBox::warning(this, tr("错误"), tr("删除异常！"));
             return;
         }
+        if(paths[index]->status == WAIT)
+        {
+            emit driverFree(paths[index]->driverId);
+            emit cargoFail(paths[index]->cargos);
+            emit truckFree(paths[index]->truckId);
+            emit removePath(paths[index]->id);
+        }
         deliveryTable->removeRow(index);
-        emit removePath(paths[index]->id);
         DeliveryPath *p = paths.takeAt(index);
         delete p;
         QMessageBox::information(this, tr("提示"), tr("删除成功！"));
@@ -216,38 +222,31 @@ void DeliveryWidget::on_delBtn_clicked()
 }
 
 
-void DeliveryWidget::showPath(DeliveryPath *p)
-{/*
-    pathList->clear();
-    for(auto d : p->m_points)
-    {
-        pathList->addItem(d.name);
-    }*/
-}
-
 void DeliveryWidget::showPath(int curRow, int curCol, int preRow, int preCol)
-{/*
+{/**/
     Q_UNUSED(curCol);
     Q_UNUSED(preCol);
     if(curRow == -1)
         pathList->clear();
     else if(curRow == preRow)
         return;
-    else if(curRow == paths.size())
-        showPath(tempPath);
-    else
-        showPath(paths.at(curRow));*/
+    else   
+    {
+        pathList->clear();
+        for(int i = 0; i < paths[curRow]->places.size(); ++i)
+        {
+            if(paths[curRow]->places[i].type != IsPass)
+                pathList->addItem(paths[curRow]->places[i].title);
+        }
+    }
 }
 
-//////////////////////////TODO/////////////////////
+
 // 设置配送路径
 void DeliveryWidget::setPath(QList<Place> &places)
 {
     delvDlg->setPath(places);
     delvDlg->show();
-
-    // 刷新路径列表
-    //    showPath(tempPath);
 }
 
 
@@ -262,6 +261,9 @@ void DeliveryWidget::acptTask(int id)
             paths[i]->status = RUN;
             deliveryTable->item(i, 4)->setText(paths[i]->startTime);
             deliveryTable->item(i, 5)->setText("配送中");
+
+            QString msg = QString("配送员%1接受任务").arg(paths[i]->driverId);
+            emit taskMsg(msg);
 
             vector<string> path;
             path.push_back("");
@@ -308,6 +310,9 @@ void DeliveryWidget::taskFinish(int id)
             emit cargoReach(paths[i]->cargos);
             emit truckFree(paths[i]->truckId);
 
+            QString msg = QString("配送员%1完成任务").arg(paths[i]->driverId);
+            emit taskMsg(msg);
+
             vector<string> path;
             path.push_back("");
             path.push_back("");
@@ -335,11 +340,14 @@ void DeliveryWidget::taskFail(int id)
             paths[i]->moveTime = QString::number(start.secsTo(now));
             paths[i]->status = INTR;
             deliveryTable->item(i, 5)->setText("配送失败");
-            emit removePath(id);
+//            emit removePath(id);
 
             emit driverFree(paths[i]->driverId);
             emit cargoFail(paths[i]->cargos);
             emit truckFree(paths[i]->truckId);
+
+            QString msg = QString("配送员%1任务失败").arg(paths[i]->driverId);
+            emit taskMsg(msg);
 
             vector<string> path;
             path.push_back("");
@@ -401,6 +409,8 @@ void DeliveryWidget::addPath(DeliveryPath *path)
         return;
     }
 
+    paths.append(path);
+
     int rowCnt = deliveryTable->rowCount();
     deliveryTable->insertRow(rowCnt);
 
@@ -432,7 +442,6 @@ void DeliveryWidget::addPath(DeliveryPath *path)
     deliveryTable->setItem(rowCnt, 5, item6);
     deliveryTable->setCurrentCell(rowCnt, 0);
 
-    paths.append(path);
     emit drawPath(path);
 
     emit sendTask(*path);

@@ -23,17 +23,13 @@ AccWidget::AccWidget(Dbsql *d, QWidget *parent) :
     delBtn = new QPushButton(this);
     closeBtn = new QPushButton(this);
 
-    QFont font;
-    font.setPixelSize(13);
     addBtn->setText("添加");
     addBtn->setEnabled(false);
-//    addBtn->setFont(font);
-    addBtn->setFixedSize(35,35);
+    addBtn->setFixedSize(80,35);
     delBtn->setText("删除");
-    delBtn->setFixedSize(35,35);
-//    delBtn->setFont(font);
+    delBtn->setFixedSize(80,35);
     closeBtn->setText("断开连接");
-    closeBtn->setFixedSize(60,35);
+    closeBtn->setFixedSize(100,35);
 
     initTable();
 
@@ -42,11 +38,11 @@ AccWidget::AccWidget(Dbsql *d, QWidget *parent) :
     mainLayout->setMargin(20);
     mainLayout->addWidget(accTable);
     QHBoxLayout *btnLayout = new QHBoxLayout;
-    btnLayout->setSpacing(0);
+    btnLayout->setSpacing(5);
     btnLayout->setMargin(0);
+    btnLayout->addStretch();
     btnLayout->addWidget(addBtn);
     btnLayout->addWidget(delBtn);
-    btnLayout->addStretch();
     btnLayout->addWidget(closeBtn);
     mainLayout->addLayout(btnLayout);
     setLayout(mainLayout);
@@ -105,8 +101,8 @@ void AccWidget::readInfo()
         a.name = QString::fromStdString(accs[i+4]);
         a.phone = QString::fromStdString(accs[i+5]);
         a.email = QString::fromStdString(accs[i+6]);
-//        a.status = stoi(accs[i+7]);
-        a.status = OFFLINE;
+        a.status = stoi(accs[i+7]);
+//        a.status = OFFLINE;
         a.last_time = QString::fromStdString(accs[i+8]);
         accounts.push_back(a);
 
@@ -237,7 +233,7 @@ void AccWidget::signIn(int id)
         {
             accounts[i].status = ONLINE;
             accounts[i].last_time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-            accTable->item(i, 5)->setText("上线");
+            accTable->item(i, 5)->setText("在线");
             accTable->item(i, 6)->setText(accounts[i].last_time);
             emit sendAccounts(&accounts);
 

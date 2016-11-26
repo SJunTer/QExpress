@@ -36,6 +36,9 @@ private:
     QString address;
     QString detail;
 
+protected:
+    void keyPressEvent(QKeyEvent *e);
+
 signals:
     void closed();
 

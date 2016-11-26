@@ -29,26 +29,21 @@ TruckWidget::TruckWidget(Dbsql *d, QWidget *parent) :
     applyBtn = new QPushButton(this);
     initTable();
 
-    QFont font;
-    font.setPixelSize(13);
     addBtn->setText("添加");
-//    addBtn->setFont(font);
-    addBtn->setFixedSize(60, 35);
+    addBtn->setFixedSize(80, 35);
     delBtn->setText("删除");
-//    delBtn->setFont(font);
-    delBtn->setFixedSize(60, 35);
+    delBtn->setFixedSize(80, 35);
     applyBtn->setText("应用");
-//    applyBtn->setFont(font);
-    applyBtn->setFixedSize(60, 35);
+    applyBtn->setFixedSize(80, 35);
 
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
-    layout->setContentsMargins(20, 20, 20, 20);
+    layout->setSpacing(10);
+    layout->setMargin(20);
     layout->addWidget(truckTable);
 
     QHBoxLayout *btnLayout = new QHBoxLayout;
-    btnLayout->setSpacing(0);
-    btnLayout->setContentsMargins(0, 5, 0, 0);
+    btnLayout->setSpacing(5);
+    btnLayout->setMargin(0);
     btnLayout->addStretch();
     btnLayout->addWidget(addBtn);
     btnLayout->addWidget(delBtn);

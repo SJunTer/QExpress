@@ -432,6 +432,7 @@ void Connection::acptTask(string &data)
 // 位置改变
 void Connection::posChange(string &data)
 {
+    qDebug() << "update pos";
     int pos = fromByteString<int>(data);
     emit sg_posChange(path.id, pos);
 }

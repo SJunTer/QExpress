@@ -85,6 +85,11 @@ void MessageDlg::getUpload(QString usr, int type, QString addr, QString detail)
     ui->roadTable->setCurrentCell(rowCnt, 0);
 }
 
+void MessageDlg::taskMsg(QString &s)
+{
+    ui->delvList->addItem(s);
+}
+
 // 同意注册
 void MessageDlg::on_acceptBtn_clicked()
 {

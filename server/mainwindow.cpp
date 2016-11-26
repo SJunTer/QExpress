@@ -47,13 +47,13 @@ MainWindow::MainWindow(ServerSocket *s, Dbsql *d, QWidget *parent) :
     msgBtn = new QToolButton(this);
     msgBtn->setIcon(QIcon(":/images/msg_32.png"));
     msgBtn->setIconSize(QSize(32,32));
-    msgBtn->setGeometry(1000,0, 32,32);
+    msgBtn->setGeometry(1000,20, 32,32);
     msgBtn->setCursor(Qt::PointingHandCursor);
     aboutDlg = new AboutDlg(this);
     aboutBtn = new QToolButton(this);
     aboutBtn->setIcon(QIcon(":/images/about.png"));
     aboutBtn->setIconSize(QSize(32,32));
-    aboutBtn->setGeometry(1040, 0, 32,32);
+    aboutBtn->setGeometry(1040, 20, 32,32);
     aboutBtn->setCursor(Qt::PointingHandCursor);
     setStyleSheet("QToolButton{border:0}");
     connect(msgBtn, SIGNAL(clicked(bool)), this, SLOT(showMsgDlg()));
@@ -100,6 +100,7 @@ MainWindow::MainWindow(ServerSocket *s, Dbsql *d, QWidget *parent) :
     connect(truckWidget, SIGNAL(sendTrucks(QList<TruckInfo*>*)), deliveryWidget, SLOT(setTrucks(QList<TruckInfo*>*)));
 
     connect(msgDlg, SIGNAL(signUp(Account)), accWidget, SLOT(signUp(Account)));
+    connect(deliveryWidget, SIGNAL(taskMsg(QString&)), msgDlg, SLOT(taskMsg(QString&)));
 
     /*-------------   读取信息   -----------------*/
     deliveryWidget->readInfo();
@@ -131,7 +132,6 @@ void MainWindow::runServer()
     connect(tcpServer, SIGNAL(sg_signOut(int)), accWidget, SLOT(signOut(int)));
     connect(tcpServer, SIGNAL(sg_changeInfo(Account)), accWidget, SLOT(changeInfo(Account)));
 
-    ///////////////////////////////////////////////////////////////////////////
     connect(tcpServer, SIGNAL(sg_acptTask(int)), deliveryWidget, SLOT(acptTask(int)));
     connect(tcpServer, SIGNAL(sg_posChange(int,int)), deliveryWidget, SLOT(posChanged(int,int)));
     connect(tcpServer, SIGNAL(sg_taskFinish(int)), deliveryWidget, SLOT(taskFinish(int)));

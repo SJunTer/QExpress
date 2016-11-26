@@ -30,6 +30,9 @@ private:
 
     int getUserInfo();
 
+protected:
+    void keyPressEvent(QKeyEvent *e);
+
 signals:
     void closed();
 

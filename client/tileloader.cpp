@@ -27,30 +27,22 @@ void TileLoader::doWork()
 {
 //    qDebug() << "start work";
 
-    int paddingH = (256-(int)(sceneRect.width())%256)/2;
-    int paddingV = (256-(int)(sceneRect.height())%256)/2;
-    int sceneLeft = sceneRect.x() - paddingH;
-    int sceneTop = sceneRect.y() - paddingV;
+    int sceneLeft = sceneRect.x();
+    int sceneTop = sceneRect.y();
     int sceneRight = sceneRect.x() + sceneRect.width();
     int sceneBottom = sceneRect.y() +sceneRect.height();
-    int step = (sceneRect.height()+2*paddingV) / pow(2, zoomLevel-MIN_LEVEL);
+    int step = pow(2, 8 + MAX_LEVEL - zoomLevel);
 
+    qDebug() << sceneLeft << sceneTop;
     int viewRight = viewRect.right();
     int viewBottom = viewRect.bottom();
     int viewLeft = viewRect.left();
     int viewTop = viewRect.top();
 
-//    qDebug() << sceneRect.width() << sceneRect.height();
-//    qDebug() << sceneLeft << sceneRight << sceneTop << sceneBottom;
-//    qDebug() << viewLeft << viewRight << viewTop << viewBottom;
-//    qDebug() << mapFromScene(viewLeft, viewTop) << mapFromScene(viewRight, viewBottom);
-
     viewTop = MAX(viewTop, sceneTop);
     viewLeft = MAX(viewLeft, sceneLeft);
-    if(zoomLevel == 9)
-        int n = 0;
-    stopped = false;
 
+    stopped = false;
     std::string data;
     commandType cmd;
     for(int y = viewTop - (viewTop-sceneTop)%step; !stopped && y < MIN(viewBottom, sceneBottom); y += step)
@@ -61,12 +53,11 @@ void TileLoader::doWork()
             int col = (x-sceneLeft) / step;
             QString fileName = QString("tmp/%1_%2_%3.png").arg(zoomLevel).arg(row).arg(col);
 
-            //if(emit tileLoaded(fileName))
             if(tiles.contains(fileName))    // 如果切片已加载
                 continue;
 
             qDebug() << fileName;
-
+/*
             ///////////////加载地图标记
             data.clear();
             data += toByteString(zoomLevel) + toByteString(x) + toByteString(y) + toByteString(step);
@@ -92,7 +83,7 @@ void TileLoader::doWork()
                 double s_y = fromByteString<double>(data);
                 emit drawSymbol(s, zoomLevel, s_x, s_y);
             }
-
+*/
             /////////////加载地图瓦片
             data.clear();
             data += toByteString(zoomLevel) + toByteString(row) + toByteString(col);

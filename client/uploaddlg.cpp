@@ -6,6 +6,7 @@
 #include <string>
 #include <QButtonGroup>
 #include <QMessageBox>
+#include <QKeyEvent>
 #include <QDebug>
 
 using namespace std;
@@ -26,6 +27,16 @@ UploadDlg::UploadDlg(ClientSocket *cli, QWidget *parent) :
 UploadDlg::~UploadDlg()
 {
     delete ui;
+}
+
+void UploadDlg::keyPressEvent(QKeyEvent *e)
+{
+    if(e->key() != Qt::Key_Escape)
+        QDialog::keyPressEvent(e);
+    else
+    {
+        e->ignore();
+    }
 }
 
 

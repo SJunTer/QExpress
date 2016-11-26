@@ -20,21 +20,25 @@ void TileMaker::doWork()
     qDebug() << "do work";
     QPixmap pix(256, 256);
     QPainter painter(&pix);
+
     int max_side = pow(2, 18);
-    int paddingH = (256-max_side%256)/2;
-    int paddingV = (256-max_side%256)/2;
+    int paddingH = (max_side - scene->itemsBoundingRect().width())/2;
+    int paddingV = (max_side - scene->itemsBoundingRect().height())/2;
     int cornerX = scene->itemsBoundingRect().x() - paddingH;
     int cornerY = scene->itemsBoundingRect().y() - paddingV;
     const int grid[] = { 10,10,10,10,10,10,10,12,16,23,32,45 };
-//    qDebug() << cornerX << cornerY;
-
+    qDebug() << scene->itemsBoundingRect();
+    qDebug() << cornerX << cornerY;
+//    qDebug() << (scene->itemsBoundingRect().width()+2*paddingH)/pow(2, 10);
+//    qDebug() << (scene->itemsBoundingRect().height()+2*paddingV)/pow(2, 10);
     makeDir("tiles");
-    for(currLevel = MIN_LEVEL; !stopped && currLevel <= maxLevel; ++currLevel)
+    for(currLevel = MIN_LEVEL; !stopped && currLevel <= 9/*maxLevel*/; ++currLevel)
     {
+
         makeDir(QString("tiles/%1").arg(currLevel));
         emit setLayerVisible(currLevel);
-        int step = (scene->itemsBoundingRect().height()+2*paddingV) / pow(2, currLevel-MIN_LEVEL);
-//        qDebug() << step;
+        int step = pow(2, 8 + MAX_LEVEL - currLevel);// (scene->itemsBoundingRect().height()+2*paddingV) / pow(2, currLevel-MIN_LEVEL);
+        qDebug() << step;
         //make dirs
         for(int row = 0; !stopped && row*grid[currLevel-MIN_LEVEL] < pow(2, currLevel-MIN_LEVEL); ++row)
         {
@@ -45,7 +49,7 @@ void TileMaker::doWork()
                 makeDir(QString("tiles/%1/%2_%3").arg(currLevel).arg(row).arg(col));
             }
         }
-        qDebug() << "after make dirs";
+//        qDebug() << "after make dirs";
         //make tiles
         for(int row = 0; !stopped && row < pow(2, currLevel-MIN_LEVEL); ++row)
         {
@@ -54,10 +58,10 @@ void TileMaker::doWork()
                 if(stopped)
                     break;
                 pix.fill(Qt::white);
-//                qDebug() << cornerX+col*step << cornerY+row*step;
-                qDebug() << "start render";
+                qDebug() << cornerX+col*step << cornerY+row*step;
+//                qDebug() << "start render";
                 scene->render(&painter, QRectF(), QRect(cornerX+col*step, cornerY+row*step, step, step));
-                qDebug() << "after render";
+//                qDebug() << "after render";
                 QString filename = QString("tiles/%1/%2_%3/%4_%5.png").arg(currLevel).
                         arg(row/grid[currLevel-MIN_LEVEL]).arg(col/grid[currLevel-MIN_LEVEL]).arg(row).arg(col);
                 qDebug() << filename;
@@ -105,9 +109,15 @@ TilesDlg::TilesDlg(QWidget *parent, QGraphicsScene *s)
     startBtn = new QPushButton(this);
     cancelBtn = new QPushButton(this);
 
+    QFont font;
+    font.setPixelSize(14);
     label->setText("未开始");
+    label->setFont(font);
     startBtn->setText("开始");
+    startBtn->setFixedSize(80, 25);
     cancelBtn->setText("取消");
+    cancelBtn->setFixedSize(80,25);
+    proBar->setFixedHeight(30);
 
     QHBoxLayout *btnLayout = new QHBoxLayout;
     btnLayout->setSpacing(5);
@@ -117,15 +127,16 @@ TilesDlg::TilesDlg(QWidget *parent, QGraphicsScene *s)
     btnLayout->addWidget(cancelBtn);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setSpacing(5);
-    mainLayout->setContentsMargins(20, 30, 20, 10);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(10,10,10, 10);
     mainLayout->addWidget(label, 0, Qt::AlignLeft);
+    mainLayout->addSpacing(20);
     mainLayout->addWidget(proBar);
+    mainLayout->addStretch();
     mainLayout->addLayout(btnLayout);
     setLayout(mainLayout);
 
-    setFixedSize(300,200);
-//    setWindowFlags(windowFlags());
+    setFixedSize(300,130);
     setWindowTitle(tr("切片生成工具"));
 
     connect(startBtn, SIGNAL(clicked(bool)), this, SLOT(start()));

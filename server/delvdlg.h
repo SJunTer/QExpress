@@ -40,6 +40,7 @@ class CargoSelectWidget : public QWidget
     Q_OBJECT
 public:
     CargoSelectWidget(DeliveryPath *p, QList<CargoInfo*>*cs, QWidget *parent = 0);
+    ~CargoSelectWidget();
 
 private:
     DeliveryPath *path;
@@ -55,6 +56,7 @@ private:
 
     void initTable();
 
+
 signals:
     void jump(int index);
     void cancel();
@@ -63,12 +65,13 @@ private slots:
     void on_nextBtn_clicked();
     void on_cancelBtn_clicked();
 };
-
+\
 class TruckSelectWidget : public QWidget
 {
     Q_OBJECT
 public:
     TruckSelectWidget(DeliveryPath *p, QList<TruckInfo*>*ts, QWidget *parent = 0);
+    ~TruckSelectWidget();
 
 private:
     DeliveryPath *path;
@@ -102,6 +105,7 @@ class AccSelectWidget : public QWidget
     Q_OBJECT
 public:
     AccSelectWidget(DeliveryPath *p, QList<Account>*as, QWidget *parent = 0);
+    ~AccSelectWidget();
 
 private:
     DeliveryPath *path;
@@ -183,6 +187,10 @@ private:
     TruckSelectWidget *truckSelectWidget;
     AccSelectWidget *accSelectWidget;
     PointSelectWidget *pointSelectWidget;
+
+
+protected:
+    void keyPressEvent(QKeyEvent *e);
 
 signals:
     void closed();

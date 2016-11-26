@@ -329,6 +329,7 @@ void MapView::drawPath(DeliveryPath *path)
 
 void MapView::updatePath(DeliveryPath *path)
 {
+    qDebug() << "updatePath";
     for(int i = 0; i < paths.size(); ++i)
     {
         if(paths[i].id == path->id)
@@ -359,6 +360,7 @@ void MapView::updatePath(DeliveryPath *path)
 
 void MapView::removePath(int id)
 {
+    qDebug() << "delete path";
     for(int i = 0; i < paths.size(); ++i)
     {
         if(paths[i].id == id)
@@ -369,18 +371,18 @@ void MapView::removePath(int id)
                 Polyline *l = paths[i].lines.takeFirst();
                 delete l;
             }
-
             for(auto n : paths[i].marker)
             {
                 scene->removeItem(paths[i].marker.front());
                 PixmapItem *l = paths[i].marker.takeFirst();
                 delete l;
             }
-
             scene->removeItem(paths[i].car);
-            delete paths[i].car;
+            PixmapItem *c = paths[i].car;
+            delete c;
 
             paths.takeAt(i);
+            scene->update();
             break;
         }
     }

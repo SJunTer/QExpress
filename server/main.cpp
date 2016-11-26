@@ -6,7 +6,7 @@
 #include "database/operatesql.h"
 #include "../network/socket.h"
 
-#define PORT 6665
+#define PORT 6666
 
 
 int main(int argc, char *argv[])

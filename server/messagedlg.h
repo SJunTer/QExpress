@@ -40,6 +40,7 @@ private slots:
 public slots:
     void signUpReq(Account a);
     void getUpload(QString usr, int type, QString addr, QString detail);
+    void taskMsg(QString &s);
 };
 
 #endif // MESSAGEDLG_H

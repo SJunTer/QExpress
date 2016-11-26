@@ -117,6 +117,8 @@ std::string fromByteString(std::string &s, int len)
 {
     std::string str;
 
+    if(len > s.size())
+        throw "unvalid length";
     for(int index = 0; index < len; ++index)
     {
         str.push_back(s[index]);

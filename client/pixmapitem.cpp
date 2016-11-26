@@ -33,8 +33,8 @@ void MapTileItem::setOffset(qreal x, qreal y)
 
 QRectF MapTileItem::boundingRect() const
 {
-//    return QRectF(left, top, width, height);
-    return rect;
+    return QRectF(left, top, width, height);
+ //   return rect;
 }
 
 void MapTileItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -48,7 +48,7 @@ void MapTileItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     painter->drawPixmap(left, top, width, height, pixmap);
     rect.setWidth(width*(1.0/oldMatrix.m11()));
     rect.setHeight(height*(1.0/oldMatrix.m22()));
-    painter->drawRect(rect);
+//    painter->drawRect(boundingRect());
 //    qDebug() << rect;
 }
 
