@@ -7,7 +7,7 @@ QT += widgets
 
 
 LIBS += -L$$PWD/mitab/ -lmitab
-LIBS += -L$$PWD/database/mysql -lmysqlclient
+LIBS += -L"/usr/lib64/mysql/" -lmysqlclient
 
 INCLUDEPATH += mitab
 

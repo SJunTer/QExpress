@@ -5,7 +5,7 @@
 #include <string>
 #include <string.h>
 #include <vector>
-#include "mysql/include/mysql.h"
+#include "/usr/include/mysql/mysql.h"
 
 class Dbsql
 {
