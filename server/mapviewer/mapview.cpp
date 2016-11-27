@@ -296,6 +296,7 @@ void MapView::drawPath(DeliveryPath *path)
         if(path->places[i].type == IsRepo)
         {
             PixmapItem *mark = new PixmapItem;
+            mark->setZValue(1);
             mark->setPixmap(QPixmap(":/images/repo_marker_48.png"));
             mark->setOffset(p.x()-ICON_SIZE/2+1, p.y()-ICON_SIZE);
             mark->setAlignPos(PixmapItem::BottomCenter);
@@ -305,6 +306,7 @@ void MapView::drawPath(DeliveryPath *path)
         else if(path->places[i].type == IsDely)
         {
             PixmapItem *mark = new PixmapItem;
+            mark->setZValue(1);
             mark->setPixmap(QPixmap(":/images/map_marker_48.png"));
             mark->setOffset(p.x()-ICON_SIZE/2+1, p.y()-ICON_SIZE);
             mark->setAlignPos(PixmapItem::BottomCenter);
@@ -316,7 +318,7 @@ void MapView::drawPath(DeliveryPath *path)
     // 车辆标记
     PixmapItem *car = new PixmapItem;
     car->setZValue(2);
-    car->setPixmap(QPixmap(":/images/truck_icon_48.png"));
+    car->setPixmap(QPixmap(":/images/truck1_48.png"));
     QPointF p = path->places[0].coord;
     car->setOffset(p.x()-ICON_SIZE/2, p.y()-ICON_SIZE/2);
     car->setAlignPos(PixmapItem::Center);

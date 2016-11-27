@@ -158,7 +158,7 @@ void DeliveryWidget::initTable()
 //    deliveryTable->setFrameShape(QFrame::NoFrame); //设置无边框
 //    deliveryTable->setShowGrid(false); //设置不显示格子线
     deliveryTable->setSelectionMode(QAbstractItemView::SingleSelection);  //设置只可选择一个单元格
-    deliveryTable->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为时每次选择一行
+//    deliveryTable->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为时每次选择一行
 //    deliveryTable->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置不可编辑
     deliveryTable->horizontalHeader()->setStretchLastSection(true); //设置充满表宽度
 //    deliveryTable->horizontalHeader()->resizeSection(0,50); //设置表头第一列的宽度为50

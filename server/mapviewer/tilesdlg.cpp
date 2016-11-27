@@ -1,4 +1,5 @@
 #include "tilesdlg.h"
+#include "unistd.h"
 #include <QPixmap>
 #include <QPainter>
 #include <QPushButton>
@@ -13,11 +14,13 @@
 #include <QThread>
 #include <QDebug>
 
+
 //---------------------------------TileMaker-----------------------------------
 //开始执行切片任务
 void TileMaker::doWork()
 {
     qDebug() << "do work";
+
     QPixmap pix(256, 256);
     QPainter painter(&pix);
 
@@ -26,19 +29,19 @@ void TileMaker::doWork()
     int paddingV = (max_side - scene->itemsBoundingRect().height())/2;
     int cornerX = scene->itemsBoundingRect().x() - paddingH;
     int cornerY = scene->itemsBoundingRect().y() - paddingV;
+    //    qDebug() << scene->itemsBoundingRect();
+    //    qDebug() << cornerX << cornerY;
+    //    qDebug() << (scene->itemsBoundingRect().width()+2*paddingH)/pow(2, 10);
+    //    qDebug() << (scene->itemsBoundingRect().height()+2*paddingV)/pow(2, 10);
     const int grid[] = { 10,10,10,10,10,10,10,12,16,23,32,45 };
-    qDebug() << scene->itemsBoundingRect();
-    qDebug() << cornerX << cornerY;
-//    qDebug() << (scene->itemsBoundingRect().width()+2*paddingH)/pow(2, 10);
-//    qDebug() << (scene->itemsBoundingRect().height()+2*paddingV)/pow(2, 10);
+
     makeDir("tiles");
-    for(currLevel = MIN_LEVEL; !stopped && currLevel <= 9/*maxLevel*/; ++currLevel)
+    for(currLevel = minLevel; !stopped && currLevel <= maxLevel; ++currLevel)
     {
 
         makeDir(QString("tiles/%1").arg(currLevel));
         emit setLayerVisible(currLevel);
-        int step = pow(2, 8 + MAX_LEVEL - currLevel);// (scene->itemsBoundingRect().height()+2*paddingV) / pow(2, currLevel-MIN_LEVEL);
-        qDebug() << step;
+        sleep(1);
         //make dirs
         for(int row = 0; !stopped && row*grid[currLevel-MIN_LEVEL] < pow(2, currLevel-MIN_LEVEL); ++row)
         {
@@ -49,41 +52,34 @@ void TileMaker::doWork()
                 makeDir(QString("tiles/%1/%2_%3").arg(currLevel).arg(row).arg(col));
             }
         }
-//        qDebug() << "after make dirs";
+
         //make tiles
-        for(int row = 0; !stopped && row < pow(2, currLevel-MIN_LEVEL); ++row)
+        int step = pow(2, 8 + MAX_LEVEL - currLevel);
+        for(int row = 0; row < pow(2, currLevel-MIN_LEVEL); row+=1)
         {
-            for(int col = 0; col < pow(2, currLevel-MIN_LEVEL); ++col)
+            for(int col = 0; col < pow(2, currLevel-MIN_LEVEL); col+=1)
             {
-                if(stopped)
-                    break;
                 pix.fill(Qt::white);
-                qDebug() << cornerX+col*step << cornerY+row*step;
-//                qDebug() << "start render";
                 scene->render(&painter, QRectF(), QRect(cornerX+col*step, cornerY+row*step, step, step));
-//                qDebug() << "after render";
                 QString filename = QString("tiles/%1/%2_%3/%4_%5.png").arg(currLevel).
                         arg(row/grid[currLevel-MIN_LEVEL]).arg(col/grid[currLevel-MIN_LEVEL]).arg(row).arg(col);
-                qDebug() << filename;
                 pix.save(filename);
                 ++cnt;
-                //if(cnt % 10 == 0)
-                    emit updateProgress(cnt);
+                emit updateProgress(cnt);
             }
         }
     }
+
     emit setLayerVisible(0);  //restore zoom
     emit updateProgress(cnt);
     emit taskFinished();
-//    exit();
+    //    exit();
 }
 
 void TileMaker::stop()
 {
     stopped = true;
 }
-
-
 
 void TileMaker::makeDir(const QString &folderName)
 {
@@ -145,10 +141,10 @@ TilesDlg::TilesDlg(QWidget *parent, QGraphicsScene *s)
 }
 
 // 获得切片总数
-int TilesDlg::getTotalCnt(int maxLevel)
+int TilesDlg::getTotalCnt(int minLevel, int maxLevel)
 {
     int sum = 0;
-    for(int lv = MIN_LEVEL; lv <= maxLevel; ++lv)
+    for(int lv = minLevel; lv <= maxLevel; ++lv)
         sum += pow(4, lv-MIN_LEVEL);
     qDebug() << sum;
     return sum;
@@ -160,14 +156,15 @@ void TilesDlg::start()
     startBtn->setEnabled(false);
     running = true;
     nComplete = 0;
-    int maxLevel = 14;
-    nTotal = getTotalCnt(maxLevel);
+    int minLevel = 15;
+    int maxLevel = 15;
+    nTotal = getTotalCnt(minLevel, maxLevel);
     proBar->setRange(0, nTotal-1);
     label->setText(QString("0/%1--0%").arg(nTotal));
 
     // 开启制作切片线程
     QThread *thread = new QThread();
-    TileMaker *tileMaker = new TileMaker(maxLevel,scene);
+    TileMaker *tileMaker = new TileMaker(minLevel, maxLevel,scene);
     tileMaker->moveToThread(thread);
     connect(thread, SIGNAL(started()), tileMaker, SLOT(doWork()));
     connect(tileMaker, SIGNAL(taskFinished()), thread, SLOT(quit()));

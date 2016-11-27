@@ -35,8 +35,8 @@ MapView::MapView(QWidget *parent, ClientSocket *cli) :
         scene->addItem(group);
     }
 
-//    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setDragMode(QGraphicsView::ScrollHandDrag); //手型拖动
 
     // preload geographical informatioin
@@ -87,6 +87,8 @@ int MapView::getPreGeoInfo()
     width = fromByteString<double>(data);
     height = fromByteString<double>(data);
 
+    bound = QRectF(x, y, width, height);
+
     // 根据切片重新调整视图大小
     int max_side = pow(2, 18);
     int paddingH = (max_side - width)/2;
@@ -94,6 +96,8 @@ int MapView::getPreGeoInfo()
     x -= paddingH;
     y -= paddingV;
     bound = QRectF(x, y, max_side, max_side);
+   /**/
+
 
     centerX = fromByteString<double>(data);
     centerY = fromByteString<double>(data);
@@ -286,7 +290,7 @@ void MapView::drawSymbol(QString symbolName, int lv, int x, int y)
 {
 //    qDebug() << symbolName << lv << x << y;
     SymbolItem *symbol = new SymbolItem;
-    QPixmap p(";/images/symbol_24.png");
+    QPixmap p(":/images/point_24.png");
     symbol->setPixmap(p);
     symbol->setCoord(x, y);
     symbol->setTitile(symbolName);

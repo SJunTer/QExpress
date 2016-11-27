@@ -77,7 +77,7 @@ void MifFile::getStyle(MapLayer *layer, MapShape *shape, TABFeatureClass feature
     switch(featureClass)
     {
     case TABFCPoint:
-        static_cast<Point *>(shape)->setPixmap(QPixmap(":/images/symbol_24.png"));
+        static_cast<Point *>(shape)->setPixmap(QPixmap(":/images/point3_24.png"));
         break;
     case TABFCRegion:
         static_cast<Region*>(shape)->setPen(layer->m_pen);

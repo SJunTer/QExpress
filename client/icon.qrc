@@ -17,5 +17,6 @@
         <file>images/map_marker_48.png</file>
         <file>images/repo_marker_48.png</file>
         <file>images/truck_icon_48.png</file>
+        <file>images/point_24.png</file>
     </qresource>
 </RCC>

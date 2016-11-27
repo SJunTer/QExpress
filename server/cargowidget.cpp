@@ -88,7 +88,7 @@ void CargoWidget::initTable()
 //    cargoTable->setFrameShape(QFrame::NoFrame); //设置无边框
 //    cargoTable->setShowGrid(false); //设置不显示格子线
     cargoTable->setSelectionMode(QAbstractItemView::SingleSelection);  //设置只可选择一个单元格
-    cargoTable->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为时每次选择一行
+//    cargoTable->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为时每次选择一行
 //    cargoTable->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置不可编辑
     cargoTable->horizontalHeader()->setStretchLastSection(true); //设置充满表宽度
 //    cargoTable->horizontalHeader()->resizeSection(0,50); //设置表头第一列的宽度为50
@@ -242,10 +242,18 @@ void CargoWidget::applyRecord()
     temp->status = InRepo;
     if(temp->descrip == "" || temp->dest == "" || temp->reciver == "")
     {
-        QMessageBox::warning(this, tr("警告"), tr("请完善信息后重试！"));
+        QMessageBox::warning(this, tr("警告"), tr("请填写完整信息！"), QMessageBox::Ok);
         return;
     }
     vector<string> cargo;
+    dbsql->NormalSearch(TABLE_CARGO, CARGO_DESCRIPTION, temp->descrip.toStdString(), cargo);
+    if(!cargo.empty())
+    {
+        QMessageBox::warning(this, tr("错误"), tr("商品已存在！"), QMessageBox::Ok);
+        return;
+    }
+    else
+        cargo.clear();
     cargo.push_back(QString::number(temp->id).toStdString());
     cargo.push_back(temp->descrip.toStdString());
     cargo.push_back(temp->dest.toStdString());

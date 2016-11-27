@@ -43,6 +43,7 @@ private:
     qreal x, y;
     qreal width, height;
     QPixmap pixmap;
+    QRectF rect;
     QString title;
 };
 

@@ -67,6 +67,11 @@ void MapLayer::addToScene(QGraphicsScene *scene)
 
 void MapLayer::setVisible(double zoom)
 {
+    if(isVisible(zoom) && m_points.size() != 0)
+    {
+        qDebug() << name << minZoom << "----" << maxZoom
+                 << "items:" << m_points.size();
+    }
     group->setVisible(isVisible(zoom));
 }
 

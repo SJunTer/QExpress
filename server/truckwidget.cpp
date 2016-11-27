@@ -87,7 +87,7 @@ void TruckWidget::initTable()
 //    truckTable->setFrameShape(QFrame::NoFrame); //设置无边框
 //    truckTable->setShowGrid(false); //设置不显示格子线
     truckTable->setSelectionMode(QAbstractItemView::SingleSelection);  //设置只可选择一个单元格
-    truckTable->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为时每次选择一行
+//    truckTable->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为时每次选择一行
 //    truckTable->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置不可编辑
     truckTable->horizontalHeader()->setStretchLastSection(true); //设置充满表宽度
 //    truckTable->horizontalHeader()->resizeSection(0,50); //设置表头第一列的宽度为50
@@ -227,10 +227,18 @@ void TruckWidget::applyRecord()
     temp->status = FREE;
     if(temp->brand == "" || temp->LPN == "")
     {
-        QMessageBox::warning(this, tr("警告"), tr("请完善信息后重试！"));
+        QMessageBox::warning(this, tr("警告"), tr("请填写完整信息！"), QMessageBox::Ok);
         return;
     }
     vector<string> truck;
+    dbsql->NormalSearch(TABLE_TRUCK, TRUCK_LPN, temp->LPN.toStdString(), truck);
+    if(!truck.empty())
+    {
+        QMessageBox::warning(this, "错误", "车牌号重复！", QMessageBox::Ok);
+        return;
+    }
+    else
+        truck.clear();
     truck.push_back(QString::number(temp->id).toStdString());
     truck.push_back(temp->brand.toStdString());
     truck.push_back(temp->LPN.toStdString());

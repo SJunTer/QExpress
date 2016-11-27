@@ -172,7 +172,7 @@ void MainWindow::resizeEvent(QResizeEvent *)
 // 退出提示
 void MainWindow::closeEvent(QCloseEvent *e)
 {
-    if(QMessageBox::warning(this, tr("关闭"), tr("后台程序正在运行，确定退出吗？"),
+    if(QMessageBox::warning(this, tr("关闭"), tr("是否确定退出程序？"),
                             QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
     {
         e->ignore();

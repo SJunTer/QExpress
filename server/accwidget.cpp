@@ -77,7 +77,7 @@ void AccWidget::initTable()
     accTable->verticalHeader()->setDefaultSectionSize(20);
     accTable->verticalHeader()->setVisible(false);
     accTable->setSelectionMode(QAbstractItemView::SingleSelection);  //设置只可选择一个单元格
-    accTable->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为时每次选择一行
+//    accTable->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为时每次选择一行
     accTable->horizontalHeader()->setStretchLastSection(true); //设置充满表宽度
     accTable->horizontalHeader()->setFixedHeight(30); //设置表头的高度
     accTable->setItemDelegate(new NoFocusDelegate(this));  // 消除选中虚框

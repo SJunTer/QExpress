@@ -5,12 +5,15 @@
         <file>images/map_marker_48.png</file>
         <file>images/repo_marker_48.png</file>
         <file>images/TabBar_icon_0.png</file>
-        <file>images/truck_icon_48.png</file>
-        <file>images/symbol_24.png</file>
-        <file>images/symbol_32.png</file>
         <file>images/msg_32.png</file>
         <file>images/msg_new_32.png</file>
         <file>images/tool_32.png</file>
         <file>images/tool_48.png</file>
+        <file>images/map_marker_32.png</file>
+        <file>images/repo_marker_32.png</file>
+        <file>images/truck1_48.png</file>
+        <file>images/point1_24.png</file>
+        <file>images/point2_24.png</file>
+        <file>images/point3_24.png</file>
     </qresource>
 </RCC>

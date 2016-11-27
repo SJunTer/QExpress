@@ -212,7 +212,7 @@ Point::Point()
 
 QRectF Point::boundingRect() const
 {
-    return QRectF(minX, minY, maxX-minX, maxY-minY);
+    return QRectF(rect.x()-rect.width()/2.0, rect.y()-rect.height()/2.0, rect.width(), rect.height());
 }
 
 void Point::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -223,23 +223,37 @@ void Point::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     painter->setRenderHint(QPainter::Antialiasing, true);
     QPointF p = points[0];
     painter->setMatrix(stableMatrix(painter->worldMatrix(), p));
-    /*
+
     QPen pen;
     pen.setCosmetic(true);
-    painter->setPen(pen);*/
+    painter->setPen(pen);
     if(getName() != "")
     {
         painter->drawPixmap(p.x()-width/2, p.y()-height/2, width, height, pixmap);
-        painter->drawText(QPointF(points[0].x(), points[0].y()),getName());
-    }
+        QRectF rect;
+        rect.setX(points[0].x()+15);
+        rect.setWidth(120);
+        QString text = getName();
+        if(text.size() >= 8)
+        {
+            text.insert((text.size()%2?text.size()/2+1:text.size()/2), '\n');
+            rect.setY(points[0].y()-12);
+            rect.setHeight(30);
+        }
+        else
+        {
+            rect.setY(points[0].y()-5);
+            rect.setHeight(15);
+        }
+        painter->drawText(rect, text);
+    }/**/
 }
 
 void Point::setBounds()
 {
-    minX = points[0].x() - POS_ICON_SIZE;
-    maxX = points[0].x() + POS_ICON_SIZE;
-    minY = points[0].y() - POS_ICON_SIZE;
-    maxY = points[0].y() + POS_ICON_SIZE;
+    rect.setTopLeft(points[0]);
+    rect.setWidth(POS_ICON_SIZE);
+    rect.setHeight(POS_ICON_SIZE);
 }
 
 QPointF Point::getPoint()

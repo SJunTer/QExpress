@@ -33,8 +33,8 @@ void MapTileItem::setOffset(qreal x, qreal y)
 
 QRectF MapTileItem::boundingRect() const
 {
-    return QRectF(left, top, width, height);
- //   return rect;
+ //    return QRectF(left, top, width, height);
+   return rect;
 }
 
 void MapTileItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -47,6 +47,7 @@ void MapTileItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     painter->setMatrix(stableMatrix(oldMatrix, QPointF(left, top)));
     painter->drawPixmap(left, top, width, height, pixmap);
     rect.setWidth(width*(1.0/oldMatrix.m11()));
+//    rect.setWidth();
     rect.setHeight(height*(1.0/oldMatrix.m22()));
 //    painter->drawRect(boundingRect());
 //    qDebug() << rect;
@@ -88,6 +89,8 @@ void SymbolItem::setCoord(qreal x1, qreal y1)
 {
     x = x1;
     y = y1;
+    rect.setX(x1);
+    rect.setY(y1);
 }
 
 void SymbolItem::setPixmap(QPixmap &pix)
@@ -95,6 +98,8 @@ void SymbolItem::setPixmap(QPixmap &pix)
     pixmap = pix;
     width = pixmap.width();
     height = pixmap.height();
+    rect.setWidth(width);
+    rect.setHeight(height);
 }
 
 void SymbolItem::setTitile(QString &t)
@@ -104,7 +109,8 @@ void SymbolItem::setTitile(QString &t)
 
 QRectF SymbolItem::boundingRect() const
 {
-    return QRectF(x-width/2, y-height/2, width, height);
+//    return QRectF(x-width/2, y-height/2, width, height);
+    return QRectF(rect.x()-rect.width()/2.0, rect.y()-rect.height()/2.0, rect.width(), rect.height());
 }
 
 void SymbolItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -112,15 +118,32 @@ void SymbolItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     Q_UNUSED(option);
      Q_UNUSED(widget);
 
-     painter->setRenderHint(QPainter::Antialiasing, true);
-     painter->setMatrix(stableMatrix(painter->worldMatrix(), QPointF(x, y)));
+    QMatrix oldMatrix = painter->worldMatrix();
+     painter->setMatrix(stableMatrix(oldMatrix, QPointF(x, y)));
+     rect.setWidth(width*(1.0/oldMatrix.m11()));
+     rect.setHeight(height*(1.0/oldMatrix.m22()));
 
-     painter->drawEllipse(x, y, 10, 10);
-//     painter->drawPixmap(x-width/2, y-height/2, width, height, pixmap);
-     /*     QPen pen;
-              pen.setCosmetic(true);
-              painter->setPen(pen);
-             painter->drawText(QPointF(points[0].x(), points[0].y()),getName());*/
+//     painter->drawEllipse(x, y, 10, 10);
+     painter->drawPixmap(x-width/2, y-height/2, width, height, pixmap);
+     QPen pen;
+     pen.setCosmetic(true);
+     painter->setPen(pen);
+     QRectF rect;
+     rect.setX(x+15);
+     rect.setWidth(120);
+     QString text = title;
+     if(text.size() >= 8)
+     {
+         text.insert((text.size()%2?text.size()/2+1:text.size()/2), '\n');
+         rect.setY(y-12);
+         rect.setHeight(30);
+     }
+     else
+     {
+         rect.setY(y-5);
+         rect.setHeight(15);
+     }
+     painter->drawText(rect, text);
 }
 
 

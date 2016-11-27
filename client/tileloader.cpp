@@ -33,7 +33,7 @@ void TileLoader::doWork()
     int sceneBottom = sceneRect.y() +sceneRect.height();
     int step = pow(2, 8 + MAX_LEVEL - zoomLevel);
 
-    qDebug() << sceneLeft << sceneTop;
+//    qDebug() << sceneLeft << sceneTop;
     int viewRight = viewRect.right();
     int viewBottom = viewRect.bottom();
     int viewLeft = viewRect.left();
@@ -56,8 +56,8 @@ void TileLoader::doWork()
             if(tiles.contains(fileName))    // 如果切片已加载
                 continue;
 
-            qDebug() << fileName;
-/*
+//            qDebug() << fileName;
+
             ///////////////加载地图标记
             data.clear();
             data += toByteString(zoomLevel) + toByteString(x) + toByteString(y) + toByteString(step);
@@ -83,7 +83,7 @@ void TileLoader::doWork()
                 double s_y = fromByteString<double>(data);
                 emit drawSymbol(s, zoomLevel, s_x, s_y);
             }
-*/
+
             /////////////加载地图瓦片
             data.clear();
             data += toByteString(zoomLevel) + toByteString(row) + toByteString(col);
@@ -106,8 +106,7 @@ void TileLoader::doWork()
             FILE *fp;
             if((fp = fopen(fileName.toStdString().c_str(), "wb")) == NULL)
                 continue;
-            for(int i = 0; i < len; ++i)
-                fwrite((char*)&data[i], sizeof(char), 1, fp);
+            fwrite((char*)data.c_str(), sizeof(char), len, fp);
             fclose(fp);
             emit drawPixmap(fileName, zoomLevel, x, y);
 

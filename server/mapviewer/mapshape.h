@@ -83,6 +83,7 @@ public:
 private:
     qreal width, height;
     QPixmap pixmap;
+    QRectF rect;
 };
 
 

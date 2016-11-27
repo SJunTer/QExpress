@@ -19,12 +19,13 @@ class TileMaker : public QObject
 {
     Q_OBJECT
 public:
-    TileMaker(int lv, QGraphicsScene *s)
-        : cnt(0), maxLevel(lv), stopped(false), scene(s) {}
+    TileMaker(int minlv, int maxlv, QGraphicsScene *s)
+        : cnt(0), minLevel(minlv), maxLevel(maxlv), stopped(false), scene(s) {}
 
 private:
     int cnt;
     int currLevel;
+    int minLevel;
     int maxLevel;
     bool stopped;
     QGraphicsScene *scene;
@@ -60,7 +61,8 @@ private:
     int nTotal;     // 总共所需切片数
     int secs;   // 已经过的秒数
 
-    int getTotalCnt(int maxLevel);
+
+    int getTotalCnt(int minLevel, int maxLevel);
 
 signals:
     void setLayerVisible(int level);
